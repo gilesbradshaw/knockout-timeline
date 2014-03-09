@@ -7,7 +7,6 @@ requirejs.config
 	paths:
 
 		jquery: "Scripts/jquery-2.1.0"
-
 		"trace":"/source/js/core/core/new/trace"
 		"global":"/source/js/core/core/new/global"
 		"Date.extensions":"/source/js/core/core/new/Date.extensions"
