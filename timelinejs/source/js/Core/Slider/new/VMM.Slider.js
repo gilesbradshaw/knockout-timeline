@@ -1,6 +1,8 @@
 (function() {
-  define(["VMM", "trace", "VMM.Browser", "VMM.Date", "VMM.Library"], function(VMM, trace, browser, vDate, library) {
-    return VMM.Slider = function(parent, parent_config) {
+  define(["trace", "VMM.Browser", "VMM.Date", "VMM.Library", "VMM.Util", "VMM.masterConfig", "VMM.Slider.Slide", "VMM.DragSlider", "VMM.ExternalAPI"], function(trace, browser, vDate, library, util, masterConfig, Slide, DragSlider, ExternalAPI) {
+    var Slider;
+
+    return Slider = function(parent, parent_config) {
       var $dragslide, $explainer, $slider, $slider_container, $slider_mask, $slides_items, backToCurrentSlide, build, buildNavigation, buildSlides, config, content, current_slide, current_width, data, detachMessege, events, getData, goToSlide, hideMessege, layout, navigation, onConfigSet, onDragFinish, onExplainerClick, onKeypressNav, onNextClick, onPrevClick, onTouchUpdate, opacitySlides, positionSlides, preloadSlides, preloadTimeOutSlides, reSize, showMessege, sizeSlide, sizeSlides, slide_positions, slides, slides_content, timer, touch, upDate, _active;
 
       config = void 0;
@@ -150,7 +152,7 @@
       };
       upDate = function() {
         config.current_slide = current_slide;
-        return VMM.fireEvent(layout, "UPDATE");
+        return library.fireEvent(layout, "UPDATE");
       };
       getData = function(d) {
         return data = d;
@@ -159,12 +161,12 @@
         var i, _results, _slide;
 
         i = 0;
-        VMM.attachElement($slides_items, "");
+        library.attachElement($slides_items, "");
         slides = [];
         i = 0;
         _results = [];
         while (i < d.length) {
-          _slide = new VMM.Slider.Slide(d[i], $slides_items);
+          _slide = new Slide(d[i], $slides_items);
           slides.push(_slide);
           _results.push(i++);
         }
@@ -252,10 +254,10 @@
         if (browser.device === "mobile" || current_width < 641) {
           is_skinny = true;
         }
-        VMM.master_config.sizes.api.width = mediasize.media.width;
-        VMM.master_config.sizes.api.height = mediasize.media.height;
-        mediasize.text_media.video = VMM.Util.ratio.fit(mediasize.text_media.width, mediasize.text_media.height, 16, 9);
-        mediasize.media.video = VMM.Util.ratio.fit(mediasize.media.width, mediasize.media.height, 16, 9);
+        masterConfig.sizes.api.width = mediasize.media.width;
+        masterConfig.sizes.api.height = mediasize.media.height;
+        mediasize.text_media.video = util.ratio.fit(mediasize.text_media.width, mediasize.text_media.height, 16, 9);
+        mediasize.media.video = util.ratio.fit(mediasize.media.width, mediasize.media.height, 16, 9);
         library.css(".slider-item", "width", config.slider.content.width);
         library.height(".slider-item", config.slider.height);
         if (is_skinny) {
@@ -263,8 +265,8 @@
           mediasize.media.width = config.slider.content.width - (config.slider.content.padding * 2);
           mediasize.text_media.height = ((config.slider.height / 100) * 50) - 50;
           mediasize.media.height = ((config.slider.height / 100) * 70) - 40;
-          mediasize.text_media.video = VMM.Util.ratio.fit(mediasize.text_media.width, mediasize.text_media.height, 16, 9);
-          mediasize.media.video = VMM.Util.ratio.fit(mediasize.media.width, mediasize.media.height, 16, 9);
+          mediasize.text_media.video = util.ratio.fit(mediasize.text_media.width, mediasize.text_media.height, 16, 9);
+          mediasize.media.video = util.ratio.fit(mediasize.media.width, mediasize.media.height, 16, 9);
           library.css(".slider-item .layout-text-media .text", "width", "100%");
           library.css(".slider-item .layout-text-media .text", "display", "block");
           library.css(".slider-item .layout-text-media .text .container", "display", "block");
@@ -386,7 +388,7 @@
         is_first = false;
         _title = "";
         _pos = void 0;
-        VMM.ExternalAPI.youtube.stopPlayers();
+        ExternalAPI.youtube.stopPlayers();
         current_slide = n;
         _pos = slides[current_slide].leftpos();
         if (current_slide === 0) {
@@ -409,34 +411,34 @@
             library.visible(navigation.prevBtn, false);
           } else {
             library.visible(navigation.prevBtn, true);
-            _title = VMM.Util.unlinkify(data[current_slide - 1].title);
+            _title = util.unlinkify(data[current_slide - 1].title);
             if (config.type === "timeline") {
               if (typeof data[current_slide - 1].date === "undefined") {
-                VMM.attachElement(navigation.prevDate, _title);
-                VMM.attachElement(navigation.prevTitle, "");
+                library.attachElement(navigation.prevDate, _title);
+                library.attachElement(navigation.prevTitle, "");
               } else {
-                VMM.attachElement(navigation.prevDate, vDate.prettyDate(data[current_slide - 1].startdate, false, data[current_slide - 1].precisiondate));
-                VMM.attachElement(navigation.prevTitle, _title);
+                library.attachElement(navigation.prevDate, vDate.prettyDate(data[current_slide - 1].startdate, false, data[current_slide - 1].precisiondate));
+                library.attachElement(navigation.prevTitle, _title);
               }
             } else {
-              VMM.attachElement(navigation.prevTitle, _title);
+              library.attachElement(navigation.prevTitle, _title);
             }
           }
           if (is_last) {
             library.visible(navigation.nextBtn, false);
           } else {
             library.visible(navigation.nextBtn, true);
-            _title = VMM.Util.unlinkify(data[current_slide + 1].title);
+            _title = util.unlinkify(data[current_slide + 1].title);
             if (config.type === "timeline") {
               if (typeof data[current_slide + 1].date === "undefined") {
-                VMM.attachElement(navigation.nextDate, _title);
-                VMM.attachElement(navigation.nextTitle, "");
+                library.attachElement(navigation.nextDate, _title);
+                library.attachElement(navigation.nextTitle, "");
               } else {
-                VMM.attachElement(navigation.nextDate, vDate.prettyDate(data[current_slide + 1].startdate, false, data[current_slide + 1].precisiondate));
-                VMM.attachElement(navigation.nextTitle, _title);
+                library.attachElement(navigation.nextDate, vDate.prettyDate(data[current_slide + 1].startdate, false, data[current_slide + 1].precisiondate));
+                library.attachElement(navigation.nextTitle, _title);
               }
             } else {
-              VMM.attachElement(navigation.nextTitle, _title);
+              library.attachElement(navigation.nextTitle, _title);
             }
           }
         }
@@ -449,7 +451,7 @@
           });
         }
         if (firstrun) {
-          VMM.fireEvent(layout, "LOADED");
+          library.fireEvent(layout, "LOADED");
         }
         if (slides[current_slide].height() > config.slider_height) {
           library.css(".slider", "overflow-y", "scroll");
@@ -467,7 +469,7 @@
           }
         }
         preloadSlides();
-        return VMM.fireEvent($slider, "MESSAGE", "TEST");
+        return library.fireEvent($slider, "MESSAGE", "TEST");
       };
       backToCurrentSlide = function() {
         library.stop($slider_container);
@@ -477,7 +479,7 @@
       };
       showMessege = function(e, msg, other) {
         trace("showMessege " + msg);
-        return VMM.attachElement($explainer, "<div class='vco-explainer'><div class='vco-explainer-container'><div class='vco-bezel'><div class='vco-gesture-icon'></div>" + "<div class='vco-message'><p>" + msg + "</p></div></div></div></div>");
+        return library.attachElement($explainer, "<div class='vco-explainer'><div class='vco-explainer-container'><div class='vco-bezel'><div class='vco-gesture-icon'></div>" + "<div class='vco-message'><p>" + msg + "</p></div></div></div></div>");
       };
       hideMessege = function() {
         return library.animate($explainer, config.duration, config.ease, {
@@ -491,42 +493,42 @@
         var temp_icon;
 
         temp_icon = "<div class='icon'>&nbsp;</div>";
-        navigation.nextBtn = VMM.appendAndGetElement($slider, "<div>", "nav-next");
-        navigation.prevBtn = VMM.appendAndGetElement($slider, "<div>", "nav-previous");
-        navigation.nextBtnContainer = VMM.appendAndGetElement(navigation.nextBtn, "<div>", "nav-container", temp_icon);
-        navigation.prevBtnContainer = VMM.appendAndGetElement(navigation.prevBtn, "<div>", "nav-container", temp_icon);
+        navigation.nextBtn = library.appendAndGetElement($slider, "<div>", "nav-next");
+        navigation.prevBtn = library.appendAndGetElement($slider, "<div>", "nav-previous");
+        navigation.nextBtnContainer = library.appendAndGetElement(navigation.nextBtn, "<div>", "nav-container", temp_icon);
+        navigation.prevBtnContainer = library.appendAndGetElement(navigation.prevBtn, "<div>", "nav-container", temp_icon);
         if (config.type === "timeline") {
-          navigation.nextDate = VMM.appendAndGetElement(navigation.nextBtnContainer, "<div>", "date", "");
-          navigation.prevDate = VMM.appendAndGetElement(navigation.prevBtnContainer, "<div>", "date", "");
+          navigation.nextDate = library.appendAndGetElement(navigation.nextBtnContainer, "<div>", "date", "");
+          navigation.prevDate = library.appendAndGetElement(navigation.prevBtnContainer, "<div>", "date", "");
         }
-        navigation.nextTitle = VMM.appendAndGetElement(navigation.nextBtnContainer, "<div>", "title", "");
-        navigation.prevTitle = VMM.appendAndGetElement(navigation.prevBtnContainer, "<div>", "title", "");
-        VMM.bindEvent(".nav-next", onNextClick);
-        VMM.bindEvent(".nav-previous", onPrevClick);
-        return VMM.bindEvent(window, onKeypressNav, "keydown");
+        navigation.nextTitle = library.appendAndGetElement(navigation.nextBtnContainer, "<div>", "title", "");
+        navigation.prevTitle = library.appendAndGetElement(navigation.prevBtnContainer, "<div>", "title", "");
+        library.bindEvent(".nav-next", onNextClick);
+        library.bindEvent(".nav-previous", onPrevClick);
+        return library.bindEvent(window, onKeypressNav, "keydown");
       };
       build = function() {
         var __duration, _active;
 
         __duration = 3000;
-        VMM.attachElement(layout, "");
-        $slider = VMM.getElement(layout);
-        $slider_mask = VMM.appendAndGetElement($slider, "<div>", "slider-container-mask");
-        $slider_container = VMM.appendAndGetElement($slider_mask, "<div>", "slider-container");
-        $slides_items = VMM.appendAndGetElement($slider_container, "<div>", "slider-item-container");
+        library.attachElement(layout, "");
+        $slider = library.getElement(layout);
+        $slider_mask = library.appendAndGetElement($slider, "<div>", "slider-container-mask");
+        $slider_container = library.appendAndGetElement($slider_mask, "<div>", "slider-container");
+        $slides_items = library.appendAndGetElement($slider_container, "<div>", "slider-item-container");
         buildNavigation();
         buildSlides(data);
         if (browser.device === "tablet" || browser.device === "mobile") {
           config.duration = 500;
           __duration = 1000;
-          $dragslide = new VMM.DragSlider();
+          $dragslide = new DragSlider();
           $dragslide.createPanel($slider, $slider_container, "", config.touch, true);
-          VMM.bindEvent($dragslide, onDragFinish, "DRAGUPDATE");
-          $explainer = VMM.appendAndGetElement($slider_mask, "<div>", "vco-feedback", "");
+          library.bindEvent($dragslide, onDragFinish, "DRAGUPDATE");
+          $explainer = library.appendAndGetElement($slider_mask, "<div>", "vco-feedback", "");
           showMessege(null, "Swipe to Navigate");
           library.height($explainer, config.slider.height);
-          VMM.bindEvent($explainer, onExplainerClick);
-          VMM.bindEvent($explainer, onExplainerClick, "touchend");
+          library.bindEvent($explainer, onExplainerClick);
+          library.bindEvent($explainer, onExplainerClick, "touchend");
         }
         reSize(false, true);
         library.visible(navigation.prevBtn, false);

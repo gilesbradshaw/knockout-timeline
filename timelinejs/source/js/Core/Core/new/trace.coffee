@@ -1,7 +1,8 @@
 ﻿# CoffeeScript
-define ["VMM"], (VMM) ->
+define [], () ->
 	trace = (msg) ->
-		if VMM.debug
+		debug=true
+		if debug
 			if window.console
 				console.log msg
 			else unless typeof (jsTrace) is "undefined"

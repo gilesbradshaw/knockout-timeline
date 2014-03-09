@@ -1,15 +1,16 @@
 # Slider Slide 
 #================================================== 
 define [
-	"VMM"
 	"trace"
 	"type"
 	"VMM.Date"
 	"VMM.Library"
-	"VMM.Slider"
+	"VMM.Util"
+	"VMM.ExternalAPI"
+	"VMM.MediaElement"
 	"VMM.TextElement"
-], (VMM, trace, type, vDate, library)->
-	VMM.Slider.Slide = (d, _parent) ->
+], (trace, type, vDate, library, util, ExternalAPI, MediaElement, TextElement)->
+	Slide = (d, _parent) ->
 		$media = undefined
 		$text = undefined
 		$slide = undefined
@@ -43,7 +44,7 @@ define [
 		_id = _id + data.uniqueid
 		@enqueue = _enqueue
 		@id = _id
-		element = VMM.appendAndGetElement(_parent, "<div>", "slider-item")
+		element = library.appendAndGetElement(_parent, "<div>", "slider-item")
 		unless typeof data.classname is "undefined"
 			trace "HAS CLASSNAME"
 			library.addClass element, data.classname
@@ -145,12 +146,12 @@ define [
 			buildSlide()
 			clearTimeout timer.pushque
 			clearTimeout timer.render
-			timer.pushque = setTimeout(VMM.ExternalAPI.pushQues, times.pushque)
+			timer.pushque = setTimeout(ExternalAPI.pushQues, times.pushque)
 			return
 
 		removeSlide = ->
 			
-			#VMM.attachElement(element, "");
+			#library.attachElement(element, "");
 			trace "REMOVE SLIDE TIMER FINISHED"
 			loaded = false
 			library.detach $text
@@ -190,8 +191,8 @@ define [
 
 		buildSlide = ->
 			trace "BUILDSLIDE"
-			$wrap = VMM.appendAndGetElement(element, "<div>", "content")
-			$slide = VMM.appendAndGetElement($wrap, "<div>")
+			$wrap = library.appendAndGetElement(element, "<div>", "content")
+			$slide = library.appendAndGetElement($wrap, "<div>")
 			
 			# DATE
 			#			================================================== 
@@ -204,31 +205,31 @@ define [
 						
 						# TAG / CATEGORY
 						#						================================================== 
-						tag = VMM.createElement("span", data.tag, "slide-tag")    if data.tag? and data.tag isnt ""
+						tag = library.createElement("span", data.tag, "slide-tag")    if data.tag? and data.tag isnt ""
 						unless st is en
-							c.text += VMM.createElement("h2", st + " &mdash; " + en + tag, "date")
+							c.text += library.createElement("h2", st + " &mdash; " + en + tag, "date")
 						else
-							c.text += VMM.createElement("h2", st + tag, "date")
+							c.text += library.createElement("h2", st + tag, "date")
 			
 			# HEADLINE
 			#			================================================== 
 			if data.headline? and data.headline isnt ""
 				c.has.headline = true
 				if data.type is "start"
-					c.text += VMM.createElement("h2", VMM.Util.linkify_with_twitter(data.headline, "_blank"), "start")
+					c.text += library.createElement("h2", util.linkify_with_twitter(data.headline, "_blank"), "start")
 				else
-					c.text += VMM.createElement("h3", VMM.Util.linkify_with_twitter(data.headline, "_blank"))
+					c.text += library.createElement("h3", util.linkify_with_twitter(data.headline, "_blank"))
 			
 			# TEXT
 			#			================================================== 
 			if data.text? and data.text isnt ""
 				c.has.text = true
-				c.text += VMM.createElement("p", VMM.Util.linkify_with_twitter(data.text, "_blank"))
+				c.text += library.createElement("p", util.linkify_with_twitter(data.text, "_blank"))
 			if c.has.text or c.has.headline
-				c.text = VMM.createElement("div", c.text, "container")
+				c.text = library.createElement("div", c.text, "container")
 				
-				#$text		=	VMM.appendAndGetElement($slide, "<div>", "text", c.text);
-				$text = VMM.appendAndGetElement($slide, "<div>", "text", VMM.TextElement.create(c.text))
+				#$text		=	library.appendAndGetElement($slide, "<div>", "text", c.text);
+				$text = library.appendAndGetElement($slide, "<div>", "text", TextElement.create(c.text))
 			
 			# SLUG
 			#			================================================== 
@@ -239,7 +240,7 @@ define [
 			if data.asset? and data.asset isnt ""
 				if data.asset.media? and data.asset.media isnt ""
 					c.has.media = true
-					$media = VMM.appendAndGetElement($slide, "<div>", "media", VMM.MediaElement.create(data.asset, data.uniqueid))
+					$media = library.appendAndGetElement($slide, "<div>", "media", MediaElement.create(data.asset, data.uniqueid))
 			
 			# COMBINE
 			#			================================================== 

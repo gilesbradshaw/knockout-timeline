@@ -348,7 +348,7 @@ function createStoryJS(c, src) {
 		storyjs_embedjs = new VMM.Timeline(storyjs_e_config.id);
 		storyjs_embedjs.init(storyjs_e_config);
 		if (isCDN) {
-			VMM.bindEvent(global, onHeadline, "HEADLINE");
+			library.bindEvent(global, onHeadline, "HEADLINE");
 		}
 	}
 		

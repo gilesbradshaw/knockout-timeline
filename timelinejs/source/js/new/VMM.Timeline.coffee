@@ -6,21 +6,31 @@
 # @codekit-prepend "Core/VMM.StoryJS.js";
 
 # @codekit-append "VMM.Timeline.TimeNav.js";
-# @codekit-append "VMM.Timeline.DataObj.js";
+# @codekit-append "dataObj.js";
 
 # Timeline
 #================================================== 
 define [
-	"VMM"
 	"type"
 	"trace"
 	"global"
 	"VMM.Browser"
 	"VMM.Date"
 	"VMM.Library"
+	"VMM.Util"
+	"VMM.masterConfig"
+	"VMM.Timeline.TimeNav"
+	"VMM.Timeline.DataObj"
+	"VMM.Slider"
+	"VMM.ExternalAPI"
 	"VMM.Language"
-], (VMM, type, trace, global, browser, vDate, library)->
-	VMM.Timeline = (_timeline_id, w, h) ->
+	"VMM.Extender"
+	"Date.extensions"
+	"aes"
+	"bootstrap-tooltip"
+	"leaflet"
+], (type, trace, global, browser, vDate, library, util, masterConfig, TimeNav, dataObj, Slider, ExternalAPI, language)->
+	Timeline = (_timeline_id, w, h) ->
 
 
 
@@ -54,16 +64,16 @@ define [
 			timeline_config = embed_config    if typeof embed_config is "object"
 			if typeof timeline_config is "object"
 				trace "HAS TIMELINE CONFIG"
-				config = VMM.Util.mergeConfig(config, timeline_config)
-			else config = VMM.Util.mergeConfig(config, conf)    if typeof conf is "object"
+				config = util.mergeConfig(config, timeline_config)
+			else config = util.mergeConfig(config, conf)    if typeof conf is "object"
 			config.touch = true    if browser.device is "mobile" or browser.device is "tablet"
 			config.nav.width = config.width
 			config.nav.height = 200
 			config.feature.width = config.width
 			config.feature.height = config.height - config.nav.height
 			config.nav.zoom.adjust = parseInt(config.start_zoom_adjust, 10)
-			VMM.Timeline.Config = config
-			VMM.master_config.Timeline = VMM.Timeline.Config
+			Timeline.Config = config
+			masterConfig.Timeline = Timeline.Config
 			@events = config.events
 			config.api_keys.google = config.gmap_key    unless config.gmap_key is ""
 			trace "VERSION " + config.version
@@ -75,17 +85,17 @@ define [
 		createStructure = ->
 			
 			# CREATE DOM STRUCTURE
-			$timeline = VMM.getElement(timeline_id)
+			$timeline = library.getElement(timeline_id)
 			library.addClass $timeline, "vco-timeline"
 			library.addClass $timeline, "vco-storyjs"
-			$container = VMM.appendAndGetElement($timeline, "<div>", "vco-container vco-main")
-			$feature = VMM.appendAndGetElement($container, "<div>", "vco-feature")
-			$slider = VMM.appendAndGetElement($feature, "<div>", "vco-slider")
-			$navigation = VMM.appendAndGetElement($container, "<div>", "vco-navigation")
-			$feedback = VMM.appendAndGetElement($timeline, "<div>", "vco-feedback", "")
+			$container = library.appendAndGetElement($timeline, "<div>", "vco-container vco-main")
+			$feature = library.appendAndGetElement($container, "<div>", "vco-feature")
+			$slider = library.appendAndGetElement($feature, "<div>", "vco-slider")
+			$navigation = library.appendAndGetElement($container, "<div>", "vco-navigation")
+			$feedback = library.appendAndGetElement($timeline, "<div>", "vco-feedback", "")
 			library.addClass $timeline, "vco-right-to-left"    unless typeof config.language.right_to_left is "undefined"
-			slider = new VMM.Slider($slider, config)
-			timenav = new VMM.Timeline.TimeNav($navigation)
+			slider = new Slider($slider, config)
+			timenav = new TimeNav($navigation)
 			unless has_width
 				config.width = library.width($timeline)
 			else
@@ -174,7 +184,7 @@ define [
 				dontcrashjs2coffee = 0
 			return
 		
-		#VMM.appendElement("head", "<meta id='viewport' name='viewport' content=" + viewport_content + "/>");
+		#library.appendElement("head", "<meta id='viewport' name='viewport' content=" + viewport_content + "/>");
 		
 		# ORIENTATION
 		#		================================================== 
@@ -207,14 +217,14 @@ define [
 		# GET DATA
 		#			================================================== 
 		
-		#VMM.Timeline.DataObj.getData(VMM.getElement(timeline_id));
+		#DataObj.getData(library.getElement(timeline_id));
 		
 		# DATA 
 		#		================================================== 
 		getData = (url) ->
-			VMM.getJSON url, (d) ->
-				data = VMM.Timeline.DataObj.getData(d)
-				VMM.fireEvent global, config.events.data_ready
+			library.getJSON url, (d) ->
+				data = dataObj.getData(d)
+				library.fireEvent global, config.events.data_ready
 				return
 
 			return
@@ -224,11 +234,11 @@ define [
 		showMessege = (e, msg, other) ->
 			trace "showMessege " + msg
 			
-			#VMM.attachElement($timeline, $feedback);
+			#library.attachElement($timeline, $feedback);
 			if other
-				VMM.attachElement $feedback, msg
+				library.attachElement $feedback, msg
 			else
-				VMM.attachElement $feedback, VMM.MediaElement.loadingmessage(msg)
+				library.attachElement $feedback, library.loadingmessage(msg)
 			return
 		hideMessege = ->
 			library.animate $feedback, config.duration, config.ease * 4,
@@ -252,23 +262,23 @@ define [
 			# IE7
 			if ie7
 				ie7 = true
-				VMM.fireEvent global, config.events.messege, "Internet Explorer " + browser.version + " is not supported by TimelineJS. Please update your browser to version 8 or higher."
+				library.fireEvent global, config.events.messege, "Internet Explorer " + browser.version + " is not supported by TimelineJS. Please update your browser to version 8 or higher."
 			else
 				detachMessege()
 				reSize()
 				
 				# EVENT LISTENERS
-				VMM.bindEvent $slider, onSliderLoaded, "LOADED"
-				VMM.bindEvent $navigation, onTimeNavLoaded, "LOADED"
-				VMM.bindEvent $slider, onSlideUpdate, "UPDATE"
-				VMM.bindEvent $navigation, onMarkerUpdate, "UPDATE"
+				library.bindEvent $slider, onSliderLoaded, "LOADED"
+				library.bindEvent $navigation, onTimeNavLoaded, "LOADED"
+				library.bindEvent $slider, onSlideUpdate, "UPDATE"
+				library.bindEvent $navigation, onMarkerUpdate, "UPDATE"
 				
 				# INITIALIZE COMPONENTS
 				slider.init _dates
 				timenav.init _dates, data.era
 				
 				# RESIZE EVENT LISTENERS
-				VMM.bindEvent global, reSize, config.events.resize
+				library.bindEvent global, reSize, config.events.resize
 			return
 		updateSize = ->
 			trace "UPDATE SIZE"
@@ -299,7 +309,7 @@ define [
 		# BUILD DATE OBJECTS
 		buildDates = ->
 			_dates = []
-			VMM.fireEvent global, config.events.messege, "Building Dates"
+			library.fireEvent global, config.events.messege, "Building Dates"
 			updateSize()
 			i = 0
 
@@ -329,7 +339,7 @@ define [
 						_date.content = ""
 						_date.tag = data.date[i].tag
 						_date.slug = data.date[i].slug
-						_date.uniqueid = VMM.Util.unique_ID(7)
+						_date.uniqueid = util.unique_ID(7)
 						_date.classname = data.date[i].classname
 						_dates.push _date
 				i++
@@ -381,7 +391,7 @@ define [
 						
 						# trace("YEAR MONTH DAY HOUR MINUTE");
 						_date.startdate.setMinutes td.getMinutes() - 1
-				_date.uniqueid = VMM.Util.unique_ID(7)
+				_date.uniqueid = util.unique_ID(7)
 				_date.enddate = _date.startdate
 				_date.precisiondate = do_start.precision
 				_date.title = data.headline
@@ -393,7 +403,7 @@ define [
 				_date.slug = false
 				_date.needs_slug = false
 				_date.fulldate = _date.startdate.getTime()
-				VMM.fireEvent global, config.events.headline, _date.headline    if config.embed
+				library.fireEvent global, config.events.headline, _date.headline    if config.embed
 				_dates.unshift _date
 			
 			# CUSTOM SORT
@@ -501,7 +511,7 @@ define [
 			ease: "easeInOutExpo"
 			duration: 1000
 			gmap_key: ""
-			language: VMM.Language
+			language: language
 
 		if w? and w isnt ""
 			config.width = w
@@ -530,17 +540,17 @@ define [
 			createStructure()
 			config.source = _data    if type.of(_data) is "string"
 			vDate.setLanguage config.language
-			VMM.master_config.language = config.language
-			VMM.ExternalAPI.setKeys config.api_keys
-			VMM.ExternalAPI.googlemaps.setMapType config.maptype
-			VMM.bindEvent global, onDataReady, config.events.data_ready
-			VMM.bindEvent global, showMessege, config.events.messege
-			VMM.fireEvent global, config.events.messege, config.language.messages.loading_timeline
+			masterConfig.language = config.language
+			ExternalAPI.setKeys config.api_keys
+			ExternalAPI.googlemaps.setMapType config.maptype
+			library.bindEvent global, onDataReady, config.events.data_ready
+			library.bindEvent global, showMessege, config.events.messege
+			library.fireEvent global, config.events.messege, config.language.messages.loading_timeline
 			ie7 = true    if parseInt(browser.version, 10) <= 7    if browser.browser is "Explorer" or browser.browser is "MSIE"
 			if type.of(config.source) is "string" or type.of(config.source) is "object"
-				VMM.Timeline.DataObj.getData config.source
+				dataObj.getData config.source
 			else
-				VMM.fireEvent global, config.events.messege, "No data source provided"
+				library.fireEvent global, config.events.messege, "No data source provided"
 			return
 
 		@iframeLoaded = ->
@@ -549,9 +559,9 @@ define [
 
 		@reload = (_d) ->
 			trace "Load new timeline data" + _d
-			VMM.fireEvent global, config.events.messege, config.language.messages.loading_timeline
+			library.fireEvent global, config.events.messege, config.language.messages.loading_timeline
 			data = {}
-			VMM.Timeline.DataObj.getData _d
+			dataObj.getData _d
 			config.current_slide = 0
 			slider.setSlide 0
 			timenav.setMarker 0, config.ease, config.duration
@@ -559,4 +569,5 @@ define [
 
 		return
 
-	VMM.Timeline.Config = {}
+	Timeline.Config = {}
+	Timeline

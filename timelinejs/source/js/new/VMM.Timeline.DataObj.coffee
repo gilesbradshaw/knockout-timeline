@@ -2,37 +2,38 @@
 #        TIMELINE SOURCE DATA PROCESSOR
 #================================================== 
 define [
-	"VMM"
 	"global"
 	"trace"
 	"type"
 	"VMM.Library"
-	"VMM.Timeline"
-], (VMM, global, trace, type, library)->
-	VMM.Timeline.DataObj =
+	"VMM.Util"
+	"VMM.masterConfig"
+	"VMM.ExternalAPI"
+], (global, trace, type, library, util,masterConfig, ExternalAPI)->
+	dataObj =
 		data_obj: {}
 		model_array: []
 		getData: (raw_data) ->
-			VMM.Timeline.DataObj.data_obj = {}
-			VMM.fireEvent global, VMM.Timeline.Config.events.messege, VMM.Timeline.Config.language.messages.loading_timeline
+			dataObj.data_obj = {}
+			library.fireEvent global, masterConfig.Timeline.events.messege, masterConfig.Timeline.language.messages.loading_timeline
 			if type.of(raw_data) is "object"
 				trace "DATA SOURCE: JSON OBJECT"
-				VMM.Timeline.DataObj.parseJSON raw_data
+				dataObj.parseJSON raw_data
 			else if type.of(raw_data) is "string"
 				if raw_data.match("%23")
 					trace "DATA SOURCE: TWITTER SEARCH"
-					VMM.Timeline.DataObj.model.tweets.getData "%23medill"
+					dataObj.model.tweets.getData "%23medill"
 				else if raw_data.match("spreadsheet")
 					trace "DATA SOURCE: GOOGLE SPREADSHEET"
-					VMM.Timeline.DataObj.model.googlespreadsheet.getData raw_data
+					dataObj.model.googlespreadsheet.getData raw_data
 				else if raw_data.match("storify.com")
 					trace "DATA SOURCE: STORIFY"
-					VMM.Timeline.DataObj.model.storify.getData raw_data
+					dataObj.model.storify.getData raw_data
 				
 				#http://api.storify.com/v1/stories/number10gov/g8-and-nato-chicago-summit
 				else if raw_data.match(".jsonp")
 					trace "DATA SOURCE: JSONP"
-					LoadLib.js raw_data, VMM.Timeline.DataObj.onJSONPLoaded
+					LoadLib.js raw_data, dataObj.onJSONPLoaded
 				else
 					trace "DATA SOURCE: JSON"
 					req = ""
@@ -40,23 +41,23 @@ define [
 						req = raw_data + "&callback=onJSONP_Data"
 					else
 						req = raw_data + "?callback=onJSONP_Data"
-					VMM.getJSON req, VMM.Timeline.DataObj.parseJSON
+					library.getJSON req, dataObj.parseJSON
 			else if type.of(raw_data) is "html"
 				trace "DATA SOURCE: HTML"
-				VMM.Timeline.DataObj.parseHTML raw_data
+				dataObj.parseHTML raw_data
 			else
 				trace "DATA SOURCE: UNKNOWN"
 			return
 
 		onJSONPLoaded: ->
 			trace "JSONP IS LOADED"
-			VMM.fireEvent global, VMM.Timeline.Config.events.data_ready, storyjs_jsonp_data
+			library.fireEvent global, masterConfig.Timeline.events.data_ready, storyjs_jsonp_data
 			return
 
 		parseHTML: (d) ->
 			trace "parseHTML"
 			trace "WARNING: THIS IS STILL ALPHA AND WILL NOT WORK WITH ID's other than #timeline"
-			_data_obj = VMM.Timeline.DataObj.data_template_obj
+			_data_obj = dataObj.data_template_obj
 			
 			#	Timeline start slide
 			#			================================================== 
@@ -119,17 +120,17 @@ define [
 					_data_obj.timeline.date.push _date
 				return
 
-			VMM.fireEvent global, VMM.Timeline.Config.events.data_ready, _data_obj
+			library.fireEvent global, masterConfig.Timeline.events.data_ready, _data_obj
 			return
 
 		parseJSON: (d) ->
 			trace "parseJSON"
 			if d.timeline.type is "default"
 				trace "DATA SOURCE: JSON STANDARD TIMELINE"
-				VMM.fireEvent global, VMM.Timeline.Config.events.data_ready, d
+				library.fireEvent global, masterConfig.Timeline.events.data_ready, d
 			else if d.timeline.type is "twitter"
 				trace "DATA SOURCE: JSON TWEETS"
-				VMM.Timeline.DataObj.model_Tweets.buildData d
+				dataObj.model_Tweets.buildData d
 			else
 				trace "DATA SOURCE: UNKNOWN JSON"
 				trace type.of(d.timeline)
@@ -143,9 +144,9 @@ define [
 			googlespreadsheet:
 				getData: (raw) ->
 					requestJsonData = ->
-						getjsondata = VMM.getJSON(url, (d) ->
+						getjsondata = library.getJSON(url, (d) ->
 							clearTimeout timeout
-							VMM.Timeline.DataObj.model.googlespreadsheet.buildData d
+							dataObj.model.googlespreadsheet.buildData d
 							return
 						).error((jqXHR, textStatus, errorThrown) ->
 							trace "Google Docs ERROR"
@@ -162,20 +163,20 @@ define [
 					url = undefined
 					timeout = undefined
 					tries = 0
-					key = VMM.Util.getUrlVars(raw)["key"]
-					worksheet = VMM.Util.getUrlVars(raw)["worksheet"]
+					key = util.getUrlVars(raw)["key"]
+					worksheet = util.getUrlVars(raw)["worksheet"]
 					worksheet = "od6"    if typeof worksheet is "undefined"
 					url = "https://spreadsheets.google.com/feeds/list/" + key + "/" + worksheet + "/public/values?alt=json"
 					timeout = setTimeout(->
 						trace "Google Docs timeout " + url
 						trace url
 						if tries < 3
-							VMM.fireEvent global, VMM.Timeline.Config.events.messege, "Still waiting on Google Docs, trying again " + tries
+							library.fireEvent global, masterConfig.Timeline.events.messege, "Still waiting on Google Docs, trying again " + tries
 							tries++
 							getjsondata.abort()
 							requestJsonData()
 						else
-							VMM.fireEvent global, VMM.Timeline.Config.events.messege, "Google Docs is not responding"
+							library.fireEvent global, masterConfig.Timeline.events.messege, "Google Docs is not responding"
 						return
 					, 16000)
 					requestJsonData()
@@ -187,11 +188,11 @@ define [
 							v.$t
 						else
 							""
-					data_obj = VMM.Timeline.DataObj.data_template_obj
+					data_obj = dataObj.data_template_obj
 					is_valid = false
-					VMM.fireEvent global, VMM.Timeline.Config.events.messege, "Parsing Google Doc Data"
+					library.fireEvent global, masterConfig.Timeline.events.messege, "Parsing Google Doc Data"
 					if typeof d.feed.entry is "undefined"
-						VMM.fireEvent global, VMM.Timeline.Config.events.messege, "Error parsing spreadsheet. Make sure you have no blank rows and that the headers have not been changed."
+						library.fireEvent global, masterConfig.Timeline.events.messege, "Error parsing spreadsheet. Make sure you have no blank rows and that the headers have not been changed."
 					else
 						is_valid = true
 						i = 0
@@ -236,19 +237,19 @@ define [
 								data_obj.timeline.date.push date
 							i++
 					if is_valid
-						VMM.fireEvent global, VMM.Timeline.Config.events.messege, "Finished Parsing Data"
-						VMM.fireEvent global, VMM.Timeline.Config.events.data_ready, data_obj
+						library.fireEvent global, masterConfig.Timeline.events.messege, "Finished Parsing Data"
+						library.fireEvent global, masterConfig.Timeline.events.data_ready, data_obj
 					else
-						VMM.fireEvent global, VMM.Timeline.Config.events.messege, VMM.Language.messages.loading + " Google Doc Data (cells)"
+						library.fireEvent global, masterConfig.Timeline.events.messege, VMM.Language.messages.loading + " Google Doc Data (cells)"
 						trace "There may be too many entries. Still trying to load data. Now trying to load cells to avoid Googles limitation on cells"
-						VMM.Timeline.DataObj.model.googlespreadsheet.getDataCells d.feed.link[0].href
+						dataObj.model.googlespreadsheet.getDataCells d.feed.link[0].href
 					return
 
 				getDataCells: (raw) ->
 					requestJsonData = ->
-						getjsondata = VMM.getJSON(url, (d) ->
+						getjsondata = library.getJSON(url, (d) ->
 							clearTimeout timeout
-							VMM.Timeline.DataObj.model.googlespreadsheet.buildDataCells d
+							dataObj.model.googlespreadsheet.buildDataCells d
 							return
 						).error((jqXHR, textStatus, errorThrown) ->
 							trace "Google Docs ERROR"
@@ -264,18 +265,18 @@ define [
 					url = undefined
 					timeout = undefined
 					tries = 0
-					key = VMM.Util.getUrlVars(raw)["key"]
+					key = util.getUrlVars(raw)["key"]
 					url = "https://spreadsheets.google.com/feeds/cells/" + key + "/od6/public/values?alt=json"
 					timeout = setTimeout(->
 						trace "Google Docs timeout " + url
 						trace url
 						if tries < 3
-							VMM.fireEvent global, VMM.Timeline.Config.events.messege, "Still waiting on Google Docs, trying again " + tries
+							library.fireEvent global, masterConfig.Timeline.events.messege, "Still waiting on Google Docs, trying again " + tries
 							tries++
 							getjsondata.abort()
 							requestJsonData()
 						else
-							VMM.fireEvent global, VMM.Timeline.Config.events.messege, "Google Docs is not responding"
+							library.fireEvent global, masterConfig.Timeline.events.messege, "Google Docs is not responding"
 						return
 					, 16000)
 					requestJsonData()
@@ -287,14 +288,14 @@ define [
 							v.$t
 						else
 							""
-					data_obj = VMM.Timeline.DataObj.data_template_obj
+					data_obj = dataObj.data_template_obj
 					is_valid = false
 					cellnames = ["timeline"]
 					list = []
 					max_row = 0
 					i = 0
 					k = 0
-					VMM.fireEvent global, VMM.Timeline.Config.events.messege, VMM.Language.messages.loading_timeline + " Parsing Google Doc Data (cells)"
+					library.fireEvent global, masterConfig.Timeline.events.messege, VMM.Language.messages.loading_timeline + " Parsing Google Doc Data (cells)"
 					unless typeof d.feed.entry is "undefined"
 						is_valid = true
 						
@@ -405,10 +406,10 @@ define [
 							i++
 					is_valid = data_obj.timeline.date.length > 0
 					if is_valid
-						VMM.fireEvent global, VMM.Timeline.Config.events.messege, "Finished Parsing Data"
-						VMM.fireEvent global, VMM.Timeline.Config.events.data_ready, data_obj
+						library.fireEvent global, masterConfig.Timeline.events.messege, "Finished Parsing Data"
+						library.fireEvent global, masterConfig.Timeline.events.data_ready, data_obj
 					else
-						VMM.fireEvent global, VMM.Timeline.Config.events.messege, "Unable to load Google Doc data source. Make sure you have no blank rows and that the headers have not been changed."
+						library.fireEvent global, masterConfig.Timeline.events.messege, "Unable to load Google Doc data source. Make sure you have no blank rows and that the headers have not been changed."
 					return
 
 			storify:
@@ -419,15 +420,15 @@ define [
 					
 					#http://storify.com/number10gov/g8-and-nato-chicago-summit
 					#http://api.storify.com/v1/stories/number10gov/g8-and-nato-chicago-summit
-					VMM.fireEvent global, VMM.Timeline.Config.events.messege, "Loading Storify..."
+					library.fireEvent global, masterConfig.Timeline.events.messege, "Loading Storify..."
 					key = raw.split("storify.com/")[1]
 					url = "//api.storify.com/v1/stories/" + key + "?per_page=300&callback=?"
 					storify_timeout = setTimeout(->
 						trace "STORIFY timeout"
-						VMM.fireEvent global, VMM.Timeline.Config.events.messege, "Storify is not responding"
+						library.fireEvent global, masterConfig.Timeline.events.messege, "Storify is not responding"
 						return
 					, 6000)
-					VMM.getJSON(url, VMM.Timeline.DataObj.model.storify.buildData).error((jqXHR, textStatus, errorThrown) ->
+					library.getJSON(url, dataObj.model.storify.buildData).error((jqXHR, textStatus, errorThrown) ->
 						trace "STORIFY error"
 						trace "STORIFY ERROR: " + textStatus + " " + jqXHR.responseText
 						return
@@ -438,8 +439,8 @@ define [
 					return
 
 				buildData: (d) ->
-					VMM.fireEvent global, VMM.Timeline.Config.events.messege, "Parsing Data"
-					_data_obj = VMM.Timeline.DataObj.data_template_obj
+					library.fireEvent global, masterConfig.Timeline.events.messege, "Parsing Data"
+					_data_obj = dataObj.data_template_obj
 					_data_obj.timeline.startDate = new Date(d.content.date.created)
 					_data_obj.timeline.headline = d.content.title
 					trace d
@@ -523,7 +524,7 @@ define [
 						else if dd.type is "quote"
 							if dd.permalink.match("twitter")
 								_date.asset.media = dd.permalink
-								_date.slug = VMM.Util.untagify(dd.data.quote.text)
+								_date.slug = util.untagify(dd.data.quote.text)
 							else if dd.permalink.match("storify")
 								is_text = true
 								_date.asset.media = "<blockquote>" + dd.data.quote.text.replace(/<\s*\/?\s*b\s*.*?>/g, "") + "</blockquote>"
@@ -589,26 +590,26 @@ define [
 						else
 							trace "NO MATCH "
 							trace dd
-						_date.slug = VMM.Util.untagify(dd.data.text)    if is_text
+						_date.slug = util.untagify(dd.data.text)    if is_text
 						_data_obj.timeline.date.push _date
 						i++
-					VMM.fireEvent global, VMM.Timeline.Config.events.data_ready, _data_obj
+					library.fireEvent global, masterConfig.Timeline.events.data_ready, _data_obj
 					return
 
 			tweets:
 				type: "twitter"
 				buildData: (raw_data) ->
-					VMM.bindEvent global, VMM.Timeline.DataObj.model.tweets.onTwitterDataReady, "TWEETSLOADED"
-					VMM.ExternalAPI.twitter.getTweets raw_data.timeline.tweets
+					library.bindEvent global, dataObj.model.tweets.onTwitterDataReady, "TWEETSLOADED"
+					ExternalAPI.twitter.getTweets raw_data.timeline.tweets
 					return
 
 				getData: (raw_data) ->
-					VMM.bindEvent global, VMM.Timeline.DataObj.model.tweets.onTwitterDataReady, "TWEETSLOADED"
-					VMM.ExternalAPI.twitter.getTweetSearch raw_data
+					library.bindEvent global, dataObj.model.tweets.onTwitterDataReady, "TWEETSLOADED"
+					ExternalAPI.twitter.getTweetSearch raw_data
 					return
 
 				onTwitterDataReady: (e, d) ->
-					_data_obj = VMM.Timeline.DataObj.data_template_obj
+					_data_obj = dataObj.data_template_obj
 					i = 0
 
 					while i < d.tweetdata.length
@@ -628,7 +629,7 @@ define [
 						# pass in the 'created_at' string returned from twitter //
 						# stamp arrives formatted as Tue Apr 07 22:52:51 +0000 2009 //
 						
-						#var twit_date = VMM.ExternalAPI.twitter.parseTwitterDate(d.tweetdata[i].raw.created_at);
+						#var twit_date = ExternalAPI.twitter.parseTwitterDate(d.tweetdata[i].raw.created_at);
 						#trace(twit_date);
 						_date.startDate = d.tweetdata[i].raw.created_at
 						if type.of(d.tweetdata[i].raw.from_user_name)
@@ -638,7 +639,7 @@ define [
 						_date.asset.media = d.tweetdata[i].content
 						_data_obj.timeline.date.push _date
 						i++
-					VMM.fireEvent global, VMM.Timeline.Config.events.data_ready, _data_obj
+					library.fireEvent global, masterConfig.Timeline.events.data_ready, _data_obj
 					return
 
 		

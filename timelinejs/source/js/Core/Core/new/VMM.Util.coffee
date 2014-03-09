@@ -1,6 +1,6 @@
 #	* Utilities and Useful Functions
 #================================================== 
-define ["VMM", "trace"], (VMM, trace)->
+define ["trace"], (trace)->
 	# rather than change Array.prototype; Thanks Jeff McWhirter for nudge
 	
 	#	* CORRECT PROTOCOL (DOES NOT WORK)
@@ -125,7 +125,7 @@ define ["VMM", "trace"], (VMM, trace)->
 	# if the last word in the title is a small word, then capitalize it
 	
 	# special cases
-	VMM.Util = (
+	util = (
 		init: ->
 			this
 
@@ -212,6 +212,7 @@ define ["VMM", "trace"], (VMM, trace)->
 				out.push i
 			out
 
+		#nb there is no VM.Math2 - this will crash
 		number2money: (n, symbol, padding) ->
 			symbol = (if (symbol isnt null) then symbol else true)
 			padding = (if (padding isnt null) then padding else false)

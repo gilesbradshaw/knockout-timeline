@@ -1,8 +1,8 @@
 /* DEFAULT LANGUAGE 
 ================================================== */
 (function () {
-	define(["VMM"], function (VMM) {
-		VMM.Language = {
+	define([], function () {
+		return Language = {
 			lang: "en",
 			api: {
 				wikipedia: "en"

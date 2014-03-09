@@ -1,10 +1,9 @@
 #	* Utilities and Useful Functions
 #================================================== 
 define [
-	"VMM"
 	"trace"
 	"type"
-], (VMM, trace, type)->
+], ( trace, type)->
 	
 	#B.C.
 	

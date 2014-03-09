@@ -3,17 +3,14 @@ requirejs.config
 	shim:
 		easing:["jquery"]
 		"bootstrap-tooltip":["jquery"]
-		"VMM.Language":["VMM"]
-
+		
 	paths:
 
 		jquery: "Scripts/jquery-2.1.0"
 
 		"trace":"/source/js/core/core/new/trace"
-		"Class":"/source/js/core/core/new/Class"
 		"global":"/source/js/core/core/new/global"
 		"Date.extensions":"/source/js/core/core/new/Date.extensions"
-		"is_":"/source/js/core/core/new/is_"
 		"type":"/source/js/core/core/new/type"
 		"jQueryExtender":"/source/js/core/core/new/jQueryExtender"
 		"easing":"/source/js/core/Library/Jquery/easing"
@@ -22,10 +19,11 @@ requirejs.config
 		"bootstrap-tooltip":"/source/js/core/Library/bootstrap-tooltip"
 		"leaflet":"/source/js/core/Library/leaflet"
 
-		"VMM":"/source/js/core/core/new/VMM"
+
 		"VMM.Browser":"/source/js/core/core/new/VMM.Browser"
 		"VMM.Date":"/source/js/core/core/new/VMM.Date"
-		"VMM.FileExtension":"/source/js/core/core/new/VMM.FileExtension" #(sic)
+		"VMM.FileExtension":"/source/js/core/core/new/VMM.FileExtension"
+		"VMM.masterConfig":"/source/js/core/core/new/VMM.masterConfig" #(sic)
 		"VMM.Library":"/source/js/core/core/new/VMM.Library"
 		"VMM.LoadLib":"/source/js/core/core/new/VMM.LoadLib"
 		"VMM.Util":"/source/js/core/core/new/VMM.Util"
@@ -52,36 +50,9 @@ requirejs.config
 
 
 require [
-	"global"
-	"Class"
-	"trace"
-	"VMM"
-	"is_"
-	"type"
-	"VMM.LoadLib"
-	"VMM.Browser"
-	"VMM.Date"
-	"VMM.FileExtension"
-	"VMM.Library"
-	"VMM.Util"
-	"VMM.ExternalAPI"
-	"VMM.Extender"
-	"VMM.MediaElement"
-	"VMM.DragSlider"
-	"VMM.Slider"
-	"VMM.Slider.Slide"
 	"VMM.Timeline"
-	"VMM.Timeline.DataObj"
-	"VMM.Timeline.TimeNav"
-	#"VMM.Language"
-
-	"Date.extensions"
-	"aes"
-	"bootstrap-tooltip"
-	"leaflet"
-
-], (global, Class, trace, VMM, is_, type, loadLib)->
-	timeline = new VMM.Timeline 'timeline', 1200,500
+], (Timeline)->
+	timeline = new Timeline 'timeline', 1200,500
 
 	timeline.init
 		type:'timeline'

@@ -7,13 +7,18 @@
 
 # @codekit-append "VMM.Slider.Slide.js";
 define [
-	"VMM"
 	"trace"
 	"VMM.Browser"
 	"VMM.Date"
 	"VMM.Library"
-], (VMM, trace, browser, vDate, library)->
-	VMM.Slider = (parent, parent_config) ->
+	"VMM.Util"
+	"VMM.masterConfig"
+	"VMM.Slider.Slide"
+	"VMM.DragSlider"
+	"VMM.ExternalAPI"
+
+], (trace, browser, vDate, library, util,masterConfig, Slide,DragSlider, ExternalAPI)->
+	Slider = (parent, parent_config) ->
 		
 
 		config = undefined
@@ -172,7 +177,7 @@ define [
 		#		================================================== 
 		upDate = ->
 			config.current_slide = current_slide
-			VMM.fireEvent layout, "UPDATE"
+			library.fireEvent layout, "UPDATE"
 			
 		
 		# GET DATA
@@ -185,11 +190,11 @@ define [
 		#		================================================== 
 		buildSlides = (d) ->
 			i = 0
-			VMM.attachElement $slides_items, ""
+			library.attachElement $slides_items, ""
 			slides = []
 			i = 0
 			while i < d.length
-				_slide = new VMM.Slider.Slide(d[i], $slides_items)
+				_slide = new Slide(d[i], $slides_items)
 				
 				#_slide.show();
 				slides.push _slide
@@ -261,10 +266,10 @@ define [
 			
 			# Handle smaller sizes
 			is_skinny = true    if browser.device is "mobile" or current_width < 641
-			VMM.master_config.sizes.api.width = mediasize.media.width
-			VMM.master_config.sizes.api.height = mediasize.media.height
-			mediasize.text_media.video = VMM.Util.ratio.fit(mediasize.text_media.width, mediasize.text_media.height, 16, 9)
-			mediasize.media.video = VMM.Util.ratio.fit(mediasize.media.width, mediasize.media.height, 16, 9)
+			masterConfig.sizes.api.width = mediasize.media.width
+			masterConfig.sizes.api.height = mediasize.media.height
+			mediasize.text_media.video = util.ratio.fit(mediasize.text_media.width, mediasize.text_media.height, 16, 9)
+			mediasize.media.video = util.ratio.fit(mediasize.media.width, mediasize.media.height, 16, 9)
 			library.css ".slider-item", "width", config.slider.content.width
 			library.height ".slider-item", config.slider.height
 			if is_skinny
@@ -272,8 +277,8 @@ define [
 				mediasize.media.width = config.slider.content.width - (config.slider.content.padding * 2)
 				mediasize.text_media.height = ((config.slider.height / 100) * 50) - 50
 				mediasize.media.height = ((config.slider.height / 100) * 70) - 40
-				mediasize.text_media.video = VMM.Util.ratio.fit(mediasize.text_media.width, mediasize.text_media.height, 16, 9)
-				mediasize.media.video = VMM.Util.ratio.fit(mediasize.media.width, mediasize.media.height, 16, 9)
+				mediasize.text_media.video = util.ratio.fit(mediasize.text_media.width, mediasize.text_media.height, 16, 9)
+				mediasize.media.video = util.ratio.fit(mediasize.media.width, mediasize.media.height, 16, 9)
 				library.css ".slider-item .layout-text-media .text", "width", "100%"
 				library.css ".slider-item .layout-text-media .text", "display", "block"
 				library.css ".slider-item .layout-text-media .text .container", "display", "block"
@@ -422,7 +427,7 @@ define [
 			
 			# STOP ANY VIDEO PLAYERS ACTIVE
 			#			================================================== 
-			VMM.ExternalAPI.youtube.stopPlayers()
+			ExternalAPI.youtube.stopPlayers()
 			
 			# Set current slide
 			current_slide = n
@@ -447,30 +452,30 @@ define [
 					library.visible navigation.prevBtn, false
 				else
 					library.visible navigation.prevBtn, true
-					_title = VMM.Util.unlinkify(data[current_slide - 1].title)
+					_title = util.unlinkify(data[current_slide - 1].title)
 					if config.type is "timeline"
 						if typeof data[current_slide - 1].date is "undefined"
-							VMM.attachElement navigation.prevDate, _title
-							VMM.attachElement navigation.prevTitle, ""
+							library.attachElement navigation.prevDate, _title
+							library.attachElement navigation.prevTitle, ""
 						else
-							VMM.attachElement navigation.prevDate, vDate.prettyDate(data[current_slide - 1].startdate, false, data[current_slide - 1].precisiondate)
-							VMM.attachElement navigation.prevTitle, _title
+							library.attachElement navigation.prevDate, vDate.prettyDate(data[current_slide - 1].startdate, false, data[current_slide - 1].precisiondate)
+							library.attachElement navigation.prevTitle, _title
 					else
-						VMM.attachElement navigation.prevTitle, _title
+						library.attachElement navigation.prevTitle, _title
 				if is_last
 					library.visible navigation.nextBtn, false
 				else
 					library.visible navigation.nextBtn, true
-					_title = VMM.Util.unlinkify(data[current_slide + 1].title)
+					_title = util.unlinkify(data[current_slide + 1].title)
 					if config.type is "timeline"
 						if typeof data[current_slide + 1].date is "undefined"
-							VMM.attachElement navigation.nextDate, _title
-							VMM.attachElement navigation.nextTitle, ""
+							library.attachElement navigation.nextDate, _title
+							library.attachElement navigation.nextTitle, ""
 						else
-							VMM.attachElement navigation.nextDate, vDate.prettyDate(data[current_slide + 1].startdate, false, data[current_slide + 1].precisiondate)
-							VMM.attachElement navigation.nextTitle, _title
+							library.attachElement navigation.nextDate, vDate.prettyDate(data[current_slide + 1].startdate, false, data[current_slide + 1].precisiondate)
+							library.attachElement navigation.nextTitle, _title
 					else
-						VMM.attachElement navigation.nextTitle, _title
+						library.attachElement navigation.nextTitle, _title
 			
 			# ANIMATE SLIDE
 			#			================================================== 
@@ -481,7 +486,7 @@ define [
 				library.animate $slider_container, _duration, _ease,
 					left: -(_pos - config.slider.content.padding)
 
-			VMM.fireEvent layout, "LOADED"    if firstrun
+			library.fireEvent layout, "LOADED"    if firstrun
 			
 			# SET Vertical Scoll
 			#			================================================== 
@@ -498,7 +503,7 @@ define [
 				catch err
 					scroll_height = library.height(layout)
 			preloadSlides()
-			VMM.fireEvent $slider, "MESSAGE", "TEST"
+			library.fireEvent $slider, "MESSAGE", "TEST"
 			
 		backToCurrentSlide = ->
 			library.stop $slider_container
@@ -512,8 +517,8 @@ define [
 		showMessege = (e, msg, other) ->
 			trace "showMessege " + msg
 			
-			#VMM.attachElement($timeline, $feedback);
-			VMM.attachElement $explainer, "<div class='vco-explainer'><div class='vco-explainer-container'><div class='vco-bezel'><div class='vco-gesture-icon'></div>" + "<div class='vco-message'><p>" + msg + "</p></div></div></div></div>"
+			#library.attachElement($timeline, $feedback);
+			library.attachElement $explainer, "<div class='vco-explainer'><div class='vco-explainer-container'><div class='vco-bezel'><div class='vco-gesture-icon'></div>" + "<div class='vco-message'><p>" + msg + "</p></div></div></div></div>"
 			
 		hideMessege = ->
 			library.animate $explainer, config.duration, config.ease,
@@ -528,18 +533,18 @@ define [
 		#		================================================== 
 		buildNavigation = ->
 			temp_icon = "<div class='icon'>&nbsp;</div>"
-			navigation.nextBtn = VMM.appendAndGetElement($slider, "<div>", "nav-next")
-			navigation.prevBtn = VMM.appendAndGetElement($slider, "<div>", "nav-previous")
-			navigation.nextBtnContainer = VMM.appendAndGetElement(navigation.nextBtn, "<div>", "nav-container", temp_icon)
-			navigation.prevBtnContainer = VMM.appendAndGetElement(navigation.prevBtn, "<div>", "nav-container", temp_icon)
+			navigation.nextBtn = library.appendAndGetElement($slider, "<div>", "nav-next")
+			navigation.prevBtn = library.appendAndGetElement($slider, "<div>", "nav-previous")
+			navigation.nextBtnContainer = library.appendAndGetElement(navigation.nextBtn, "<div>", "nav-container", temp_icon)
+			navigation.prevBtnContainer = library.appendAndGetElement(navigation.prevBtn, "<div>", "nav-container", temp_icon)
 			if config.type is "timeline"
-				navigation.nextDate = VMM.appendAndGetElement(navigation.nextBtnContainer, "<div>", "date", "")
-				navigation.prevDate = VMM.appendAndGetElement(navigation.prevBtnContainer, "<div>", "date", "")
-			navigation.nextTitle = VMM.appendAndGetElement(navigation.nextBtnContainer, "<div>", "title", "")
-			navigation.prevTitle = VMM.appendAndGetElement(navigation.prevBtnContainer, "<div>", "title", "")
-			VMM.bindEvent ".nav-next", onNextClick
-			VMM.bindEvent ".nav-previous", onPrevClick
-			VMM.bindEvent window, onKeypressNav, "keydown"
+				navigation.nextDate = library.appendAndGetElement(navigation.nextBtnContainer, "<div>", "date", "")
+				navigation.prevDate = library.appendAndGetElement(navigation.prevBtnContainer, "<div>", "date", "")
+			navigation.nextTitle = library.appendAndGetElement(navigation.nextBtnContainer, "<div>", "title", "")
+			navigation.prevTitle = library.appendAndGetElement(navigation.prevBtnContainer, "<div>", "title", "")
+			library.bindEvent ".nav-next", onNextClick
+			library.bindEvent ".nav-previous", onPrevClick
+			library.bindEvent window, onKeypressNav, "keydown"
 			
 		
 		# BUILD
@@ -548,13 +553,13 @@ define [
 			__duration = 3000
 			
 			# Clear out existing content
-			VMM.attachElement layout, ""
+			library.attachElement layout, ""
 			
 			# Get DOM Objects to local objects
-			$slider = VMM.getElement(layout)
-			$slider_mask = VMM.appendAndGetElement($slider, "<div>", "slider-container-mask")
-			$slider_container = VMM.appendAndGetElement($slider_mask, "<div>", "slider-container")
-			$slides_items = VMM.appendAndGetElement($slider_container, "<div>", "slider-item-container")
+			$slider = library.getElement(layout)
+			$slider_mask = library.appendAndGetElement($slider, "<div>", "slider-container-mask")
+			$slider_container = library.appendAndGetElement($slider_mask, "<div>", "slider-container")
+			$slides_items = library.appendAndGetElement($slider_container, "<div>", "slider-item-container")
 			
 			# BUILD NAVIGATION
 			buildNavigation()
@@ -571,16 +576,16 @@ define [
 				__duration = 1000
 				
 				# Make touchable
-				$dragslide = new VMM.DragSlider()
+				$dragslide = new DragSlider()
 				$dragslide.createPanel $slider, $slider_container, "", config.touch, true
-				VMM.bindEvent $dragslide, onDragFinish, "DRAGUPDATE"
+				library.bindEvent $dragslide, onDragFinish, "DRAGUPDATE"
 				
 				# EXPLAINER
-				$explainer = VMM.appendAndGetElement($slider_mask, "<div>", "vco-feedback", "")
+				$explainer = library.appendAndGetElement($slider_mask, "<div>", "vco-feedback", "")
 				showMessege null, "Swipe to Navigate"
 				library.height $explainer, config.slider.height
-				VMM.bindEvent $explainer, onExplainerClick
-				VMM.bindEvent $explainer, onExplainerClick, "touchend"
+				library.bindEvent $explainer, onExplainerClick
+				library.bindEvent $explainer, onExplainerClick, "touchend"
 			reSize false, true
 			library.visible navigation.prevBtn, false
 			goToSlide config.current_slide, "easeOutExpo", __duration, true, true

@@ -13,13 +13,13 @@
 # @codekit-prepend "Library/AES.js";
 # @codekit-prepend "Library/bootstrap-tooltip.js";
 if typeof VMM isnt "undefined" and typeof VMM.StoryJS is "undefined"
-VMM.StoryJS = ->
+	VMM.StoryJS = ->
 		
-	# PRIVATE VARS
-	#		================================================== 
+		# PRIVATE VARS
+		#		================================================== 
 		
-	# PUBLIC FUNCTIONS
-	#		================================================== 
-	@init = (d) ->
+		# PUBLIC FUNCTIONS
+		#		================================================== 
+		@init = (d) ->
 
 	return

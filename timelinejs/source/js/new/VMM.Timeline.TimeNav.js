@@ -1,6 +1,8 @@
 (function() {
-  define(["VMM", "trace", "type", "VMM.Browser", "VMM.Date", "VMM.Library", "VMM.Timeline"], function(VMM, trace, type, browser, vDate, library) {
-    return VMM.Timeline.TimeNav = function(parent, content_width, content_height) {
+  define(["trace", "type", "VMM.Browser", "VMM.Date", "VMM.Library", "VMM.Util", "VMM.masterConfig", "VMM.DragSlider", "VMM.ExternalAPI", "VMM.MediaElement"], function(trace, type, browser, vDate, library, util, masterConfig, DragSlider, ExternalAPI, MediaElement) {
+    var timeNav;
+
+    return timeNav = function(parent, content_width, content_height) {
       var $content, $dragslide, $time, $timebackground, $timeinterval, $timeintervalbackground, $timeintervalmajor, $timeintervalminor, $timeintervalminor_minor, $timenav, $timenavindicator, $timenavline, $toolbar, $zoomin, $zoomout, averageDateDistance, averageMarkerPositionDistance, build, buildEras, buildInterval, buildMarkers, calculateInterval, calculateMultiplier, config, content, createIntervalElements, current_marker, data, dateFractionBrowser, era_markers, eras, events, getDateFractions, goToMarker, interval, interval_array, interval_calc, interval_macro, interval_major, interval_major_array, layout, markers, onBackHome, onConfigSet, onMarkerClick, onMarkerHover, onMouseScroll, onTouchUpdate, onZoomIn, onZoomOut, positionEras, positionInterval, positionMarkers, positionOnTimeline, positionRelative, reSize, refreshTimeline, row_height, tags, timelookup, timenav_pos, timeouts, timespan, upDate, _active;
 
       trace("VMM.Timeline.TimeNav");
@@ -19,7 +21,7 @@
       $zoomin = void 0;
       $zoomout = void 0;
       $dragslide = void 0;
-      config = VMM.Timeline.Config;
+      config = masterConfig.Timeline;
       row_height = void 0;
       events = {};
       timespan = {};
@@ -149,7 +151,7 @@
         goToMarker(config.current_slide, config.ease, config.duration, true, firstrun);
       };
       upDate = function() {
-        VMM.fireEvent(layout, "UPDATE");
+        library.fireEvent(layout, "UPDATE");
       };
       onZoomIn = function() {
         $dragslide.cancelSlide();
@@ -314,7 +316,7 @@
           }
           i++;
         }
-        return VMM.Util.average(mp_diff).mean;
+        return util.average(mp_diff).mean;
       };
       averageDateDistance = function() {
         var date_dif, date_diffs, dd, i, is_first_date, last_dd, _dd;
@@ -339,7 +341,7 @@
           }
           i++;
         }
-        return VMM.Util.average(date_diffs);
+        return util.average(date_diffs);
       };
       calculateMultiplier = function() {
         var i, temp_multiplier;
@@ -671,7 +673,7 @@
           pos_cache_obj.row = row;
           pos_cache_array.push(pos_cache_obj);
           if (pos_cache_array.length > pos_cache_max) {
-            VMM.Util.removeRange(pos_cache_array, 0);
+            util.removeRange(pos_cache_array, 0);
           }
           if (is_animated) {
             library.stop(marker.flag);
@@ -799,7 +801,7 @@
                     is_visible = false;
                   }
                 } else {
-                  if (!VMM.Util.isEven(i)) {
+                  if (!util.isEven(i)) {
                     is_visible = false;
                   }
                 }
@@ -884,7 +886,7 @@
           offset: 0
         };
         i = 0;
-        VMM.attachElement(_element_parent, "");
+        library.attachElement(_element_parent, "");
         _interval.date = new Date(data[0].startdate.getFullYear(), 0, 1, 0, 0, 0);
         _timezone_offset = _interval.date.getTimezoneOffset();
         i = 0;
@@ -892,7 +894,7 @@
           trace(_interval.type);
           _is_year = false;
           int_obj = {
-            element: VMM.appendAndGetElement(_element_parent, "<div>", _interval.classname),
+            element: library.appendAndGetElement(_element_parent, "<div>", _interval.classname),
             date: new Date(data[0].startdate.getFullYear(), 0, 1, 0, 0, 0),
             visible: false,
             date_string: "",
@@ -1036,7 +1038,7 @@
           if (int_obj.relative_pos.begin > _largest_pos) {
             _largest_pos = int_obj.relative_pos.begin;
           }
-          VMM.appendElement(int_obj.element, int_obj.date_string);
+          library.appendElement(int_obj.element, int_obj.date_string);
           library.css(int_obj.element, "text-indent", -(library.width(int_obj.element) / 2));
           library.css(int_obj.element, "opacity", "0");
           _array.push(int_obj);
@@ -1050,19 +1052,19 @@
 
         i = 0;
         j = 0;
-        VMM.attachElement(layout, "");
-        $timenav = VMM.appendAndGetElement(layout, "<div>", "timenav");
-        $content = VMM.appendAndGetElement($timenav, "<div>", "content");
-        $time = VMM.appendAndGetElement($timenav, "<div>", "time");
-        $timeintervalminor = VMM.appendAndGetElement($time, "<div>", "time-interval-minor");
-        $timeintervalminor_minor = VMM.appendAndGetElement($timeintervalminor, "<div>", "minor");
-        $timeintervalmajor = VMM.appendAndGetElement($time, "<div>", "time-interval-major");
-        $timeinterval = VMM.appendAndGetElement($time, "<div>", "time-interval");
-        $timebackground = VMM.appendAndGetElement(layout, "<div>", "timenav-background");
-        $timenavline = VMM.appendAndGetElement($timebackground, "<div>", "timenav-line");
-        $timenavindicator = VMM.appendAndGetElement($timebackground, "<div>", "timenav-indicator");
-        $timeintervalbackground = VMM.appendAndGetElement($timebackground, "<div>", "timenav-interval-background", "<div class='top-highlight'></div>");
-        $toolbar = VMM.appendAndGetElement(layout, "<div>", "vco-toolbar");
+        library.attachElement(layout, "");
+        $timenav = library.appendAndGetElement(layout, "<div>", "timenav");
+        $content = library.appendAndGetElement($timenav, "<div>", "content");
+        $time = library.appendAndGetElement($timenav, "<div>", "time");
+        $timeintervalminor = library.appendAndGetElement($time, "<div>", "time-interval-minor");
+        $timeintervalminor_minor = library.appendAndGetElement($timeintervalminor, "<div>", "minor");
+        $timeintervalmajor = library.appendAndGetElement($time, "<div>", "time-interval-major");
+        $timeinterval = library.appendAndGetElement($time, "<div>", "time-interval");
+        $timebackground = library.appendAndGetElement(layout, "<div>", "timenav-background");
+        $timenavline = library.appendAndGetElement($timebackground, "<div>", "timenav-line");
+        $timenavindicator = library.appendAndGetElement($timebackground, "<div>", "timenav-indicator");
+        $timeintervalbackground = library.appendAndGetElement($timebackground, "<div>", "timenav-interval-background", "<div class='top-highlight'></div>");
+        $toolbar = library.appendAndGetElement(layout, "<div>", "vco-toolbar");
         buildInterval();
         buildMarkers();
         buildEras();
@@ -1072,12 +1074,12 @@
         positionInterval($timeinterval, interval_array, false, true);
         positionInterval($timeintervalmajor, interval_major_array);
         if (config.start_page) {
-          $backhome = VMM.appendAndGetElement($toolbar, "<div>", "back-home", "<div class='icon'></div>");
-          VMM.bindEvent(".back-home", onBackHome, "click");
-          library.attribute($backhome, "title", VMM.master_config.language.messages.return_to_title);
+          $backhome = library.appendAndGetElement($toolbar, "<div>", "back-home", "<div class='icon'></div>");
+          library.bindEvent(".back-home", onBackHome, "click");
+          library.attribute($backhome, "title", masterConfig.language.messages.return_to_title);
           library.attribute($backhome, "rel", "timeline-tooltip");
         }
-        $dragslide = new VMM.DragSlider;
+        $dragslide = new DragSlider();
         $dragslide.createPanel(layout, $timenav, config.nav.constraint, config.touch);
         if (config.touch && config.start_page) {
           library.addClass($toolbar, "touch");
@@ -1087,20 +1089,20 @@
           if (config.start_page) {
             library.css($toolbar, "top", 27);
           }
-          $zoomin = VMM.appendAndGetElement($toolbar, "<div>", "zoom-in", "<div class='icon'></div>");
-          $zoomout = VMM.appendAndGetElement($toolbar, "<div>", "zoom-out", "<div class='icon'></div>");
-          VMM.bindEvent($zoomin, onZoomIn, "click");
-          VMM.bindEvent($zoomout, onZoomOut, "click");
-          library.attribute($zoomin, "title", VMM.master_config.language.messages.expand_timeline);
+          $zoomin = library.appendAndGetElement($toolbar, "<div>", "zoom-in", "<div class='icon'></div>");
+          $zoomout = library.appendAndGetElement($toolbar, "<div>", "zoom-out", "<div class='icon'></div>");
+          library.bindEvent($zoomin, onZoomIn, "click");
+          library.bindEvent($zoomout, onZoomOut, "click");
+          library.attribute($zoomin, "title", masterConfig.language.messages.expand_timeline);
           library.attribute($zoomin, "rel", "timeline-tooltip");
-          library.attribute($zoomout, "title", VMM.master_config.language.messages.contract_timeline);
+          library.attribute($zoomout, "title", masterConfig.language.messages.contract_timeline);
           library.attribute($zoomout, "rel", "timeline-tooltip");
           $toolbar.tooltip({
             selector: "div[rel=timeline-tooltip]",
             placement: "right"
           });
-          VMM.bindEvent(layout, onMouseScroll, "DOMMouseScroll");
-          VMM.bindEvent(layout, onMouseScroll, "mousewheel");
+          library.bindEvent(layout, onMouseScroll, "DOMMouseScroll");
+          library.bindEvent(layout, onMouseScroll, "mousewheel");
         }
         if (config.nav.zoom.adjust !== 0) {
           if (config.nav.zoom.adjust < 0) {
@@ -1119,7 +1121,7 @@
         }
         _active = true;
         reSize(true);
-        VMM.fireEvent(layout, "LOADED");
+        library.fireEvent(layout, "LOADED");
       };
       buildInterval = function() {
         var i, j;
@@ -1176,7 +1178,7 @@
           j = 0;
           while (j < interval_major_array.length) {
             if (interval_array[i].date_string === interval_major_array[j].date_string) {
-              VMM.attachElement(interval_array[i].element, "");
+              library.attachElement(interval_array[i].element, "");
             }
             j++;
           }
@@ -1205,29 +1207,29 @@
           _marker_obj = void 0;
           _marker_title = "";
           has_title = false;
-          _marker = VMM.appendAndGetElement($content, "<div>", "marker");
-          _marker_flag = VMM.appendAndGetElement(_marker, "<div>", "flag");
-          _marker_content = VMM.appendAndGetElement(_marker_flag, "<div>", "flag-content");
-          _marker_dot = VMM.appendAndGetElement(_marker, "<div>", "dot");
-          _marker_line = VMM.appendAndGetElement(_marker, "<div>", "line");
-          _marker_line_event = VMM.appendAndGetElement(_marker_line, "<div>", "event-line");
+          _marker = library.appendAndGetElement($content, "<div>", "marker");
+          _marker_flag = library.appendAndGetElement(_marker, "<div>", "flag");
+          _marker_content = library.appendAndGetElement(_marker_flag, "<div>", "flag-content");
+          _marker_dot = library.appendAndGetElement(_marker, "<div>", "dot");
+          _marker_line = library.appendAndGetElement(_marker, "<div>", "line");
+          _marker_line_event = library.appendAndGetElement(_marker_line, "<div>", "event-line");
           _marker_relative_pos = positionRelative(interval, data[i].startdate, data[i].enddate);
           _marker_thumb = "";
           if ((data[i].asset != null) && data[i].asset !== "") {
-            VMM.appendElement(_marker_content, VMM.MediaElement.thumbnail(data[i].asset, 24, 24, data[i].uniqueid));
+            library.appendElement(_marker_content, MediaElement.thumbnail(data[i].asset, 24, 24, data[i].uniqueid));
           } else {
-            VMM.appendElement(_marker_content, "<div style='margin-right:7px;height:50px;width:2px;float:left;'></div>");
+            library.appendElement(_marker_content, "<div style='margin-right:7px;height:50px;width:2px;float:left;'></div>");
           }
           if (data[i].title === "" || data[i].title === " ") {
             trace("TITLE NOTHING");
             if (typeof data[i].slug !== "undefined" && data[i].slug !== "") {
               trace("SLUG");
-              _marker_title = VMM.Util.untagify(data[i].slug);
+              _marker_title = util.untagify(data[i].slug);
               has_title = true;
             } else {
-              m = VMM.MediaType(data[i].asset.media);
+              m = ExternalAPI.mediaTypeFromAsset(data[i].asset);
               if (m.type === "quote" || m.type === "unknown") {
-                _marker_title = VMM.Util.untagify(m.id);
+                _marker_title = util.untagify(m.id);
                 has_title = true;
               } else {
                 has_title = false;
@@ -1235,22 +1237,22 @@
             }
           } else if (data[i].title !== "" || data[i].title !== " ") {
             trace(data[i].title);
-            _marker_title = VMM.Util.untagify(data[i].title);
+            _marker_title = util.untagify(data[i].title);
             has_title = true;
           } else {
             trace("TITLE SLUG NOT FOUND " + data[i].slug);
           }
           if (has_title) {
-            VMM.appendElement(_marker_content, "<h3>" + _marker_title + "</h3>");
+            library.appendElement(_marker_content, "<h3>" + _marker_title + "</h3>");
           } else {
-            VMM.appendElement(_marker_content, "<h3>" + _marker_title + "</h3>");
-            VMM.appendElement(_marker_content, "<h3 id='marker_content_" + data[i].uniqueid + "'>" + _marker_title + "</h3>");
+            library.appendElement(_marker_content, "<h3>" + _marker_title + "</h3>");
+            library.appendElement(_marker_content, "<h3 id='marker_content_" + data[i].uniqueid + "'>" + _marker_title + "</h3>");
           }
           library.attr(_marker, "id", ("marker_" + data[i].uniqueid).toString());
-          VMM.bindEvent(_marker_flag, onMarkerClick, "", {
+          library.bindEvent(_marker_flag, onMarkerClick, "", {
             number: i
           });
-          VMM.bindEvent(_marker_flag, onMarkerHover, "mouseenter mouseleave", {
+          library.bindEvent(_marker_flag, onMarkerHover, "mouseenter mouseleave", {
             number: i,
             elem: _marker_flag
           });
@@ -1278,7 +1280,7 @@
           markers.push(_marker_obj);
           i++;
         }
-        tags = VMM.Util.deDupeArray(tags);
+        tags = util.deDupeArray(tags);
         if (tags.length > 3) {
           config.nav.rows.current = config.nav.rows.half;
         } else {
@@ -1287,14 +1289,14 @@
         k = 0;
         while (k < tags.length) {
           if (k < config.nav.rows.current.length) {
-            tag_element = VMM.appendAndGetElement($timebackground, "<div>", "timenav-tag");
+            tag_element = library.appendAndGetElement($timebackground, "<div>", "timenav-tag");
             library.addClass(tag_element, "timenav-tag-row-" + (k + 1));
             if (tags.length > 3) {
               library.addClass(tag_element, "timenav-tag-size-half");
             } else {
               library.addClass(tag_element, "timenav-tag-size-full");
             }
-            VMM.appendElement(tag_element, "<div><h3>" + tags[k] + "</h3></div>");
+            library.appendElement(tag_element, "<div><h3>" + tags[k] + "</h3></div>");
           }
           k++;
         }
@@ -1316,12 +1318,12 @@
         j = 0;
         while (j < eras.length) {
           era = {
-            content: VMM.appendAndGetElement($content, "<div>", "era"),
-            text_content: VMM.appendAndGetElement($timeinterval, "<div>", "era"),
+            content: library.appendAndGetElement($content, "<div>", "era"),
+            text_content: library.appendAndGetElement($timeinterval, "<div>", "era"),
             startdate: vDate.parse(eras[j].startDate),
             enddate: vDate.parse(eras[j].endDate),
             title: eras[j].headline,
-            uniqueid: VMM.Util.unique_ID(6),
+            uniqueid: util.unique_ID(6),
             tag: "",
             relative_pos: ""
           };
@@ -1341,8 +1343,8 @@
           } else {
             current_color = 0;
           }
-          VMM.appendElement(era.content, era_text);
-          VMM.appendElement(era.text_content, VMM.Util.unlinkify(era.title));
+          library.appendElement(era.content, era_text);
+          library.appendElement(era.text_content, util.unlinkify(era.title));
           era_markers.push(era);
           j++;
         }

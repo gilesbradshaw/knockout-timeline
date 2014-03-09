@@ -1,6 +1,8 @@
 (function() {
-  define(["VMM", "trace"], function(VMM, trace) {
-    return VMM.TextElement = {
+  define(["trace"], function(trace) {
+    var TextElement;
+
+    return TextElement = {
       init: function() {
         return this;
       },

@@ -1,4 +1,9 @@
-/* CoffeeScript compiler error in C:\Users\giles\Documents\Visual Studio 2013\Projects\TimelineJS\source\timelinejs\source\js\Core\new\VMM.StoryJS.coffee, line 15, column 1.  Details:
+(function() {
+  if (typeof VMM !== "undefined" && typeof VMM.StoryJS === "undefined") {
+    VMM.StoryJS = function() {
+      return this.init = function(d) {};
+    };
+    return;
+  }
 
-SyntaxError: unexpected POST_IF
- */
+}).call(this);

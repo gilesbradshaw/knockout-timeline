@@ -1,5 +1,5 @@
 (function() {
-  define(["VMM", "trace", "type"], function(VMM, trace, type) {
+  define(["trace", "type"], function(trace, type) {
     var dateFormat, vDate;
 
     dateFormat = (function() {

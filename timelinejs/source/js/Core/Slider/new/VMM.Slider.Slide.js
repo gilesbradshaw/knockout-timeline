@@ -1,6 +1,8 @@
 (function() {
-  define(["VMM", "trace", "type", "VMM.Date", "VMM.Library", "VMM.Slider", "VMM.TextElement"], function(VMM, trace, type, vDate, library) {
-    return VMM.Slider.Slide = function(d, _parent) {
+  define(["trace", "type", "VMM.Date", "VMM.Library", "VMM.Util", "VMM.ExternalAPI", "VMM.MediaElement", "VMM.TextElement"], function(trace, type, vDate, library, util, ExternalAPI, MediaElement, TextElement) {
+    var Slide;
+
+    return Slide = function(d, _parent) {
       var $media, $slide, $text, $wrap, buildSlide, c, data, element, is_skinny, loaded, media, preloaded, reLayout, reloadLayout, removeSlide, render, slide, timer, times, _class, _enqueue, _id, _removeque;
 
       $media = void 0;
@@ -36,7 +38,7 @@
       _id = _id + data.uniqueid;
       this.enqueue = _enqueue;
       this.id = _id;
-      element = VMM.appendAndGetElement(_parent, "<div>", "slider-item");
+      element = library.appendAndGetElement(_parent, "<div>", "slider-item");
       if (typeof data.classname !== "undefined") {
         trace("HAS CLASSNAME");
         library.addClass(element, data.classname);
@@ -133,7 +135,7 @@
         buildSlide();
         clearTimeout(timer.pushque);
         clearTimeout(timer.render);
-        timer.pushque = setTimeout(VMM.ExternalAPI.pushQues, times.pushque);
+        timer.pushque = setTimeout(ExternalAPI.pushQues, times.pushque);
       };
       removeSlide = function() {
         trace("REMOVE SLIDE TIMER FINISHED");
@@ -179,8 +181,8 @@
         var dontcrashjs2coffee, en, st, tag;
 
         trace("BUILDSLIDE");
-        $wrap = VMM.appendAndGetElement(element, "<div>", "content");
-        $slide = VMM.appendAndGetElement($wrap, "<div>");
+        $wrap = library.appendAndGetElement(element, "<div>", "content");
+        $slide = library.appendAndGetElement($wrap, "<div>");
         if ((data.startdate != null) && data.startdate !== "") {
           if (type.of(data.startdate) === "date") {
             if (data.type !== "start") {
@@ -188,12 +190,12 @@
               en = vDate.prettyDate(data.enddate, false, data.precisiondate);
               tag = "";
               if ((data.tag != null) && data.tag !== "") {
-                tag = VMM.createElement("span", data.tag, "slide-tag");
+                tag = library.createElement("span", data.tag, "slide-tag");
               }
               if (st !== en) {
-                c.text += VMM.createElement("h2", st + " &mdash; " + en + tag, "date");
+                c.text += library.createElement("h2", st + " &mdash; " + en + tag, "date");
               } else {
-                c.text += VMM.createElement("h2", st + tag, "date");
+                c.text += library.createElement("h2", st + tag, "date");
               }
             }
           }
@@ -201,18 +203,18 @@
         if ((data.headline != null) && data.headline !== "") {
           c.has.headline = true;
           if (data.type === "start") {
-            c.text += VMM.createElement("h2", VMM.Util.linkify_with_twitter(data.headline, "_blank"), "start");
+            c.text += library.createElement("h2", util.linkify_with_twitter(data.headline, "_blank"), "start");
           } else {
-            c.text += VMM.createElement("h3", VMM.Util.linkify_with_twitter(data.headline, "_blank"));
+            c.text += library.createElement("h3", util.linkify_with_twitter(data.headline, "_blank"));
           }
         }
         if ((data.text != null) && data.text !== "") {
           c.has.text = true;
-          c.text += VMM.createElement("p", VMM.Util.linkify_with_twitter(data.text, "_blank"));
+          c.text += library.createElement("p", util.linkify_with_twitter(data.text, "_blank"));
         }
         if (c.has.text || c.has.headline) {
-          c.text = VMM.createElement("div", c.text, "container");
-          $text = VMM.appendAndGetElement($slide, "<div>", "text", VMM.TextElement.create(c.text));
+          c.text = library.createElement("div", c.text, "container");
+          $text = library.appendAndGetElement($slide, "<div>", "text", TextElement.create(c.text));
         }
         if (data.needs_slug) {
           dontcrashjs2coffee = 0;
@@ -220,7 +222,7 @@
         if ((data.asset != null) && data.asset !== "") {
           if ((data.asset.media != null) && data.asset.media !== "") {
             c.has.media = true;
-            $media = VMM.appendAndGetElement($slide, "<div>", "media", VMM.MediaElement.create(data.asset, data.uniqueid));
+            $media = library.appendAndGetElement($slide, "<div>", "media", MediaElement.create(data.asset, data.uniqueid));
           }
         }
         if (c.has.text) {

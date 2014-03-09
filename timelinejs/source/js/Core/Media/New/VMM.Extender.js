@@ -1,18 +1,18 @@
 (function() {
-  define(["jquery", "VMM", "trace", "VMM.FileExtension", "VMM.ExternalAPI"], function($, VMM, trace, fileExtension) {
+  define(["jquery", "trace", "VMM.FileExtension", "VMM.Util", "VMM.ExternalAPI", "VMM.Language"], function($, trace, fileExtension, util, ExternalAPI, language) {
     var mediaTypes, unknownMediaType;
 
     mediaTypes = [];
     unknownMediaType = void 0;
-    $.extend(VMM.ExternalAPI, {
+    $.extend(ExternalAPI, {
       insertMediaType: function(name, mediaType) {
         mediaType.name = name;
-        VMM.ExternalAPI[name] = mediaType;
+        ExternalAPI[name] = mediaType;
         return mediaTypes.unshift(mediaType);
       },
       addMediaType: function(name, mediaType) {
         mediaType.name = name;
-        VMM.ExternalAPI[name] = mediaType;
+        ExternalAPI[name] = mediaType;
         return mediaTypes.push(mediaType);
       },
       setUnknownMediaType: function(mediaType) {
@@ -28,8 +28,8 @@
             start: 0,
             hd: false,
             link: "",
-            lang: VMM.Language.lang,
-            uniqueid: VMM.Util.unique_ID(6)
+            lang: language.lang,
+            uniqueid: util.unique_ID(6)
           };
         };
         if (asset.media) {
@@ -52,12 +52,12 @@
         });
       }
     });
-    VMM.ExternalAPI.addMediaType("twitter-ready", {
+    ExternalAPI.addMediaType("twitter-ready", {
       assetTest: function(asset, media, d) {
         if (d && d.match("div class='twitter'")) {
           return {
             id: d,
-            mediaType: VMM.ExternalAPI["twitter-ready"]
+            mediaType: ExternalAPI["twitter-ready"]
           };
         }
       },
@@ -69,12 +69,12 @@
       },
       isTextMedia: true
     });
-    VMM.ExternalAPI.addMediaType("youtube", $.extend(VMM.ExternalAPI.youtube, {
+    ExternalAPI.addMediaType("youtube", $.extend(ExternalAPI.youtube, {
       assetTest: function(asset, media, d) {
         if (d) {
           if (d.match("(www.)?youtube|youtu.be")) {
             if (d.match("v=")) {
-              media.id = VMM.Util.getUrlVars(d)["v"];
+              media.id = util.getUrlVars(d)["v"];
             } else if (d.match("/embed/")) {
               media.id = d.split("embed/")[1].split(/[?&]/)[0];
             } else if (d.match(/v\/|v=|youtu\.be\//)) {
@@ -83,9 +83,9 @@
               trace("YOUTUBE IN URL BUT NOT A VALID VIDEO");
             }
             return $.extend(media, {
-              start: VMM.Util.getUrlVars(d)["t"],
-              hd: VMM.Util.getUrlVars(d)["hd"],
-              mediaType: VMM.ExternalAPI.youtube,
+              start: util.getUrlVars(d)["t"],
+              hd: util.getUrlVars(d)["hd"],
+              mediaType: ExternalAPI.youtube,
               type: "youtube"
             });
           }
@@ -98,17 +98,17 @@
         var mediaElem;
 
         mediaElem = "<div class='media-shadow'><div class='media-frame video youtube' id='" + media.uid + "'>" + loading_message + "</div></div>";
-        VMM.ExternalAPI.youtube.get(media);
+        ExternalAPI.youtube.get(media);
         return mediaElem;
       }
     }));
-    VMM.ExternalAPI.addMediaType("vimeo", $.extend(VMM.ExternalAPI.vimeo, {
+    ExternalAPI.addMediaType("vimeo", $.extend(ExternalAPI.vimeo, {
       assetTest: function(asset, media, d) {
         if (d) {
           if (d.match("(player.)?vimeo.com")) {
             return {
               id: d.split(/video\/|\/\/vimeo\.com\//)[1].split(/[?&]/)[0],
-              mediaType: VMM.ExternalAPI.vimeo,
+              mediaType: ExternalAPI.vimeo,
               type: "vimeo"
             };
           }
@@ -121,17 +121,17 @@
         var mediaElem;
 
         mediaElem = "<div class='media-shadow media-frame video vimeo' id='" + media.uid + "'>" + loading_message + "</div>";
-        VMM.ExternalAPI.vimeo.get(media);
+        ExternalAPI.vimeo.get(media);
         return mediaElem;
       }
     }));
-    VMM.ExternalAPI.addMediaType("dailymotion", $.extend(VMM.ExternalAPI.dailymotion, {
+    ExternalAPI.addMediaType("dailymotion", $.extend(ExternalAPI.dailymotion, {
       assetTest: function(asset, media, d) {
         if (d) {
           if (d.match("(www.)?dailymotion.com")) {
             return {
               id: d.split(/video\/|\/\/dailymotion\.com\//)[1],
-              mediaType: VMM.ExternalAPI.dailymotion,
+              mediaType: ExternalAPI.dailymotion,
               type: "dailymotion"
             };
           }
@@ -144,7 +144,7 @@
         return "<div class='media-shadow'><iframe class='media-frame video dailymotion' autostart='false' frameborder='0' width='100%' height='100%' src='http://www.dailymotion.com/embed/video/" + media.id + "'></iframe></div>";
       }
     }));
-    VMM.ExternalAPI.addMediaType("vine", $.extend(VMM.ExternalAPI.vine, {
+    ExternalAPI.addMediaType("vine", $.extend(ExternalAPI.vine, {
       assetTest: function(asset, media, d) {
         if (d) {
           if (d.match("(www.)?vine.co")) {
@@ -154,12 +154,12 @@
               return {
                 id: d.split("vine.co/v/")[1],
                 type: "vine",
-                mediaType: VMM.ExternalAPI.vine
+                mediaType: ExternalAPI.vine
               };
             } else {
               return {
                 type: "vine",
-                mediaType: VMM.ExternalAPI.vine
+                mediaType: ExternalAPI.vine
               };
             }
           }
@@ -172,18 +172,18 @@
         var mediaElem;
 
         mediaElem = "<div class='media-shadow media-frame video vine' id='" + media.uid + "'>" + loading_message + "</div>";
-        VMM.ExternalAPI.vine.get(media);
+        ExternalAPI.vine.get(media);
         return mediaElem;
       }
     }));
-    VMM.ExternalAPI.addMediaType("soundcloud", $.extend(VMM.ExternalAPI.soundcloud, {
+    ExternalAPI.addMediaType("soundcloud", $.extend(ExternalAPI.soundcloud, {
       assetTest: function(asset, media, d) {
         if (d) {
           if (d.match("(player.)?soundcloud.com")) {
             return {
               id: d,
               type: "soundcloud",
-              mediaType: VMM.ExternalAPI.soundcloud
+              mediaType: ExternalAPI.soundcloud
             };
           }
         }
@@ -195,11 +195,11 @@
         var mediaElem;
 
         mediaElem = "<div class='media-frame media-shadow soundcloud' id='" + media.uid + "'>" + loading_message + "</div>";
-        VMM.ExternalAPI.soundcloud.get(media);
+        ExternalAPI.soundcloud.get(media);
         return mediaElem;
       }
     }));
-    VMM.ExternalAPI.addMediaType("twitter", $.extend(VMM.ExternalAPI.twitter, {
+    ExternalAPI.addMediaType("twitter", $.extend(ExternalAPI.twitter, {
       assetTest: function(asset, media, d) {
         if (d) {
           if (d.match("(www.)?twitter.com") && d.match("status")) {
@@ -211,7 +211,7 @@
               media.id = "";
             }
             media.type = "twitter";
-            media.mediaType = VMM.ExternalAPI.twitter;
+            media.mediaType = ExternalAPI.twitter;
             return media;
           }
         }
@@ -223,19 +223,19 @@
         var mediaElem;
 
         mediaElem = "<div class='twitter' id='" + media.uid + "'>" + loading_message + "</div>";
-        VMM.ExternalAPI.twitter.get(media);
+        ExternalAPI.twitter.get(media);
         return mediaElem;
       },
       isTextMedia: true
     }));
-    VMM.ExternalAPI.addMediaType("googlemaps", $.extend(VMM.ExternalAPI.googlemaps, {
+    ExternalAPI.addMediaType("googlemaps", $.extend(ExternalAPI.googlemaps, {
       assetTest: function(asset, media, d) {
         if (d) {
           if (d.match("maps.google") && !d.match("staticmap")) {
             return $.extend(media, {
               type: "google-map",
               id: d.split(/src=['|"][^'|"]*?['|"]/g),
-              mediaType: VMM.ExternalAPI.googlemaps
+              mediaType: ExternalAPI.googlemaps
             });
           }
         }
@@ -247,17 +247,17 @@
         var mediaElem;
 
         mediaElem = "<div class='media-frame media-shadow map' id='" + media.uid + "'>" + loading_message + "</div>";
-        VMM.ExternalAPI.googlemaps.get(media);
+        ExternalAPI.googlemaps.get(media);
         return mediaElem;
       }
     }));
-    VMM.ExternalAPI.addMediaType("googleplus", $.extend(VMM.ExternalAPI.googleplus, {
+    ExternalAPI.addMediaType("googleplus", $.extend(ExternalAPI.googleplus, {
       assetTest: function(asset, media, d) {
         if (d) {
           if (d.match("plus.google")) {
             media.type = "googleplus";
             media.id = d.split("/posts/")[1];
-            media.mediaType = VMM.ExternalAPI.googleplus;
+            media.mediaType = ExternalAPI.googleplus;
             if (d.split("/posts/")[0].match("u/0/")) {
               return media.user = d.split("u/0/")[1].split("/posts")[0];
             } else {
@@ -273,19 +273,19 @@
         var mediaElem;
 
         mediaElem = "<div class='googleplus' id='googleplus_" + media.id + "'>" + loading_message + "</div>";
-        VMM.ExternalAPI.googleplus.get(media);
+        ExternalAPI.googleplus.get(media);
         return mediaElem;
       },
       isTextMedia: true
     }));
-    VMM.ExternalAPI.addMediaType("flickr", $.extend(VMM.ExternalAPI.flickr, {
+    ExternalAPI.addMediaType("flickr", $.extend(ExternalAPI.flickr, {
       assetTest: function(asset, media, d) {
         if (d) {
           if (d.match("flickr.com/photos/")) {
             media.type = "flickr";
-            media.id = VMM.ExternalAPI.flickr.getFlickrIdFromUrl(d);
+            media.id = ExternalAPI.flickr.getFlickrIdFromUrl(d);
             media.link = d;
-            media.mediaType = VMM.ExternalAPI.flickr;
+            media.mediaType = ExternalAPI.flickr;
             if (Boolean(media.id)) {
               return media;
             } else {
@@ -301,18 +301,18 @@
         var mediaElem;
 
         mediaElem = "<div class='media-image media-shadow'><a href='" + media.link + "' target='_blank'><img id='" + media.uid + "'></a></div>";
-        VMM.ExternalAPI.flickr.get(media);
+        ExternalAPI.flickr.get(media);
         return mediaElem;
       }
     }));
-    VMM.ExternalAPI.addMediaType("instagram", $.extend(VMM.ExternalAPI.instagram, {
+    ExternalAPI.addMediaType("instagram", $.extend(ExternalAPI.instagram, {
       assetTest: function(asset, media, d) {
         if (d) {
-          if (VMM.ExternalAPI.instagram.isInstagramUrl(d)) {
+          if (ExternalAPI.instagram.isInstagramUrl(d)) {
             media.type = "instagram";
             media.link = d;
-            media.id = VMM.ExternalAPI.instagram.getInstagramIdFromUrl(d);
-            media.mediaType = VMM.ExternalAPI.instagram;
+            media.id = ExternalAPI.instagram.getInstagramIdFromUrl(d);
+            media.mediaType = ExternalAPI.instagram;
             if (Boolean(media.id)) {
               return media;
             } else {
@@ -322,20 +322,20 @@
         }
       },
       thumbnail: function(media, uid) {
-        return "<div class='thumbnail thumb-instagram' id='" + uid + "_thumb'><img src='" + VMM.ExternalAPI.instagram.get(media, true) + "'></div>";
+        return "<div class='thumbnail thumb-instagram' id='" + uid + "_thumb'><img src='" + ExternalAPI.instagram.get(media, true) + "'></div>";
       },
       createElement: function(media, loading_message) {
-        return "<div class='media-image media-shadow'><a href='" + media.link + "' target='_blank'><img src='" + VMM.ExternalAPI.instagram.get(media) + "'></a></div>";
+        return "<div class='media-image media-shadow'><a href='" + media.link + "' target='_blank'><img src='" + ExternalAPI.instagram.get(media) + "'></a></div>";
       }
     }));
-    VMM.ExternalAPI.addMediaType("image", {
+    ExternalAPI.addMediaType("image", {
       assetTest: function(asset, media, d) {
         if (d) {
           if (d.match(/jpg|jpeg|png|gif/i) || d.match("staticmap") || d.match("yfrog.com") || d.match("twitpic.com")) {
             return $.extend(media, {
               type: "image",
               id: d,
-              mediaType: VMM.ExternalAPI.image
+              mediaType: ExternalAPI.image
             });
           }
         }
@@ -350,14 +350,14 @@
         return "<div class='media-image media-shadow'><img src='" + media.id + "' class='media-image'></div>";
       }
     });
-    VMM.ExternalAPI.addMediaType("googledocs", $.extend(VMM.ExternalAPI.googledocs, {
+    ExternalAPI.addMediaType("googledocs", $.extend(ExternalAPI.googledocs, {
       assetTest: function(asset, media, d) {
         if (d) {
           if (fileExtension.googleDocType(d)) {
             return $.extend(media, {
               type: "googledoc",
               id: d,
-              mediaType: VMM.ExternalAPI.googledocs
+              mediaType: ExternalAPI.googledocs
             });
           }
         }
@@ -369,11 +369,11 @@
         var mediaElem;
 
         mediaElem = "<div class='media-frame media-shadow doc' id='" + media.uid + "'>" + loading_message + "</div>";
-        VMM.ExternalAPI.googledocs.get(media);
+        ExternalAPI.googledocs.get(media);
         return mediaElem;
       }
     }));
-    VMM.ExternalAPI.addMediaType("wikipedia", $.extend(VMM.ExternalAPI.wikipedia, {
+    ExternalAPI.addMediaType("wikipedia", $.extend(ExternalAPI.wikipedia, {
       assetTest: function(asset, media, d) {
         var wiki_id;
 
@@ -383,7 +383,7 @@
             wiki_id = d.split("wiki/")[1].split("#")[0].replace("_", " ");
             media.id = wiki_id.replace(" ", "%20");
             media.lang = d.split("//")[1].split(".wikipedia")[0];
-            media.mediaType = VMM.ExternalAPI.wikipedia;
+            media.mediaType = ExternalAPI.wikipedia;
             return media;
           }
         }
@@ -395,17 +395,17 @@
         var mediaElem;
 
         mediaElem = "<div class='wikipedia' id='" + media.uid + "'>" + loading_message + "</div>";
-        return VMM.ExternalAPI.wikipedia.get(media);
+        return ExternalAPI.wikipedia.get(media);
       },
       isTextMedia: true
     }));
-    VMM.ExternalAPI.addMediaType("website", {
+    ExternalAPI.addMediaType("website", {
       assetTest: function(asset, media, d) {
         if (d) {
           if (d.indexOf("http://") === 0) {
             media.type = "website";
             media.id = d;
-            media.mediaType = VMM.ExternalAPI.website;
+            media.mediaType = ExternalAPI.website;
             return media;
           }
         }
@@ -417,17 +417,17 @@
         var mediaElem;
 
         mediaElem = "<div class='media-shadow website' id='" + media.uid + "'>" + loading_message + "</div>";
-        VMM.ExternalAPI.webthumb.get(media);
+        ExternalAPI.webthumb.get(media);
         return mediaElem;
       }
     });
-    VMM.ExternalAPI.addMediaType("storify", {
+    ExternalAPI.addMediaType("storify", {
       assetTest: function(asset, media, d) {
         if (d) {
           if (d.match("storify")) {
             media.type = "storify";
             media.id = d;
-            media.mediaType = VMM.ExternalAPI.storify;
+            media.mediaType = ExternalAPI.storify;
             return media;
           }
         }
@@ -440,13 +440,13 @@
       },
       isTextMedia: true
     });
-    VMM.ExternalAPI.addMediaType("blockquote", {
+    ExternalAPI.addMediaType("blockquote", {
       assetTest: function(asset, media, d) {
         if (d) {
           if (d.match("blockquote")) {
             media.type = "quote";
             media.id = d;
-            media.mediaType = VMM.ExternalAPI.blockquote;
+            media.mediaType = ExternalAPI.blockquote;
             return media;
           }
         }
@@ -459,7 +459,7 @@
       },
       isTextMedia: true
     });
-    VMM.ExternalAPI.addMediaType("iframe", {
+    ExternalAPI.addMediaType("iframe", {
       assetTest: function(asset, media, d) {
         var group, regex;
 
@@ -472,7 +472,7 @@
             if (group) {
               media.id = group[1];
             }
-            media.mediaType = VMM.ExternalAPI.iframe;
+            media.mediaType = ExternalAPI.iframe;
             trace("iframe url: " + media.id);
             if (Boolean(media.id)) {
               return media;
@@ -490,7 +490,7 @@
       },
       isTextMedia: true
     });
-    return VMM.ExternalAPI.setUnknownMediaType("unknown", {
+    return ExternalAPI.setUnknownMediaType("unknown", {
       assetTest: function(asset, media, d) {
         if (d) {
           trace("unknown media");
@@ -506,7 +506,7 @@
       },
       createElement: function(media, loading_message) {
         trace("NO KNOWN MEDIA TYPE FOUND TRYING TO JUST PLACE THE HTML");
-        return "<div class='plain-text'><div class='container'>" + VMM.Util.properQuotes(media.id) + "</div></div>";
+        return "<div class='plain-text'><div class='container'>" + util.properQuotes(media.id) + "</div></div>";
       },
       isTextMedia: true
     });

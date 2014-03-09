@@ -1,18 +1,18 @@
 ﻿# External API
 #================================================== 
 
-#VMM.master_config.api.pushques.push(VMM.ExternalAPI.twitter.pushQue);
+#masterConfig.api.pushques.push(VMM.ExternalAPI.twitter.pushQue);
 
-#twitter_timeout	= setTimeout(VMM.ExternalAPI.twitter.errorTimeOut, VMM.master_config.timers.api, tweet),
-#callback_timeout= setTimeout(callback, VMM.master_config.timers.api, tweet);
+#twitter_timeout	= setTimeout(VMM.ExternalAPI.twitter.errorTimeOut, masterConfig.timers.api, tweet),
+#callback_timeout= setTimeout(callback, masterConfig.timers.api, tweet);
 
 #
 #				// Disabled thanks to twitter's new api
 #				
-#				VMM.getJSON(the_url, function(d) {
+#				library.getJSON(the_url, function(d) {
 #					var id		= d.id_str,
 #						twit	= "<blockquote><p>",
-#						td		= VMM.Util.linkify_with_twitter(d.text, "_blank");
+#						td		= util.linkify_with_twitter(d.text, "_blank");
 #					
 #					//	TWEET CONTENT	
 #					twit += td;
@@ -36,15 +36,15 @@
 #				
 #					
 #				
-#					VMM.attachElement("#"+tweet.id.toString(), twit );
-#					VMM.attachElement("#text_thumb_"+tweet.id.toString(), d.text );
-#					VMM.attachElement("#marker_content_" + tweet.id.toString(), d.text );
+#					library.attachElement("#"+tweet.id.toString(), twit );
+#					library.attachElement("#text_thumb_"+tweet.id.toString(), d.text );
+#					library.attachElement("#marker_content_" + tweet.id.toString(), d.text );
 #					
 #				})
 #				.error(function(jqXHR, textStatus, errorThrown) {
 #					trace("TWITTER error");
 #					trace("TWITTER ERROR: " + textStatus + " " + jqXHR.responseText);
-#					VMM.attachElement("#"+tweet.id, VMM.MediaElement.loadingmessage("ERROR LOADING TWEET " + tweet.mid) );
+#					library.attachElement("#"+tweet.id, library.loadingmessage("ERROR LOADING TWEET " + tweet.mid) );
 #				})
 #				.success(function(d) {
 #					clearTimeout(twitter_timeout);
@@ -58,7 +58,7 @@
 
 #mes 	= 	"<p>Tweet " + id + " was not found.</p>";
 
-#callback_timeout= setTimeout(callback, VMM.master_config.timers.api, tweet);
+#callback_timeout= setTimeout(callback, masterConfig.timers.api, tweet);
 
 #	TWEET CONTENT
 
@@ -151,15 +151,15 @@
 #mediaElem		=	"<div class='googleplus'>";
 
 #
-#				for(var i = 0; i < VMM.master_config.googleplus.que.length; i++) {
-#					VMM.ExternalAPI.googleplus.create(VMM.master_config.googleplus.que[i]);
+#				for(var i = 0; i < masterConfig.googleplus.que.length; i++) {
+#					VMM.ExternalAPI.googleplus.create(masterConfig.googleplus.que[i]);
 #				}
-#				VMM.master_config.googleplus.que = [];
+#				masterConfig.googleplus.que = [];
 #				
 
 #flickr_thumb_id = "flickr_" + uid + "_thumb";
 
-#VMM.attachElement(flickr_large_id, "<a href='" + flick.link + "' target='_blank'><img src='" + flickr_img_size + "'></a>");
+#library.attachElement(flickr_large_id, "<a href='" + flick.link + "' target='_blank'><img src='" + flickr_img_size + "'></a>");
 
 #callback();
 
@@ -169,7 +169,7 @@
 
 # SET TO HD
 # DOESN'T WORK AS OF NOW
-#VMM.master_config.youtube.array[i].player.setPlaybackQuality("hd720");
+#masterConfig.youtube.array[i].player.setPlaybackQuality("hd720");
 
 # THUMBNAIL
 
@@ -190,18 +190,19 @@
 define [
 	"global"
 	"trace"
-	"VMM"
 	"VMM.LoadLib"
 	"VMM.Browser"
 	"VMM.Date"
 	"VMM.Library"
-], (global,trace,VMM, LoadLib, browser, vDate, library)->
+	"VMM.Util"
+	"VMM.masterConfig"
+], (global,trace, LoadLib, browser, vDate, library, util, masterConfig)->
 	global.onYouTubePlayerAPIReady = ->
 		trace "GLOBAL YOUTUBE API CALLED"
-		VMM.ExternalAPI.youtube.onAPIReady()
+		ExternalAPI.youtube.onAPIReady()
 		return
 
-	VMM.ExternalAPI = (
+	ExternalAPI = (
 		keys:
 			google: ""
 			flickr: ""
@@ -217,21 +218,21 @@ define [
 			this
 
 		setKeys: (d) ->
-			VMM.ExternalAPI.keys = d
+			ExternalAPI.keys = d
 			return
 
 		pushQues: ->
-			VMM.ExternalAPI.googlemaps.pushQue()    if VMM.master_config.googlemaps.active
-			VMM.ExternalAPI.youtube.pushQue()    if VMM.master_config.youtube.active
-			VMM.ExternalAPI.soundcloud.pushQue()    if VMM.master_config.soundcloud.active
-			VMM.ExternalAPI.googledocs.pushQue()    if VMM.master_config.googledocs.active
-			VMM.ExternalAPI.googleplus.pushQue()    if VMM.master_config.googleplus.active
-			VMM.ExternalAPI.wikipedia.pushQue()    if VMM.master_config.wikipedia.active
-			VMM.ExternalAPI.vimeo.pushQue()    if VMM.master_config.vimeo.active
-			VMM.ExternalAPI.vine.pushQue()    if VMM.master_config.vine.active
-			VMM.ExternalAPI.twitter.pushQue()    if VMM.master_config.twitter.active
-			VMM.ExternalAPI.flickr.pushQue()    if VMM.master_config.flickr.active
-			VMM.ExternalAPI.webthumb.pushQue()    if VMM.master_config.webthumb.active
+			ExternalAPI.googlemaps.pushQue()    if masterConfig.googlemaps.active
+			ExternalAPI.youtube.pushQue()    if masterConfig.youtube.active
+			ExternalAPI.soundcloud.pushQue()    if masterConfig.soundcloud.active
+			ExternalAPI.googledocs.pushQue()    if masterConfig.googledocs.active
+			ExternalAPI.googleplus.pushQue()    if masterConfig.googleplus.active
+			ExternalAPI.wikipedia.pushQue()    if masterConfig.wikipedia.active
+			ExternalAPI.vimeo.pushQue()    if masterConfig.vimeo.active
+			ExternalAPI.vine.pushQue()    if masterConfig.vine.active
+			ExternalAPI.twitter.pushQue()    if masterConfig.twitter.active
+			ExternalAPI.flickr.pushQue()    if masterConfig.flickr.active
+			ExternalAPI.webthumb.pushQue()    if masterConfig.webthumb.active
 			return
 
 		twitter:
@@ -241,21 +242,21 @@ define [
 					mid: m.id
 					id: m.uid
 
-				VMM.master_config.twitter.que.push tweet
-				VMM.master_config.twitter.active = true
+				masterConfig.twitter.que.push tweet
+				masterConfig.twitter.active = true
 				return
 
 			create: (tweet, callback) ->
 				id = tweet.mid.toString()
 				error_obj = twitterid: tweet.mid
 				the_url = "//api.twitter.com/1/statuses/show.json?id=" + tweet.mid + "&include_entities=true&callback=?"
-				VMM.ExternalAPI.twitter.getOEmbed tweet, callback
+				ExternalAPI.twitter.getOEmbed tweet, callback
 				return
 
 			errorTimeOut: (tweet) ->
 				trace "TWITTER JSON ERROR TIMEOUT " + tweet.mid
-				VMM.attachElement "#" + tweet.id.toString(), VMM.MediaElement.loadingmessage("Still waiting on Twitter: " + tweet.mid)
-				VMM.getJSON "//api.twitter.com/1/account/rate_limit_status.json", (d) ->
+				library.attachElement "#" + tweet.id.toString(), library.loadingmessage("Still waiting on Twitter: " + tweet.mid)
+				library.getJSON "//api.twitter.com/1/account/rate_limit_status.json", (d) ->
 					trace "REMAINING TWITTER API CALLS " + d.remaining_hits
 					trace "TWITTER RATE LIMIT WILL RESET AT " + d.reset_time
 					mes = ""
@@ -264,26 +265,26 @@ define [
 						mes += "<p>You can view tweets again starting at: <br/>" + d.reset_time + "</p>"
 					else
 						mes = "<p>Still waiting on Twitter. " + tweet.mid + "</p>"
-					VMM.attachElement "#" + tweet.id.toString(), VMM.MediaElement.loadingmessage(mes)
+					library.attachElement "#" + tweet.id.toString(), library.loadingmessage(mes)
 					return
 
 				return
 
 			errorTimeOutOembed: (tweet) ->
 				trace "TWITTER JSON ERROR TIMEOUT " + tweet.mid
-				VMM.attachElement "#" + tweet.id.toString(), VMM.MediaElement.loadingmessage("Still waiting on Twitter: " + tweet.mid)
+				library.attachElement "#" + tweet.id.toString(), library.loadingmessage("Still waiting on Twitter: " + tweet.mid)
 				return
 
 			pushQue: ->
-				if VMM.master_config.twitter.que.length > 0
-					VMM.ExternalAPI.twitter.create VMM.master_config.twitter.que[0], VMM.ExternalAPI.twitter.pushQue
-					VMM.Util.removeRange VMM.master_config.twitter.que, 0
+				if masterConfig.twitter.que.length > 0
+					ExternalAPI.twitter.create masterConfig.twitter.que[0], ExternalAPI.twitter.pushQue
+					util.removeRange masterConfig.twitter.que, 0
 				return
 
 			getOEmbed: (tweet, callback) ->
 				the_url = "//api.twitter.com/1/statuses/oembed.json?id=" + tweet.mid + "&omit_script=true&include_entities=true&callback=?"
-				twitter_timeout = setTimeout(VMM.ExternalAPI.twitter.errorTimeOutOembed, VMM.master_config.timers.api, tweet)
-				VMM.getJSON(the_url, (d) ->
+				twitter_timeout = setTimeout(ExternalAPI.twitter.errorTimeOutOembed, masterConfig.timers.api, tweet)
+				library.getJSON(the_url, (d) ->
 					twit = ""
 					tuser = ""
 					twit += d.html.split("</p>&mdash;")[0] + "</p></blockquote>"
@@ -295,15 +296,15 @@ define [
 					twit += "<span class='nickname'>@" + tuser + "<span class='thumbnail-inline'></span></span>"
 					twit += "</a>"
 					twit += "</div>"
-					VMM.attachElement "#" + tweet.id.toString(), twit
-					VMM.attachElement "#text_thumb_" + tweet.id.toString(), d.html
-					VMM.attachElement "#marker_content_" + tweet.id.toString(), d.html
+					library.attachElement "#" + tweet.id.toString(), twit
+					library.attachElement "#text_thumb_" + tweet.id.toString(), d.html
+					library.attachElement "#marker_content_" + tweet.id.toString(), d.html
 					return
 				).error((jqXHR, textStatus, errorThrown) ->
 					trace "TWITTER error"
 					trace "TWITTER ERROR: " + textStatus + " " + jqXHR.responseText
 					clearTimeout twitter_timeout
-					VMM.attachElement "#" + tweet.id, VMM.MediaElement.loadingmessage("ERROR LOADING TWEET " + tweet.mid)
+					library.attachElement "#" + tweet.id, library.loadingmessage("ERROR LOADING TWEET " + tweet.mid)
 					return
 				).success (d) ->
 					clearTimeout twitter_timeout
@@ -314,13 +315,13 @@ define [
 
 			getHTML: (id) ->
 				the_url = "//api.twitter.com/1/statuses/oembed.json?id=" + id + "&omit_script=true&include_entities=true&callback=?"
-				VMM.getJSON the_url, VMM.ExternalAPI.twitter.onJSONLoaded
+				library.getJSON the_url, ExternalAPI.twitter.onJSONLoaded
 				return
 
 			onJSONLoaded: (d) ->
 				trace "TWITTER JSON LOADED"
 				id = d.id
-				VMM.attachElement "#" + id, VMM.Util.linkify_with_twitter(d.html)
+				library.attachElement "#" + id, util.linkify_with_twitter(d.html)
 				return
 
 			parseTwitterDate: (d) ->
@@ -345,19 +346,19 @@ define [
 					else
 						twitter_id = ""
 					the_url = "//api.twitter.com/1/statuses/show.json?id=" + twitter_id + "&include_entities=true&callback=?"
-					VMM.getJSON(the_url, (d) ->
+					library.getJSON(the_url, (d) ->
 						tweet = {}
 						twit = "<div class='twitter'><blockquote><p>"
-						td = VMM.Util.linkify_with_twitter(d.text, "_blank")
+						td = util.linkify_with_twitter(d.text, "_blank")
 						twit += td
 						twit += "</p>"
-						twit += "— " + d.user.name + " (<a href='https://twitter.com/" + d.user.screen_name + "'>@" + d.user.screen_name + "</a>) <a href='https://twitter.com/" + d.user.screen_name + "/status/" + d.id + "'>" + VMM.ExternalAPI.twitter.prettyParseTwitterDate(d.created_at) + " </a></blockquote></div>"
+						twit += "— " + d.user.name + " (<a href='https://twitter.com/" + d.user.screen_name + "'>@" + d.user.screen_name + "</a>) <a href='https://twitter.com/" + d.user.screen_name + "/status/" + d.id + "'>" + ExternalAPI.twitter.prettyParseTwitterDate(d.created_at) + " </a></blockquote></div>"
 						tweet.content = twit
 						tweet.raw = d
 						tweetArray.push tweet
 						if tweetArray.length is number_of_tweets
 							the_tweets = tweetdata: tweetArray
-							VMM.fireEvent global, "TWEETSLOADED", the_tweets
+							library.fireEvent global, "TWEETSLOADED", the_tweets
 						return
 					).success(->
 						trace "second success"
@@ -377,22 +378,22 @@ define [
 				_number_of_tweets = number_of_tweets    if number_of_tweets? and number_of_tweets isnt ""
 				the_url = "//search.twitter.com/search.json?q=" + tweets + "&rpp=" + _number_of_tweets + "&include_entities=true&result_type=mixed"
 				tweetArray = []
-				VMM.getJSON the_url, (d) ->
+				library.getJSON the_url, (d) ->
 					i = 0
 
 					while i < d.results.length
 						tweet = {}
 						twit = "<div class='twitter'><blockquote><p>"
-						td = VMM.Util.linkify_with_twitter(d.results[i].text, "_blank")
+						td = util.linkify_with_twitter(d.results[i].text, "_blank")
 						twit += td
 						twit += "</p>"
-						twit += "— " + d.results[i].from_user_name + " (<a href='https://twitter.com/" + d.results[i].from_user + "'>@" + d.results[i].from_user + "</a>) <a href='https://twitter.com/" + d.results[i].from_user + "/status/" + d.id + "'>" + VMM.ExternalAPI.twitter.prettyParseTwitterDate(d.results[i].created_at) + " </a></blockquote></div>"
+						twit += "— " + d.results[i].from_user_name + " (<a href='https://twitter.com/" + d.results[i].from_user + "'>@" + d.results[i].from_user + "</a>) <a href='https://twitter.com/" + d.results[i].from_user + "/status/" + d.id + "'>" + ExternalAPI.twitter.prettyParseTwitterDate(d.results[i].created_at) + " </a></blockquote></div>"
 						tweet.content = twit
 						tweet.raw = d.results[i]
 						tweetArray.push tweet
 						i++
 					the_tweets = tweetdata: tweetArray
-					VMM.fireEvent global, "TWEETSLOADED", the_tweets
+					library.fireEvent global, "TWEETSLOADED", the_tweets
 					return
 
 				return
@@ -401,15 +402,15 @@ define [
 				id = id.toString()
 				error_obj = twitterid: id
 				the_url = "//api.twitter.com/1/statuses/show.json?id=" + id + "&include_entities=true&callback=?"
-				twitter_timeout = setTimeout(VMM.ExternalAPI.twitter.errorTimeOut, VMM.master_config.timers.api, id)
-				VMM.getJSON(the_url, VMM.ExternalAPI.twitter.formatJSON).error((jqXHR, textStatus, errorThrown) ->
+				twitter_timeout = setTimeout(ExternalAPI.twitter.errorTimeOut, masterConfig.timers.api, id)
+				library.getJSON(the_url, ExternalAPI.twitter.formatJSON).error((jqXHR, textStatus, errorThrown) ->
 					trace "TWITTER error"
 					trace "TWITTER ERROR: " + textStatus + " " + jqXHR.responseText
-					VMM.attachElement "#twitter_" + id, "<p>ERROR LOADING TWEET " + id + "</p>"
+					library.attachElement "#twitter_" + id, "<p>ERROR LOADING TWEET " + id + "</p>"
 					return
 				).success (d) ->
 					clearTimeout twitter_timeout
-					VMM.ExternalAPI.twitter.secondaryMedia d    if secondary
+					ExternalAPI.twitter.secondaryMedia d    if secondary
 					return
 
 				return
@@ -417,7 +418,7 @@ define [
 			formatJSON: (d) ->
 				id = d.id_str
 				twit = "<blockquote><p>"
-				td = VMM.Util.linkify_with_twitter(d.text, "_blank")
+				td = util.linkify_with_twitter(d.text, "_blank")
 				twit += td
 				twit += "</p></blockquote>"
 				twit += "<div class='vcard author'>"
@@ -428,31 +429,31 @@ define [
 				twit += "</a>"
 				twit += "</div>"
 				twit += "<img src=' " + d.entities.media[0].media_url + "'    alt=''>"    if d.entities.media[0].type is "photo"    unless typeof d.entities.media is "undefined"
-				VMM.attachElement "#twitter_" + id.toString(), twit
-				VMM.attachElement "#text_thumb_" + id.toString(), d.text
+				library.attachElement "#twitter_" + id.toString(), twit
+				library.attachElement "#text_thumb_" + id.toString(), d.text
 				return
 
 		googlemaps:
 			maptype: "TERRAIN"
 			setMapType: (d) ->
-				VMM.ExternalAPI.googlemaps.maptype = d    unless d is ""
+				ExternalAPI.googlemaps.maptype = d    unless d is ""
 				return
 
 			get: (m) ->
 				timer = undefined
 				api_key = undefined
 				map_url = undefined
-				m.vars = VMM.Util.getUrlVars(m.id)
-				unless VMM.ExternalAPI.keys.google is ""
-					api_key = VMM.ExternalAPI.keys.google
+				m.vars = util.getUrlVars(m.id)
+				unless ExternalAPI.keys.google is ""
+					api_key = ExternalAPI.keys.google
 				else
-					api_key = Aes.Ctr.decrypt(VMM.ExternalAPI.keys_master.google, VMM.ExternalAPI.keys_master.vp, 256)
-				map_url = "//maps.googleapis.com/maps/api/js?key=" + api_key + "&v=3.9&libraries=places&sensor=false&callback=VMM.ExternalAPI.googlemaps.onMapAPIReady"
-				if VMM.master_config.googlemaps.active
-					VMM.master_config.googlemaps.que.push m
+					api_key = Aes.Ctr.decrypt(ExternalAPI.keys_master.google, ExternalAPI.keys_master.vp, 256)
+				map_url = "//maps.googleapis.com/maps/api/js?key=" + api_key + "&v=3.9&libraries=places&sensor=false&callback=ExternalAPI.googlemaps.onMapAPIReady"
+				if masterConfig.googlemaps.active
+					masterConfig.googlemaps.que.push m
 				else
-					VMM.master_config.googlemaps.que.push m
-					if VMM.master_config.googlemaps.api_loaded
+					masterConfig.googlemaps.que.push m
+					if masterConfig.googlemaps.api_loaded
 						dontcrashjs2coffee = 0
 					else
 						LoadLib.js map_url, ->
@@ -462,7 +463,7 @@ define [
 				return
 
 			create: (m) ->
-				VMM.ExternalAPI.googlemaps.createAPIMap m
+				ExternalAPI.googlemaps.createAPIMap m
 				return
 
 			createiFrameMap: (m) ->
@@ -472,16 +473,16 @@ define [
 				mc += "<div class='google-map' id='" + unique_map_id + "' style='width=100%;height=100%;'>"
 				mc += "<iframe width='100%' height='100%' frameborder='0' scrolling='no' marginheight='0' marginwidth='0' src='" + embed_url + "'></iframe>"
 				mc += "</div>"
-				VMM.attachElement "#" + m.uid, mc
+				library.attachElement "#" + m.uid, mc
 				return
 
 			createAPIMap: (m) ->
 				mapProvider = (name) ->
-					if name of VMM.ExternalAPI.googlemaps.map_providers
-						map_attribution = VMM.ExternalAPI.googlemaps.map_attribution[VMM.ExternalAPI.googlemaps.map_providers[name].attribution]
-						VMM.ExternalAPI.googlemaps.map_providers[name]
+					if name of ExternalAPI.googlemaps.map_providers
+						map_attribution = ExternalAPI.googlemaps.map_attribution[ExternalAPI.googlemaps.map_providers[name].attribution]
+						ExternalAPI.googlemaps.map_providers[name]
 					else
-						if VMM.ExternalAPI.googlemaps.defaultType(name)
+						if ExternalAPI.googlemaps.defaultType(name)
 							trace "GOOGLE MAP DEFAULT TYPE"
 							google.maps.MapTypeId[name.toUpperCase()]
 						else
@@ -489,7 +490,7 @@ define [
 					return
 				geocodePlace = ->
 					geocoder = new google.maps.Geocoder()
-					address = VMM.Util.getUrlVars(m.id)["q"]
+					address = util.getUrlVars(m.id)["q"]
 					marker = undefined
 					if address.match("loc:")
 						address_latlon = address.split(":")[1].split("+")
@@ -543,7 +544,7 @@ define [
 							else
 								trace "USING SIMPLE IFRAME MAP EMBED"
 								m.id = m.url[0].replace("https", "http")    if m.id[0].match("https")
-								VMM.ExternalAPI.googlemaps.createiFrameMap m
+								ExternalAPI.googlemaps.createiFrameMap m
 						return
 					createMarker = (place) ->
 						marker = undefined
@@ -577,7 +578,7 @@ define [
 							"geocode"
 						]
 
-					search_request.query = VMM.Util.getUrlVars(m.id)["q"]    if type.of(VMM.Util.getUrlVars(m.id)["q"]) is "string"
+					search_request.query = util.getUrlVars(m.id)["q"]    if type.of(util.getUrlVars(m.id)["q"]) is "string"
 					if has_location
 						search_request.location = location
 						search_request.radius = "15000"
@@ -592,17 +593,17 @@ define [
 					places_url = undefined
 					has_key = false
 					trace "LOADING PLACES API FOR GOOGLE MAPS"
-					unless VMM.ExternalAPI.keys.google is ""
-						api_key = VMM.ExternalAPI.keys.google
+					unless ExternalAPI.keys.google is ""
+						api_key = ExternalAPI.keys.google
 						has_key = true
 					else
 						trace "YOU NEED A GOOGLE MAPS API KEY IN ORDER TO USE THIS FEATURE OF TIMELINEJS"
 						trace "FIND OUT HOW TO GET YOUR KEY HERE: https://developers.google.com/places/documentation/#Authentication"
 					places_url = "https://maps.googleapis.com/maps/api/place/textsearch/json?key=" + api_key + "&sensor=false&language=" + m.lang + "&"
-					places_url += "query=" + VMM.Util.getUrlVars(m.id)["q"]    if type.of(VMM.Util.getUrlVars(m.id)["q"]) is "string"
+					places_url += "query=" + util.getUrlVars(m.id)["q"]    if type.of(util.getUrlVars(m.id)["q"]) is "string"
 					places_url += "&location=" + location    if has_location
 					if has_key
-						VMM.getJSON(places_url, (d) ->
+						library.getJSON(places_url, (d) ->
 							trace "PLACES JSON"
 							places_location = ""
 							places_bounds = ""
@@ -617,7 +618,7 @@ define [
 								else
 									trace "DOING TRADITIONAL MAP IFRAME EMBED UNTIL QUERY LIMIT RESTORED"
 									api_limit = true
-									VMM.ExternalAPI.googlemaps.createiFrameMap m
+									ExternalAPI.googlemaps.createiFrameMap m
 							else
 								if d.results.length >= 1
 									places_bounds_ne = new google.maps.LatLng(parseFloat(d.results[0].geometry.viewport.northeast.lat), parseFloat(d.results[0].geometry.viewport.northeast.lng))
@@ -643,7 +644,7 @@ define [
 							map.setZoom zoom    if has_zoom
 						else
 							trace "DOING TRADITIONAL MAP IFRAME EMBED BECAUSE NO GOOGLE MAP API KEY WAS PROVIDED"
-							VMM.ExternalAPI.googlemaps.createiFrameMap m
+							ExternalAPI.googlemaps.createiFrameMap m
 					return
 				loadKML = ->
 					kml_url = undefined
@@ -689,14 +690,14 @@ define [
 				api_limit = false
 				map_bounds = undefined
 				google.maps.VeriteMapType = (name) ->
-					if VMM.ExternalAPI.googlemaps.defaultType(name)
+					if ExternalAPI.googlemaps.defaultType(name)
 						google.maps.MapTypeId[name.toUpperCase()]
 					else
 						provider = mapProvider(name)
 						google.maps.ImageMapType.call this,
 							getTileUrl: (coord, zoom) ->
-								index = (zoom + coord.x + coord.y) % VMM.ExternalAPI.googlemaps.map_subdomains.length
-								retURL = provider.url.replace("{S}", VMM.ExternalAPI.googlemaps.map_subdomains[index]).replace("{Z}", zoom).replace("{X}", coord.x).replace("{Y}", coord.y).replace("{z}", zoom).replace("{x}", coord.x).replace("{y}", coord.y)
+								index = (zoom + coord.x + coord.y) % ExternalAPI.googlemaps.map_subdomains.length
+								retURL = provider.url.replace("{S}", ExternalAPI.googlemaps.map_subdomains[index]).replace("{Z}", zoom).replace("{X}", coord.x).replace("{Y}", coord.y).replace("{z}", zoom).replace("{x}", coord.x).replace("{y}", coord.y)
 								retURL
 
 							tileSize: new google.maps.Size(256, 256)
@@ -706,23 +707,23 @@ define [
 
 
 				google.maps.VeriteMapType:: = new google.maps.ImageMapType("_")
-				unless VMM.ExternalAPI.googlemaps.maptype is ""
-					if VMM.ExternalAPI.googlemaps.defaultType(VMM.ExternalAPI.googlemaps.maptype)
-						layer = google.maps.MapTypeId[VMM.ExternalAPI.googlemaps.maptype.toUpperCase()]
+				unless ExternalAPI.googlemaps.maptype is ""
+					if ExternalAPI.googlemaps.defaultType(ExternalAPI.googlemaps.maptype)
+						layer = google.maps.MapTypeId[ExternalAPI.googlemaps.maptype.toUpperCase()]
 					else
-						layer = VMM.ExternalAPI.googlemaps.maptype
+						layer = ExternalAPI.googlemaps.maptype
 				else
 					layer = google.maps.MapTypeId["TERRAIN"]
-				if type.of(VMM.Util.getUrlVars(m.id)["ll"]) is "string"
+				if type.of(util.getUrlVars(m.id)["ll"]) is "string"
 					has_location = true
-					latlong = VMM.Util.getUrlVars(m.id)["ll"].split(",")
+					latlong = util.getUrlVars(m.id)["ll"].split(",")
 					location = new google.maps.LatLng(parseFloat(latlong[0]), parseFloat(latlong[1]))
-				else if type.of(VMM.Util.getUrlVars(m.id)["sll"]) is "string"
-					latlong = VMM.Util.getUrlVars(m.id)["sll"].split(",")
+				else if type.of(util.getUrlVars(m.id)["sll"]) is "string"
+					latlong = util.getUrlVars(m.id)["sll"].split(",")
 					location = new google.maps.LatLng(parseFloat(latlong[0]), parseFloat(latlong[1]))
-				if type.of(VMM.Util.getUrlVars(m.id)["z"]) is "string"
+				if type.of(util.getUrlVars(m.id)["z"]) is "string"
 					has_zoom = true
-					zoom = parseFloat(VMM.Util.getUrlVars(m.id)["z"])
+					zoom = parseFloat(util.getUrlVars(m.id)["z"])
 				map_options =
 					zoom: zoom
 					draggable: false
@@ -738,45 +739,45 @@ define [
 					mapTypeControlOptions:
 						mapTypeIds: [layer]
 
-				VMM.attachElement "#" + m.uid, "<div class='google-map' id='" + unique_map_id + "' style='width=100%;height=100%;'></div>"
+				library.attachElement "#" + m.uid, "<div class='google-map' id='" + unique_map_id + "' style='width=100%;height=100%;'></div>"
 				map = new google.maps.Map(document.getElementById(unique_map_id), map_options)
-				if VMM.ExternalAPI.googlemaps.defaultType(VMM.ExternalAPI.googlemaps.maptype)
+				if ExternalAPI.googlemaps.defaultType(ExternalAPI.googlemaps.maptype)
 					dontcrashjs2coffee = 0
 				else
 					map.mapTypes.set layer, new google.maps.VeriteMapType(layer)
 					map_attribution_html = "<div class='map-attribution'><div class='attribution-text'>" + map_attribution + "</div></div>"
-					VMM.appendElement "#" + unique_map_id, map_attribution_html
-				if type.of(VMM.Util.getUrlVars(m.id)["msid"]) is "string"
+					library.appendElement "#" + unique_map_id, map_attribution_html
+				if type.of(util.getUrlVars(m.id)["msid"]) is "string"
 					loadKML()
 				else
-					geocodePlace()    if type.of(VMM.Util.getUrlVars(m.id)["q"]) is "string"
+					geocodePlace()    if type.of(util.getUrlVars(m.id)["q"]) is "string"
 				return
 
 			pushQue: ->
 				i = 0
 
-				while i < VMM.master_config.googlemaps.que.length
-					VMM.ExternalAPI.googlemaps.create VMM.master_config.googlemaps.que[i]
+				while i < masterConfig.googlemaps.que.length
+					ExternalAPI.googlemaps.create masterConfig.googlemaps.que[i]
 					i++
-				VMM.master_config.googlemaps.que = []
+				masterConfig.googlemaps.que = []
 				return
 
 			onMapAPIReady: ->
-				VMM.master_config.googlemaps.map_active = true
-				VMM.master_config.googlemaps.places_active = true
-				VMM.ExternalAPI.googlemaps.onAPIReady()
+				masterConfig.googlemaps.map_active = true
+				masterConfig.googlemaps.places_active = true
+				ExternalAPI.googlemaps.onAPIReady()
 				return
 
 			onPlacesAPIReady: ->
-				VMM.master_config.googlemaps.places_active = true
-				VMM.ExternalAPI.googlemaps.onAPIReady()
+				masterConfig.googlemaps.places_active = true
+				ExternalAPI.googlemaps.onAPIReady()
 				return
 
 			onAPIReady: ->
-				unless VMM.master_config.googlemaps.active
-					if VMM.master_config.googlemaps.map_active and VMM.master_config.googlemaps.places_active
-						VMM.master_config.googlemaps.active = true
-						VMM.ExternalAPI.googlemaps.pushQue()
+				unless masterConfig.googlemaps.active
+					if masterConfig.googlemaps.map_active and masterConfig.googlemaps.places_active
+						masterConfig.googlemaps.active = true
+						ExternalAPI.googlemaps.pushQue()
 				return
 
 			defaultType: (name) ->
@@ -841,8 +842,8 @@ define [
 					activity: m.id
 					id: m.uid
 
-				VMM.master_config.googleplus.que.push gplus
-				VMM.master_config.googleplus.active = true
+				masterConfig.googleplus.que.push gplus
+				masterConfig.googleplus.active = true
 				return
 
 			create: (gplus, callback) ->
@@ -853,16 +854,16 @@ define [
 				g_attachments = ""
 				gperson_api_url = undefined
 				gactivity_api_url = undefined
-				googleplus_timeout = setTimeout(VMM.ExternalAPI.googleplus.errorTimeOut, VMM.master_config.timers.api, gplus)
-				callback_timeout = setTimeout(callback, VMM.master_config.timers.api, gplus)
+				googleplus_timeout = setTimeout(ExternalAPI.googleplus.errorTimeOut, masterConfig.timers.api, gplus)
+				callback_timeout = setTimeout(callback, masterConfig.timers.api, gplus)
 
-				unless VMM.master_config.Timeline.api_keys.google is ""
-					api_key = VMM.master_config.Timeline.api_keys.google
+				unless masterConfig.Timeline.api_keys.google is ""
+					api_key = masterConfig.Timeline.api_keys.google
 				else
-					api_key = Aes.Ctr.decrypt(VMM.master_config.api_keys_master.google, VMM.master_config.vp, 256)
+					api_key = Aes.Ctr.decrypt(masterConfig.api_keys_master.google, masterConfig.vp, 256)
 				gperson_api_url = "https://www.googleapis.com/plus/v1/people/" + gplus.user + "/activities/public?alt=json&maxResults=100&fields=items(id,url)&key=" + api_key
 				mediaElem = "GOOGLE PLUS API CALL"
-				VMM.getJSON(gperson_api_url, (p_data) ->
+				library.getJSON(gperson_api_url, (p_data) ->
 					i = 0
 
 					while i < p_data.items.length
@@ -871,7 +872,7 @@ define [
 							trace "FOUND IT!!"
 							g_activity = p_data.items[i].id
 							gactivity_api_url = "https://www.googleapis.com/plus/v1/activities/" + g_activity + "?alt=json&key=" + api_key
-							VMM.getJSON gactivity_api_url, (a_data) ->
+							library.getJSON gactivity_api_url, (a_data) ->
 								trace a_data
 								unless typeof a_data.annotation is "undefined"
 									g_content += "<div class='googleplus-annotation'>'" + a_data.annotation + "</div>"
@@ -907,16 +908,16 @@ define [
 								mediaElem += "<span class='fn'>" + a_data.actor.displayName + "</span>"
 								mediaElem += "<span class='nickname'><span class='thumbnail-inline'></span></span>"
 								mediaElem += "</a></div>"
-								VMM.attachElement "#googleplus_" + gplus.activity, mediaElem
+								library.attachElement "#googleplus_" + gplus.activity, mediaElem
 								return
 
 							break
 						i++
 					return
 				).error((jqXHR, textStatus, errorThrown) ->
-					error_obj = VMM.parseJSON(jqXHR.responseText)
+					error_obj = library.parseJSON(jqXHR.responseText)
 					trace error_obj.error.message
-					VMM.attachElement "#googleplus_" + gplus.activity, VMM.MediaElement.loadingmessage("<p>ERROR LOADING GOOGLE+ </p><p>" + error_obj.error.message + "</p>")
+					library.attachElement "#googleplus_" + gplus.activity, library.loadingmessage("<p>ERROR LOADING GOOGLE+ </p><p>" + error_obj.error.message + "</p>")
 					return
 				).success (d) ->
 					clearTimeout googleplus_timeout
@@ -927,20 +928,20 @@ define [
 				return
 
 			pushQue: ->
-				if VMM.master_config.googleplus.que.length > 0
-					VMM.ExternalAPI.googleplus.create VMM.master_config.googleplus.que[0], VMM.ExternalAPI.googleplus.pushQue
-					VMM.Util.removeRange VMM.master_config.googleplus.que, 0
+				if masterConfig.googleplus.que.length > 0
+					ExternalAPI.googleplus.create masterConfig.googleplus.que[0], ExternalAPI.googleplus.pushQue
+					util.removeRange masterConfig.googleplus.que, 0
 				return
 
 			errorTimeOut: (gplus) ->
 				trace "GOOGLE+ JSON ERROR TIMEOUT " + gplus.activity
-				VMM.attachElement "#googleplus_" + gplus.activity, VMM.MediaElement.loadingmessage("<p>Still waiting on GOOGLE+ </p><p>" + gplus.activity + "</p>")
+				library.attachElement "#googleplus_" + gplus.activity, library.loadingmessage("<p>Still waiting on GOOGLE+ </p><p>" + gplus.activity + "</p>")
 				return
 
 		googledocs:
 			get: (m) ->
-				VMM.master_config.googledocs.que.push m
-				VMM.master_config.googledocs.active = true
+				masterConfig.googledocs.que.push m
+				masterConfig.googledocs.active = true
 				return
 
 			create: (m) ->
@@ -949,41 +950,41 @@ define [
 					mediaElem = "<iframe class='doc' frameborder='0' width='100%' height='100%' src='" + m.id + "&amp;embedded=true'></iframe>"
 				else
 					mediaElem = "<iframe class='doc' frameborder='0' width='100%' height='100%' src='" + "//docs.google.com/viewer?url=" + m.id + "&amp;embedded=true'></iframe>"
-				VMM.attachElement "#" + m.uid, mediaElem
+				library.attachElement "#" + m.uid, mediaElem
 				return
 
 			pushQue: ->
 				i = 0
 
-				while i < VMM.master_config.googledocs.que.length
-					VMM.ExternalAPI.googledocs.create VMM.master_config.googledocs.que[i]
+				while i < masterConfig.googledocs.que.length
+					ExternalAPI.googledocs.create masterConfig.googledocs.que[i]
 					i++
-				VMM.master_config.googledocs.que = []
+				masterConfig.googledocs.que = []
 				return
 
 		flickr:
 			get: (m) ->
-				VMM.master_config.flickr.que.push m
-				VMM.master_config.flickr.active = true
+				masterConfig.flickr.que.push m
+				masterConfig.flickr.active = true
 				return
 
 			create: (m, callback) ->
 				api_key = undefined
-				callback_timeout = setTimeout(callback, VMM.master_config.timers.api, m)
-				if typeof VMM.master_config.Timeline isnt "undefined" and VMM.master_config.Timeline.api_keys.flickr isnt ""
-					api_key = VMM.master_config.Timeline.api_keys.flickr
+				callback_timeout = setTimeout(callback, masterConfig.timers.api, m)
+				if typeof masterConfig.Timeline isnt "undefined" and masterConfig.Timeline.api_keys.flickr isnt ""
+					api_key = masterConfig.Timeline.api_keys.flickr
 				else
-					api_key = Aes.Ctr.decrypt(VMM.master_config.api_keys_master.flickr, VMM.master_config.vp, 256)
+					api_key = Aes.Ctr.decrypt(masterConfig.api_keys_master.flickr, masterConfig.vp, 256)
 				the_url = "//api.flickr.com/services/rest/?method=flickr.photos.getSizes&api_key=" + api_key + "&photo_id=" + m.id + "&format=json&jsoncallback=?"
-				VMM.getJSON(the_url, (d) ->
-					flickr_id = VMM.ExternalAPI.flickr.getFlickrIdFromUrl(d.sizes.size[0].url)
+				library.getJSON(the_url, (d) ->
+					flickr_id = ExternalAPI.flickr.getFlickrIdFromUrl(d.sizes.size[0].url)
 					flickr_large_id = "#" + m.uid
 					flickr_thumb_id = "#" + m.uid + "_thumb"
 					flickr_img_size = undefined
 					flickr_img_thumb = undefined
 					flickr_size_found = false
 					flickr_best_size = "Large"
-					flickr_best_size = VMM.ExternalAPI.flickr.sizes(VMM.master_config.sizes.api.height)
+					flickr_best_size = ExternalAPI.flickr.sizes(masterConfig.sizes.api.height)
 					i = 0
 
 					while i < d.sizes.size.length
@@ -994,7 +995,7 @@ define [
 					flickr_img_size = d.sizes.size[d.sizes.size.length - 2].source    unless flickr_size_found
 					flickr_img_thumb = d.sizes.size[0].source
 					library.attr flickr_large_id, "src", flickr_img_size
-					VMM.attachElement flickr_thumb_id, "<img src='" + flickr_img_thumb + "'>"
+					library.attachElement flickr_thumb_id, "<img src='" + flickr_img_thumb + "'>"
 					return
 				).error((jqXHR, textStatus, errorThrown) ->
 					trace "FLICKR error"
@@ -1008,9 +1009,9 @@ define [
 				return
 
 			pushQue: ->
-				if VMM.master_config.flickr.que.length > 0
-					VMM.ExternalAPI.flickr.create VMM.master_config.flickr.que[0], VMM.ExternalAPI.flickr.pushQue
-					VMM.Util.removeRange VMM.master_config.flickr.que, 0
+				if masterConfig.flickr.que.length > 0
+					ExternalAPI.flickr.create masterConfig.flickr.que[0], ExternalAPI.flickr.pushQue
+					util.removeRange masterConfig.flickr.que, 0
 				return
 
 			sizes: (s) ->
@@ -1045,7 +1046,7 @@ define [
 				if thumb
 					"//instagr.am/p/" + m.id + "/media/?size=t"
 				else
-					"//instagr.am/p/" + m.id + "/media/?size=" + VMM.ExternalAPI.instagram.sizes(VMM.master_config.sizes.api.height)
+					"//instagr.am/p/" + m.id + "/media/?size=" + ExternalAPI.instagram.sizes(masterConfig.sizes.api.height)
 
 			sizes: (s) ->
 				_size = ""
@@ -1070,40 +1071,40 @@ define [
 
 		soundcloud:
 			get: (m) ->
-				VMM.master_config.soundcloud.que.push m
-				VMM.master_config.soundcloud.active = true
+				masterConfig.soundcloud.que.push m
+				masterConfig.soundcloud.active = true
 				return
 
 			create: (m, callback) ->
 				the_url = "//soundcloud.com/oembed?url=" + m.id + "&format=js&callback=?"
-				VMM.getJSON the_url, (d) ->
-					VMM.attachElement "#" + m.uid, d.html
+				library.getJSON the_url, (d) ->
+					library.attachElement "#" + m.uid, d.html
 					callback()
 					return
 
 				return
 
 			pushQue: ->
-				if VMM.master_config.soundcloud.que.length > 0
-					VMM.ExternalAPI.soundcloud.create VMM.master_config.soundcloud.que[0], VMM.ExternalAPI.soundcloud.pushQue
-					VMM.Util.removeRange VMM.master_config.soundcloud.que, 0
+				if masterConfig.soundcloud.que.length > 0
+					ExternalAPI.soundcloud.create masterConfig.soundcloud.que[0], ExternalAPI.soundcloud.pushQue
+					util.removeRange masterConfig.soundcloud.que, 0
 				return
 
 		wikipedia:
 			get: (m) ->
-				VMM.master_config.wikipedia.que.push m
-				VMM.master_config.wikipedia.active = true
+				masterConfig.wikipedia.que.push m
+				masterConfig.wikipedia.active = true
 				return
 
 			create: (m, callback) ->
 				the_url = "//" + m.lang + ".wikipedia.org/w/api.php?action=query&prop=extracts&redirects=&titles=" + m.id + "&exintro=1&format=json&callback=?"
-				callback_timeout = setTimeout(callback, VMM.master_config.timers.api, m)
+				callback_timeout = setTimeout(callback, masterConfig.timers.api, m)
 				if browser.browser is "Explorer" and parseInt(browser.version, 10) >= 7 and window.XDomainRequest
-					temp_text = "<h4><a href='http://" + VMM.master_config.language.api.wikipedia + ".wikipedia.org/wiki/" + m.id + "' target='_blank'>" + m.url + "</a></h4>"
-					temp_text += "<span class='wiki-source'>" + VMM.master_config.language.messages.wikipedia + "</span>"
+					temp_text = "<h4><a href='http://" + masterConfig.language.api.wikipedia + ".wikipedia.org/wiki/" + m.id + "' target='_blank'>" + m.url + "</a></h4>"
+					temp_text += "<span class='wiki-source'>" + masterConfig.language.messages.wikipedia + "</span>"
 					temp_text += "<p>Wikipedia entry unable to load using Internet Explorer 8 or below.</p>"
-					VMM.attachElement "#" + m.uid, temp_text
-				VMM.getJSON(the_url, (d) ->
+					library.attachElement "#" + m.uid, temp_text
+				library.getJSON(the_url, (d) ->
 					if d.query
 						wiki_extract = undefined
 						wiki_title = undefined
@@ -1111,8 +1112,8 @@ define [
 						wiki_text = ""
 						wiki_number_of_paragraphs = 1
 						wiki_text_array = []
-						wiki_extract = VMM.Util.getObjectAttributeByIndex(d.query.pages, 0).extract
-						wiki_title = VMM.Util.getObjectAttributeByIndex(d.query.pages, 0).title
+						wiki_extract = util.getObjectAttributeByIndex(d.query.pages, 0).extract
+						wiki_title = util.getObjectAttributeByIndex(d.query.pages, 0).title
 						if wiki_extract.match("<p>")
 							wiki_text_array = wiki_extract.split("<p>")
 						else
@@ -1122,31 +1123,31 @@ define [
 						while i < wiki_text_array.length
 							wiki_text += "<p>" + wiki_text_array[i + 1]    if i + 1 <= wiki_number_of_paragraphs and i + 1 < wiki_text_array.length
 							i++
-						_wiki = "<h4><a href='http://" + VMM.master_config.language.api.wikipedia + ".wikipedia.org/wiki/" + wiki_title + "' target='_blank'>" + wiki_title + "</a></h4>"
-						_wiki += "<span class='wiki-source'>" + VMM.master_config.language.messages.wikipedia + "</span>"
-						_wiki += VMM.Util.linkify_wikipedia(wiki_text)
+						_wiki = "<h4><a href='http://" + masterConfig.language.api.wikipedia + ".wikipedia.org/wiki/" + wiki_title + "' target='_blank'>" + wiki_title + "</a></h4>"
+						_wiki += "<span class='wiki-source'>" + masterConfig.language.messages.wikipedia + "</span>"
+						_wiki += util.linkify_wikipedia(wiki_text)
 						if wiki_extract.match("REDIRECT")
 							don = undefined
 							tcrashjs2coffee = 0
 						else
-							VMM.attachElement "#" + m.uid, _wiki
+							library.attachElement "#" + m.uid, _wiki
 					return
 				).error((jqXHR, textStatus, errorThrown) ->
 					trace "WIKIPEDIA error"
 					trace "WIKIPEDIA ERROR: " + textStatus + " " + jqXHR.responseText
 					trace errorThrown
-					VMM.attachElement "#" + m.uid, VMM.MediaElement.loadingmessage("<p>Wikipedia is not responding</p>")
+					library.attachElement "#" + m.uid, library.loadingmessage("<p>Wikipedia is not responding</p>")
 					clearTimeout callback_timeout
-					if VMM.master_config.wikipedia.tries < 4
-						trace "WIKIPEDIA ATTEMPT " + VMM.master_config.wikipedia.tries
+					if masterConfig.wikipedia.tries < 4
+						trace "WIKIPEDIA ATTEMPT " + masterConfig.wikipedia.tries
 						trace m
-						VMM.master_config.wikipedia.tries++
-						VMM.ExternalAPI.wikipedia.create m, callback
+						masterConfig.wikipedia.tries++
+						ExternalAPI.wikipedia.create m, callback
 					else
 						callback()
 					return
 				).success (d) ->
-					VMM.master_config.wikipedia.tries = 0
+					masterConfig.wikipedia.tries = 0
 					clearTimeout callback_timeout
 					callback()
 					return
@@ -1154,24 +1155,24 @@ define [
 				return
 
 			pushQue: ->
-				if VMM.master_config.wikipedia.que.length > 0
-					trace "WIKIPEDIA PUSH QUE " + VMM.master_config.wikipedia.que.length
-					VMM.ExternalAPI.wikipedia.create VMM.master_config.wikipedia.que[0], VMM.ExternalAPI.wikipedia.pushQue
-					VMM.Util.removeRange VMM.master_config.wikipedia.que, 0
+				if masterConfig.wikipedia.que.length > 0
+					trace "WIKIPEDIA PUSH QUE " + masterConfig.wikipedia.que.length
+					ExternalAPI.wikipedia.create masterConfig.wikipedia.que[0], ExternalAPI.wikipedia.pushQue
+					util.removeRange masterConfig.wikipedia.que, 0
 				return
 
 		youtube:
 			get: (m) ->
 				the_url = "//gdata.youtube.com/feeds/api/videos/" + m.id + "?v=2&alt=jsonc&callback=?"
-				VMM.master_config.youtube.que.push m
-				unless VMM.master_config.youtube.active
-					unless VMM.master_config.youtube.api_loaded
+				masterConfig.youtube.que.push m
+				unless masterConfig.youtube.active
+					unless masterConfig.youtube.api_loaded
 						LoadLib.js "//www.youtube.com/player_api", ->
 							trace "YouTube API Library Loaded"
 							return
 
-				VMM.getJSON the_url, (d) ->
-					VMM.ExternalAPI.youtube.createThumb d, m
+				library.getJSON the_url, (d) ->
+					ExternalAPI.youtube.createThumb d, m
 					return
 
 				return
@@ -1210,10 +1211,10 @@ define [
 
 					videoId: m.id
 					events:
-						onReady: VMM.ExternalAPI.youtube.onPlayerReady
-						onStateChange: VMM.ExternalAPI.youtube.onStateChange
+						onReady: ExternalAPI.youtube.onPlayerReady
+						onStateChange: ExternalAPI.youtube.onStateChange
 				)
-				VMM.master_config.youtube.array.push p
+				masterConfig.youtube.array.push p
 				return
 
 			createThumb: (d, m) ->
@@ -1222,43 +1223,43 @@ define [
 				trace m
 				unless typeof d.data is "undefined"
 					thumb_id = "#" + m.uid + "_thumb"
-					VMM.attachElement thumb_id, "<img src='" + d.data.thumbnail.sqDefault + "'>"
+					library.attachElement thumb_id, "<img src='" + d.data.thumbnail.sqDefault + "'>"
 				return
 
 			pushQue: ->
 				i = 0
 
-				while i < VMM.master_config.youtube.que.length
-					VMM.ExternalAPI.youtube.create VMM.master_config.youtube.que[i]
+				while i < masterConfig.youtube.que.length
+					ExternalAPI.youtube.create masterConfig.youtube.que[i]
 					i++
-				VMM.master_config.youtube.que = []
+				masterConfig.youtube.que = []
 				return
 
 			onAPIReady: ->
-				VMM.master_config.youtube.active = true
-				VMM.ExternalAPI.youtube.pushQue()
+				masterConfig.youtube.active = true
+				ExternalAPI.youtube.pushQue()
 				return
 
 			stopPlayers: ->
 				i = 0
 
-				while i < VMM.master_config.youtube.array.length
-					if VMM.master_config.youtube.array[i].playing
-						#the_name = VMM.master_config.youtube.array[i].name
-						VMM.master_config.youtube.array[i].player[Object.keys(VMM.master_config.youtube.array[i].player)[0]].stopVideo()
+				while i < masterConfig.youtube.array.length
+					if masterConfig.youtube.array[i].playing
+						#the_name = masterConfig.youtube.array[i].name
+						masterConfig.youtube.array[i].player[Object.keys(masterConfig.youtube.array[i].player)[0]].stopVideo()
 					i++
 				return
 
 			onStateChange: (e) ->
 				i = 0
 
-				while i < VMM.master_config.youtube.array.length
-					#the_name = VMM.master_config.youtube.array[i].name
-					if VMM.master_config.youtube.array[i].player[Object.keys(VMM.master_config.youtube.array[i].player)[0]] is e.target
+				while i < masterConfig.youtube.array.length
+					#the_name = masterConfig.youtube.array[i].name
+					if masterConfig.youtube.array[i].player[Object.keys(masterConfig.youtube.array[i].player)[0]] is e.target
 						if e.data is YT.PlayerState.PLAYING
-							VMM.master_config.youtube.array[i].playing = true
-							trace VMM.master_config.youtube.array[i].hd
-							dontcrashjs2coffee = 0    if VMM.master_config.youtube.array[i].hd
+							masterConfig.youtube.array[i].playing = true
+							trace masterConfig.youtube.array[i].hd
+							dontcrashjs2coffee = 0    if masterConfig.youtube.array[i].hd
 					i++
 				return
 
@@ -1266,56 +1267,56 @@ define [
 
 		vimeo:
 			get: (m) ->
-				VMM.master_config.vimeo.que.push m
-				VMM.master_config.vimeo.active = true
+				masterConfig.vimeo.que.push m
+				masterConfig.vimeo.active = true
 				return
 
 			create: (m, callback) ->
 				trace "VIMEO CREATE"
 				thumb_url = "//vimeo.com/api/v2/video/" + m.id + ".json"
 				video_url = "//player.vimeo.com/video/" + m.id + "?title=0&amp;byline=0&amp;portrait=0&amp;color=ffffff"
-				VMM.getJSON thumb_url, (d) ->
-					VMM.ExternalAPI.vimeo.createThumb d, m
+				library.getJSON thumb_url, (d) ->
+					ExternalAPI.vimeo.createThumb d, m
 					callback()
 					return
 
-				VMM.attachElement "#" + m.uid, "<iframe autostart='false' frameborder='0' width='100%' height='100%' src='" + video_url + "'></iframe>"
+				library.attachElement "#" + m.uid, "<iframe autostart='false' frameborder='0' width='100%' height='100%' src='" + video_url + "'></iframe>"
 				return
 
 			createThumb: (d, m) ->
 				trace "VIMEO CREATE THUMB"
 				thumb_id = "#" + m.uid + "_thumb"
-				VMM.attachElement thumb_id, "<img src='" + d[0].thumbnail_small + "'>"
+				library.attachElement thumb_id, "<img src='" + d[0].thumbnail_small + "'>"
 				return
 
 			pushQue: ->
-				if VMM.master_config.vimeo.que.length > 0
-					VMM.ExternalAPI.vimeo.create VMM.master_config.vimeo.que[0], VMM.ExternalAPI.vimeo.pushQue
-					VMM.Util.removeRange VMM.master_config.vimeo.que, 0
+				if masterConfig.vimeo.que.length > 0
+					ExternalAPI.vimeo.create masterConfig.vimeo.que[0], ExternalAPI.vimeo.pushQue
+					util.removeRange masterConfig.vimeo.que, 0
 				return
 
 		vine:
 			get: (m) ->
-				VMM.master_config.vine.que.push m
-				VMM.master_config.vine.active = true
+				masterConfig.vine.que.push m
+				masterConfig.vine.active = true
 				return
 
 			create: (m, callback) ->
 				trace "VINE CREATE"
 				video_url = "https://vine.co/v/" + m.id + "/embed/simple"
-				VMM.attachElement "#" + m.uid, "<iframe frameborder='0' width='100%' height='100%' src='" + video_url + "'></iframe><script async src='http://platform.vine.co/static/scripts/embed.js' charset='utf-8'></script>"
+				library.attachElement "#" + m.uid, "<iframe frameborder='0' width='100%' height='100%' src='" + video_url + "'></iframe><script async src='http://platform.vine.co/static/scripts/embed.js' charset='utf-8'></script>"
 				return
 
 			pushQue: ->
-				if VMM.master_config.vine.que.length > 0
-					VMM.ExternalAPI.vine.create VMM.master_config.vine.que[0], VMM.ExternalAPI.vine.pushQue
-					VMM.Util.removeRange VMM.master_config.vine.que, 0
+				if masterConfig.vine.que.length > 0
+					ExternalAPI.vine.create masterConfig.vine.que[0], ExternalAPI.vine.pushQue
+					util.removeRange masterConfig.vine.que, 0
 				return
 
 		webthumb:
 			get: (m, thumb) ->
-				VMM.master_config.webthumb.que.push m
-				VMM.master_config.webthumb.active = true
+				masterConfig.webthumb.que.push m
+				masterConfig.webthumb.active = true
 				return
 
 			sizes: (s) ->
@@ -1332,16 +1333,16 @@ define [
 				trace "WEB THUMB CREATE"
 				thumb_url = "//api.pagepeeker.com/v2/thumbs.php?"
 				url = m.id.replace("http://", "")
-				VMM.attachElement "#" + m.uid, "<a href='" + m.id + "' target='_blank'><img src='" + thumb_url + "size=x&url=" + url + "'></a>"
-				VMM.attachElement "#" + m.uid + "_thumb", "<img src='" + thumb_url + "size=t&url=" + url + "'>"
+				library.attachElement "#" + m.uid, "<a href='" + m.id + "' target='_blank'><img src='" + thumb_url + "size=x&url=" + url + "'></a>"
+				library.attachElement "#" + m.uid + "_thumb", "<img src='" + thumb_url + "size=t&url=" + url + "'>"
 				return
 
 			pushQue: ->
 				i = 0
 
-				while i < VMM.master_config.webthumb.que.length
-					VMM.ExternalAPI.webthumb.create VMM.master_config.webthumb.que[i]
+				while i < masterConfig.webthumb.que.length
+					ExternalAPI.webthumb.create masterConfig.webthumb.que[i]
 					i++
-				VMM.master_config.webthumb.que = []
+				masterConfig.webthumb.que = []
 				return
 	).init()

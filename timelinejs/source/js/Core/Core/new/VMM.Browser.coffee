@@ -1,6 +1,6 @@
 #	* DEVICE AND BROWSER DETECTION
 #================================================== 
-define ["VMM"], (VMM)->
+define [], ()->
 	Browser =
 		init: ->
 			@browser = @searchString(@dataBrowser) or "An unknown browser"

@@ -1,7 +1,7 @@
 # TextElement
 #================================================== 
-define ["VMM", "trace"	], (VMM, trace)->
-	VMM.TextElement = (
+define ["trace"	], (trace)->
+	TextElement = (
 		init: ->
 			this
 

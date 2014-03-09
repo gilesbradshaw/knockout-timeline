@@ -1,5 +1,5 @@
 (function() {
-  define(["VMM", "trace"], function(VMM, trace) {
+  define(["trace"], function(trace) {
     var fileExtension;
 
     return fileExtension = {

@@ -1,6 +1,6 @@
 #	* File Extension
 #================================================== 
-define ["VMM", "trace"], (VMM, trace)->
+define ["trace"], (trace)->
 	fileExtension = googleDocType: (url) ->
 		fileName = url.replace(/\s\s*$/, "")
 		fileExtension = ""

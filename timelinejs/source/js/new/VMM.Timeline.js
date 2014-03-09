@@ -1,6 +1,8 @@
 (function() {
-  define(["VMM", "type", "trace", "global", "VMM.Browser", "VMM.Date", "VMM.Library", "VMM.Language"], function(VMM, type, trace, global, browser, vDate, library) {
-    VMM.Timeline = function(_timeline_id, w, h) {
+  define(["type", "trace", "global", "VMM.Browser", "VMM.Date", "VMM.Library", "VMM.Util", "VMM.masterConfig", "VMM.Timeline.TimeNav", "VMM.Timeline.DataObj", "VMM.Slider", "VMM.ExternalAPI", "VMM.Language", "VMM.Extender", "Date.extensions", "aes", "bootstrap-tooltip", "leaflet"], function(type, trace, global, browser, vDate, library, util, masterConfig, TimeNav, dataObj, Slider, ExternalAPI, language) {
+    var Timeline;
+
+    Timeline = function(_timeline_id, w, h) {
       var $container, $feature, $feedback, $navigation, $slider, $timeline, build, buildDates, config, createConfig, createStructure, data, detachMessege, events, getData, getViewport, goToEvent, has_height, has_width, hash, hideMessege, ie7, is_moving, onComponentLoaded, onDataReady, onDatesProcessed, onMarkerUpdate, onSlideUpdate, onSliderLoaded, onTimeNavLoaded, orientationChange, reSize, searchOrientation, setHash, setViewport, showMessege, slider, timeline_id, timenav, updateSize, version, _dates;
 
       $timeline = void 0;
@@ -29,10 +31,10 @@
         }
         if (typeof timeline_config === "object") {
           trace("HAS TIMELINE CONFIG");
-          config = VMM.Util.mergeConfig(config, timeline_config);
+          config = util.mergeConfig(config, timeline_config);
         } else {
           if (typeof conf === "object") {
-            config = VMM.Util.mergeConfig(config, conf);
+            config = util.mergeConfig(config, conf);
           }
         }
         if (browser.device === "mobile" || browser.device === "tablet") {
@@ -43,8 +45,8 @@
         config.feature.width = config.width;
         config.feature.height = config.height - config.nav.height;
         config.nav.zoom.adjust = parseInt(config.start_zoom_adjust, 10);
-        VMM.Timeline.Config = config;
-        VMM.master_config.Timeline = VMM.Timeline.Config;
+        Timeline.Config = config;
+        masterConfig.Timeline = Timeline.Config;
         this.events = config.events;
         if (config.gmap_key !== "") {
           config.api_keys.google = config.gmap_key;
@@ -53,19 +55,19 @@
         version = config.version;
       };
       createStructure = function() {
-        $timeline = VMM.getElement(timeline_id);
+        $timeline = library.getElement(timeline_id);
         library.addClass($timeline, "vco-timeline");
         library.addClass($timeline, "vco-storyjs");
-        $container = VMM.appendAndGetElement($timeline, "<div>", "vco-container vco-main");
-        $feature = VMM.appendAndGetElement($container, "<div>", "vco-feature");
-        $slider = VMM.appendAndGetElement($feature, "<div>", "vco-slider");
-        $navigation = VMM.appendAndGetElement($container, "<div>", "vco-navigation");
-        $feedback = VMM.appendAndGetElement($timeline, "<div>", "vco-feedback", "");
+        $container = library.appendAndGetElement($timeline, "<div>", "vco-container vco-main");
+        $feature = library.appendAndGetElement($container, "<div>", "vco-feature");
+        $slider = library.appendAndGetElement($feature, "<div>", "vco-slider");
+        $navigation = library.appendAndGetElement($container, "<div>", "vco-navigation");
+        $feedback = library.appendAndGetElement($timeline, "<div>", "vco-feedback", "");
         if (typeof config.language.right_to_left !== "undefined") {
           library.addClass($timeline, "vco-right-to-left");
         }
-        slider = new VMM.Slider($slider, config);
-        timenav = new VMM.Timeline.TimeNav($navigation);
+        slider = new Slider($slider, config);
+        timenav = new TimeNav($navigation);
         if (!has_width) {
           config.width = library.width($timeline);
         } else {
@@ -189,17 +191,17 @@
         }
       };
       getData = function(url) {
-        VMM.getJSON(url, function(d) {
-          data = VMM.Timeline.DataObj.getData(d);
-          VMM.fireEvent(global, config.events.data_ready);
+        library.getJSON(url, function(d) {
+          data = dataObj.getData(d);
+          library.fireEvent(global, config.events.data_ready);
         });
       };
       showMessege = function(e, msg, other) {
         trace("showMessege " + msg);
         if (other) {
-          VMM.attachElement($feedback, msg);
+          library.attachElement($feedback, msg);
         } else {
-          VMM.attachElement($feedback, VMM.MediaElement.loadingmessage(msg));
+          library.attachElement($feedback, library.loadingmessage(msg));
         }
       };
       hideMessege = function() {
@@ -219,17 +221,17 @@
         }
         if (ie7) {
           ie7 = true;
-          VMM.fireEvent(global, config.events.messege, "Internet Explorer " + browser.version + " is not supported by TimelineJS. Please update your browser to version 8 or higher.");
+          library.fireEvent(global, config.events.messege, "Internet Explorer " + browser.version + " is not supported by TimelineJS. Please update your browser to version 8 or higher.");
         } else {
           detachMessege();
           reSize();
-          VMM.bindEvent($slider, onSliderLoaded, "LOADED");
-          VMM.bindEvent($navigation, onTimeNavLoaded, "LOADED");
-          VMM.bindEvent($slider, onSlideUpdate, "UPDATE");
-          VMM.bindEvent($navigation, onMarkerUpdate, "UPDATE");
+          library.bindEvent($slider, onSliderLoaded, "LOADED");
+          library.bindEvent($navigation, onTimeNavLoaded, "LOADED");
+          library.bindEvent($slider, onSlideUpdate, "UPDATE");
+          library.bindEvent($navigation, onMarkerUpdate, "UPDATE");
           slider.init(_dates);
           timenav.init(_dates, data.era);
-          VMM.bindEvent(global, reSize, config.events.resize);
+          library.bindEvent(global, reSize, config.events.resize);
         }
       };
       updateSize = function() {
@@ -254,7 +256,7 @@
         var do_end, do_start, i, startpage_date, td, td_num, _date;
 
         _dates = [];
-        VMM.fireEvent(global, config.events.messege, "Building Dates");
+        library.fireEvent(global, config.events.messege, "Building Dates");
         updateSize();
         i = 0;
         while (i < data.date.length) {
@@ -284,7 +286,7 @@
               _date.content = "";
               _date.tag = data.date[i].tag;
               _date.slug = data.date[i].slug;
-              _date.uniqueid = VMM.Util.unique_ID(7);
+              _date.uniqueid = util.unique_ID(7);
               _date.classname = data.date[i].classname;
               _dates.push(_date);
             }
@@ -327,7 +329,7 @@
               _date.startdate.setMinutes(td.getMinutes() - 1);
             }
           }
-          _date.uniqueid = VMM.Util.unique_ID(7);
+          _date.uniqueid = util.unique_ID(7);
           _date.enddate = _date.startdate;
           _date.precisiondate = do_start.precision;
           _date.title = data.headline;
@@ -340,7 +342,7 @@
           _date.needs_slug = false;
           _date.fulldate = _date.startdate.getTime();
           if (config.embed) {
-            VMM.fireEvent(global, config.events.headline, _date.headline);
+            library.fireEvent(global, config.events.headline, _date.headline);
           }
           _dates.unshift(_date);
         }
@@ -447,7 +449,7 @@
         ease: "easeInOutExpo",
         duration: 1000,
         gmap_key: "",
-        language: VMM.Language
+        language: language
       };
       if ((w != null) && w !== "") {
         config.width = w;
@@ -484,19 +486,19 @@
           config.source = _data;
         }
         vDate.setLanguage(config.language);
-        VMM.master_config.language = config.language;
-        VMM.ExternalAPI.setKeys(config.api_keys);
-        VMM.ExternalAPI.googlemaps.setMapType(config.maptype);
-        VMM.bindEvent(global, onDataReady, config.events.data_ready);
-        VMM.bindEvent(global, showMessege, config.events.messege);
-        VMM.fireEvent(global, config.events.messege, config.language.messages.loading_timeline);
+        masterConfig.language = config.language;
+        ExternalAPI.setKeys(config.api_keys);
+        ExternalAPI.googlemaps.setMapType(config.maptype);
+        library.bindEvent(global, onDataReady, config.events.data_ready);
+        library.bindEvent(global, showMessege, config.events.messege);
+        library.fireEvent(global, config.events.messege, config.language.messages.loading_timeline);
         if (browser.browser === "Explorer" || browser.browser === "MSIE" ? parseInt(browser.version, 10) <= 7 : void 0) {
           ie7 = true;
         }
         if (type.of(config.source) === "string" || type.of(config.source) === "object") {
-          VMM.Timeline.DataObj.getData(config.source);
+          dataObj.getData(config.source);
         } else {
-          VMM.fireEvent(global, config.events.messege, "No data source provided");
+          library.fireEvent(global, config.events.messege, "No data source provided");
         }
       };
       this.iframeLoaded = function() {
@@ -504,15 +506,16 @@
       };
       this.reload = function(_d) {
         trace("Load new timeline data" + _d);
-        VMM.fireEvent(global, config.events.messege, config.language.messages.loading_timeline);
+        library.fireEvent(global, config.events.messege, config.language.messages.loading_timeline);
         data = {};
-        VMM.Timeline.DataObj.getData(_d);
+        dataObj.getData(_d);
         config.current_slide = 0;
         slider.setSlide(0);
         timenav.setMarker(0, config.ease, config.duration);
       };
     };
-    return VMM.Timeline.Config = {};
+    Timeline.Config = {};
+    return Timeline;
   });
 
 }).call(this);

@@ -1,5 +1,5 @@
 (function() {
-  define(["VMM"], function(VMM) {
+  define([], function() {
     var Browser;
 
     Browser = {

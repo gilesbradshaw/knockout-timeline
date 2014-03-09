@@ -1,160 +1,7 @@
 (function() {
-  define(["jquery", "VMM", "trace", "VMM.Browser", "jQueryExtender"], function(jQuery, VMM, trace, browser) {
+  define(["jquery", "trace", "VMM.Browser", "jQueryExtender"], function(jQuery, trace, browser) {
     var library;
 
-    VMM.smoothScrollTo = function(elem, duration, ease) {
-      var _duration, _ease;
-
-      if (typeof jQuery !== "undefined") {
-        _ease = "easein";
-        _duration = 1000;
-        if (duration != null) {
-          if (duration < 1) {
-            _duration = 1;
-          } else {
-            _duration = Math.round(duration);
-          }
-        }
-        if ((ease != null) && ease !== "") {
-          _ease = ease;
-        }
-        if (jQuery(window).scrollTop() !== library.offset(elem).top) {
-          return library.animate("html,body", _duration, _ease, {
-            scrollTop: library.offset(elem).top
-          });
-        }
-      }
-    };
-    VMM.attachElement = function(element, content) {
-      if (typeof jQuery !== "undefined") {
-        return jQuery(element).html(content);
-      }
-    };
-    VMM.appendElement = function(element, content) {
-      if (typeof jQuery !== "undefined") {
-        return jQuery(element).append(content);
-      }
-    };
-    VMM.getHTML = function(element) {
-      var e;
-
-      e = void 0;
-      if (typeof jQuery !== "undefined") {
-        e = jQuery(element).html();
-        return e;
-      }
-    };
-    VMM.getElement = function(element, p) {
-      var e;
-
-      e = void 0;
-      if (typeof jQuery !== "undefined") {
-        if (p) {
-          e = jQuery(element).parent().get(0);
-        } else {
-          e = jQuery(element).get(0);
-        }
-        return e;
-      }
-    };
-    VMM.bindEvent = function(element, the_handler, the_event_type, event_data) {
-      var e, _event_data, _event_type;
-
-      e = void 0;
-      _event_type = "click";
-      _event_data = {};
-      if ((the_event_type != null) && the_event_type !== "") {
-        _event_type = the_event_type;
-      }
-      if ((_event_data != null) && _event_data !== "") {
-        _event_data = event_data;
-      }
-      if (typeof jQuery !== "undefined") {
-        return jQuery(element).bind(_event_type, _event_data, the_handler);
-      }
-    };
-    VMM.unbindEvent = function(element, the_handler, the_event_type) {
-      var e, _event_data, _event_type;
-
-      e = void 0;
-      _event_type = "click";
-      _event_data = {};
-      if ((the_event_type != null) && the_event_type !== "") {
-        _event_type = the_event_type;
-      }
-      if (typeof jQuery !== "undefined") {
-        return jQuery(element).unbind(_event_type, the_handler);
-      }
-    };
-    VMM.fireEvent = function(element, the_event_type, the_data) {
-      var e, _data, _event_type;
-
-      e = void 0;
-      _event_type = "click";
-      _data = [];
-      if ((the_event_type != null) && the_event_type !== "") {
-        _event_type = the_event_type;
-      }
-      if ((the_data != null) && the_data !== "") {
-        _data = the_data;
-      }
-      if (typeof jQuery !== "undefined") {
-        return jQuery(element).trigger(_event_type, _data);
-      }
-    };
-    VMM.getJSON = function(url, data, callback) {
-      var ie_url;
-
-      if (typeof jQuery !== "undefined") {
-        jQuery.ajaxSetup({
-          timeout: 3000
-        });
-        if (browser.browser === "Explorer" && parseInt(browser.version, 10) >= 7 && window.XDomainRequest) {
-          trace("IE JSON");
-          ie_url = url;
-          if (ie_url.match("^http://")) {
-            return jQuery.getJSON(ie_url, data, callback);
-          } else if (ie_url.match("^https://")) {
-            ie_url = ie_url.replace("https://", "http://");
-            return jQuery.getJSON(ie_url, data, callback);
-          } else {
-            return jQuery.getJSON(url, data, callback);
-          }
-        } else {
-          return jQuery.getJSON(url, data, callback);
-        }
-      }
-    };
-    VMM.parseJSON = function(the_json) {
-      if (typeof jQuery !== "undefined") {
-        return jQuery.parseJSON(the_json);
-      }
-    };
-    VMM.appendAndGetElement = function(append_to_element, tag, cName, content) {
-      var e, _class, _content, _id, _tag;
-
-      e = void 0;
-      _tag = "<div>";
-      _class = "";
-      _content = "";
-      _id = "";
-      if ((tag != null) && tag !== "") {
-        _tag = tag;
-      }
-      if ((cName != null) && cName !== "") {
-        _class = cName;
-      }
-      if ((content != null) && content !== "") {
-        _content = content;
-      }
-      if (typeof jQuery !== "undefined") {
-        e = jQuery(tag);
-        e.addClass(_class);
-        e.html(_content);
-        jQuery(append_to_element).append(e);
-      }
-      return e;
-    };
     return library = {
       init: function() {
         return this;
@@ -449,6 +296,226 @@
             }
           }
         }
+      },
+      smoothScrollTo: function(elem, duration, ease) {
+        var _duration, _ease;
+
+        if (typeof jQuery !== "undefined") {
+          _ease = "easein";
+          _duration = 1000;
+          if (duration != null) {
+            if (duration < 1) {
+              _duration = 1;
+            } else {
+              _duration = Math.round(duration);
+            }
+          }
+          if ((ease != null) && ease !== "") {
+            _ease = ease;
+          }
+          if (jQuery(window).scrollTop() !== library.offset(elem).top) {
+            return library.animate("html,body", _duration, _ease, {
+              scrollTop: library.offset(elem).top
+            });
+          }
+        }
+      },
+      attachElement: function(element, content) {
+        if (typeof jQuery !== "undefined") {
+          return jQuery(element).html(content);
+        }
+      },
+      appendElement: function(element, content) {
+        if (typeof jQuery !== "undefined") {
+          return jQuery(element).append(content);
+        }
+      },
+      getHTML: function(element) {
+        var e;
+
+        e = void 0;
+        if (typeof jQuery !== "undefined") {
+          e = jQuery(element).html();
+          return e;
+        }
+      },
+      getElement: function(element, p) {
+        var e;
+
+        e = void 0;
+        if (typeof jQuery !== "undefined") {
+          if (p) {
+            e = jQuery(element).parent().get(0);
+          } else {
+            e = jQuery(element).get(0);
+          }
+          return e;
+        }
+      },
+      bindEvent: function(element, the_handler, the_event_type, event_data) {
+        var e, _event_data, _event_type;
+
+        e = void 0;
+        _event_type = "click";
+        _event_data = {};
+        if ((the_event_type != null) && the_event_type !== "") {
+          _event_type = the_event_type;
+        }
+        if ((_event_data != null) && _event_data !== "") {
+          _event_data = event_data;
+        }
+        if (typeof jQuery !== "undefined") {
+          return jQuery(element).bind(_event_type, _event_data, the_handler);
+        }
+      },
+      unbindEvent: function(element, the_handler, the_event_type) {
+        var e, _event_data, _event_type;
+
+        e = void 0;
+        _event_type = "click";
+        _event_data = {};
+        if ((the_event_type != null) && the_event_type !== "") {
+          _event_type = the_event_type;
+        }
+        if (typeof jQuery !== "undefined") {
+          return jQuery(element).unbind(_event_type, the_handler);
+        }
+      },
+      fireEvent: function(element, the_event_type, the_data) {
+        var e, _data, _event_type;
+
+        e = void 0;
+        _event_type = "click";
+        _data = [];
+        if ((the_event_type != null) && the_event_type !== "") {
+          _event_type = the_event_type;
+        }
+        if ((the_data != null) && the_data !== "") {
+          _data = the_data;
+        }
+        if (typeof jQuery !== "undefined") {
+          return jQuery(element).trigger(_event_type, _data);
+        }
+      },
+      getJSON: function(url, data, callback) {
+        var ie_url;
+
+        if (typeof jQuery !== "undefined") {
+          jQuery.ajaxSetup({
+            timeout: 3000
+          });
+          if (browser.browser === "Explorer" && parseInt(browser.version, 10) >= 7 && window.XDomainRequest) {
+            trace("IE JSON");
+            ie_url = url;
+            if (ie_url.match("^http://")) {
+              return jQuery.getJSON(ie_url, data, callback);
+            } else if (ie_url.match("^https://")) {
+              ie_url = ie_url.replace("https://", "http://");
+              return jQuery.getJSON(ie_url, data, callback);
+            } else {
+              return jQuery.getJSON(url, data, callback);
+            }
+          } else {
+            return jQuery.getJSON(url, data, callback);
+          }
+        }
+      },
+      parseJSON: function(the_json) {
+        if (typeof jQuery !== "undefined") {
+          return jQuery.parseJSON(the_json);
+        }
+      },
+      appendAndGetElement: function(append_to_element, tag, cName, content) {
+        var e, _class, _content, _id, _tag;
+
+        e = void 0;
+        _tag = "<div>";
+        _class = "";
+        _content = "";
+        _id = "";
+        if ((tag != null) && tag !== "") {
+          _tag = tag;
+        }
+        if ((cName != null) && cName !== "") {
+          _class = cName;
+        }
+        if ((content != null) && content !== "") {
+          _content = content;
+        }
+        if (typeof jQuery !== "undefined") {
+          e = jQuery(tag);
+          e.addClass(_class);
+          e.html(_content);
+          jQuery(append_to_element).append(e);
+        }
+        return e;
+      },
+      createElement: function(tag, value, cName, attrs, styles) {
+        var ce;
+
+        ce = "";
+        if ((tag != null) && tag !== "") {
+          ce += "<" + tag;
+          if ((cName != null) && cName !== "") {
+            ce += " class='" + cName + "'";
+          }
+          if ((attrs != null) && attrs !== "") {
+            ce += " " + attrs;
+          }
+          if ((styles != null) && styles !== "") {
+            ce += " style='" + styles + "'";
+          }
+          ce += ">";
+          if ((value != null) && value !== "") {
+            ce += value;
+          }
+          ce = ce + "</" + tag + ">";
+        }
+        return ce;
+      },
+      createMediaElement: function(media, caption, credit) {
+        var ce, valid, _valid;
+
+        ce = "";
+        _valid = false;
+        ce += "<div class='media'>";
+        if ((media != null) && media !== "") {
+          valid = true;
+          ce += "<img src='" + media + "'>";
+          if ((credit != null) && credit !== "") {
+            ce += library.createElement("div", credit, "credit");
+          }
+          if ((caption != null) && caption !== "") {
+            ce += library.createElement("div", caption, "caption");
+          }
+        }
+        ce += "</div>";
+        return ce;
+      },
+      hideUrlBar: function() {
+        var bodycheck, doc, scrollTop, win;
+
+        win = window;
+        doc = win.document;
+        if (!location.hash || !win.addEventListener) {
+          window.scrollTo(0, 1);
+          scrollTop = 1;
+          bodycheck = setInterval(function() {
+            if (doc.body) {
+              clearInterval(bodycheck);
+              scrollTop = ("scrollTop" in doc.body ? doc.body.scrollTop : 1);
+              win.scrollTo(0, (scrollTop === 1 ? 0 : 1));
+            }
+          }, 15);
+          win.addEventListener("load", (function() {
+            setTimeout((function() {
+              win.scrollTo(0, (scrollTop === 1 ? 0 : 1));
+            }), 0);
+          }), false);
+        }
+      },
+      loadingmessage: function(m) {
+        return "<div class='vco-loading'><div class='vco-loading-container'><div class='vco-loading-icon'></div>" + "<div class='vco-message'><p>" + m + "</p></div></div></div>";
       }
     };
   });

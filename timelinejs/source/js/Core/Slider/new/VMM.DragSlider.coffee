@@ -1,11 +1,10 @@
 # DRAG SLIDER
 #================================================== 
 define [
-	"VMM"
 	"VMM.Library"
 	"trace"
-], (VMM,library, trace)->
-	VMM.DragSlider = ->
+], (library, trace)->
+	DragSlider = ->
 		
 		# PUBLIC FUNCTIONS
 		#		================================================== 
@@ -15,19 +14,19 @@ define [
 		# PRIVATE FUNCTIONS
 		#		================================================== 
 		makeDraggable = (drag_object, move_object) ->
-			VMM.bindEvent drag_object, onDragStart, dragevent.down,
+			library.bindEvent drag_object, onDragStart, dragevent.down,
 				element: move_object
 				delement: drag_object
 
-			VMM.bindEvent drag_object, onDragEnd, dragevent.up,
+			library.bindEvent drag_object, onDragEnd, dragevent.up,
 				element: move_object
 				delement: drag_object
 
-			VMM.bindEvent drag_object, onDragLeave, dragevent.leave,
+			library.bindEvent drag_object, onDragLeave, dragevent.leave,
 				element: move_object
 				delement: drag_object
 		onDragLeave = (e) ->
-			VMM.unbindEvent e.data.delement, onDragMove, dragevent.move
+			library.unbindEvent e.data.delement, onDragMove, dragevent.move
 			e.preventDefault()    unless drag.touch
 			e.stopPropagation()
 			if drag.sliding
@@ -66,11 +65,11 @@ define [
 			drag.left.start = getLeft(elem)
 			drag.time.start = new Date().getTime()
 			library.stop elem
-			VMM.bindEvent delem, onDragMove, dragevent.move,
+			library.bindEvent delem, onDragMove, dragevent.move,
 				element: elem
 
 		dragEnd = (elem, delem, e) ->
-			VMM.unbindEvent delem, onDragMove, dragevent.move
+			library.unbindEvent delem, onDragMove, dragevent.move
 			dragMomentum elem, e
 		dragMove = (elem, e) ->
 			drag_to = undefined
@@ -113,7 +112,7 @@ define [
 				else if drag_info.left < drag.constraint.right
 					drag_info.left = drag.constraint.right
 					drag_info.time = 5000    if drag_info.time > 5000
-			VMM.fireEvent dragslider, "DRAGUPDATE", [drag_info]
+			library.fireEvent dragslider, "DRAGUPDATE", [drag_info]
 			unless is_sticky
 				if drag_info.time > 0
 					if drag.touch
@@ -194,7 +193,7 @@ define [
 			drag.constraint = constraint
 
 		@cancelSlide = (e) ->
-			VMM.unbindEvent drag.element, onDragMove, dragevent.move
+			library.unbindEvent drag.element, onDragMove, dragevent.move
 			true
 
 		return

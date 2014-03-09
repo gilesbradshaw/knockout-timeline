@@ -73,14 +73,8 @@
     <Content Include="source\gfx\timeline.psd" />
     <Content Include="packages.config" />
     <Content Include="Scripts\app\Configuration.coffee" />
-    <Content Include="source\js\Core\Core\new\Class.js">
-      <DependentUpon>Class.coffee</DependentUpon>
-    </Content>
     <Content Include="source\js\Core\Core\new\Date.extensions.js">
       <DependentUpon>Date.extensions.coffee</DependentUpon>
-    </Content>
-    <Content Include="source\js\Core\Core\new\is_.js">
-      <DependentUpon>is_.coffee</DependentUpon>
     </Content>
     <Content Include="source\js\Core\Core\new\jQueryExtender.js">
       <DependentUpon>jQueryExtender.coffee</DependentUpon>
@@ -89,19 +83,17 @@
     <Content Include="source\js\Core\Core\new\type.js">
       <DependentUpon>type.coffee</DependentUpon>
     </Content>
-    <Content Include="source\js\Core\Core\new\Class.coffee" />
     <Content Include="source\js\Core\Core\new\global.js" />
     <Content Include="source\js\Core\Core\new\Date.extensions.coffee" />
-    <Content Include="source\js\Core\Core\new\is_.coffee" />
     <Content Include="Scripts\jquery-2.1.0.min.map" />
     <Content Include="source\js\Core\Core\new\jQueryExtender.coffee" />
+    <Content Include="source\js\Core\Core\new\VMM.masterConfig.coffee" />
     <None Include="source\js\Core\Core\new\VMM.Browser.coffee" />
     <Content Include="source\js\Core\Core\new\trace.js">
       <DependentUpon>trace.coffee</DependentUpon>
     </Content>
     <None Include="source\js\Core\Core\new\VMM.Date.coffee" />
     <None Include="source\js\Core\Core\new\VMM.FileExtension.coffee" />
-    <None Include="source\js\Core\Core\new\VMM.coffee" />
     <None Include="source\js\Core\Core\new\VMM.Library.coffee" />
     <None Include="source\js\Core\Core\new\VMM.LoadLib.coffee" />
     <None Include="source\js\Core\Core\new\VMM.Util.coffee" />
@@ -114,14 +106,14 @@
     <Content Include="source\js\Core\Core\new\VMM.FileExtension.js">
       <DependentUpon>VMM.FileExtension.coffee</DependentUpon>
     </Content>
-    <Content Include="source\js\Core\Core\new\VMM.js">
-      <DependentUpon>VMM.coffee</DependentUpon>
-    </Content>
     <Content Include="source\js\Core\Core\new\VMM.Library.js">
       <DependentUpon>VMM.Library.coffee</DependentUpon>
     </Content>
     <Content Include="source\js\Core\Core\new\VMM.LoadLib.js">
       <DependentUpon>VMM.LoadLib.coffee</DependentUpon>
+    </Content>
+    <Content Include="source\js\Core\Core\new\VMM.masterConfig.js">
+      <DependentUpon>VMM.masterConfig.coffee</DependentUpon>
     </Content>
     <Content Include="source\js\Core\Core\new\VMM.Util.js">
       <DependentUpon>VMM.Util.coffee</DependentUpon>

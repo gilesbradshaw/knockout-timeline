@@ -2,114 +2,15 @@
 #================================================== 
 define [
 	"jquery"
-	"VMM"
 	"trace"
 	"VMM.Browser"
 	"jQueryExtender"
-] , (jQuery,VMM, trace, browser)->
-	VMM.smoothScrollTo = (elem, duration, ease) ->
-		unless typeof (jQuery) is "undefined"
-			_ease = "easein"
-			_duration = 1000
-			if duration?
-				if duration < 1
-					_duration = 1
-				else
-					_duration = Math.round(duration)
-			_ease = ease    if ease? and ease isnt ""
-			unless jQuery(window).scrollTop() is library.offset(elem).top
-				library.animate "html,body", _duration, _ease,
-					scrollTop: library.offset(elem).top
+] , (jQuery,trace, browser)->
+	
+	
 
-	VMM.attachElement = (element, content) ->
-		jQuery(element).html content    unless typeof (jQuery) is "undefined"
-
-	VMM.appendElement = (element, content) ->
-		jQuery(element).append content    unless typeof (jQuery) is "undefined"
-
-	VMM.getHTML = (element) ->
-		e = undefined
-		unless typeof (jQuery) is "undefined"
-			e = jQuery(element).html()
-			e
-
-	VMM.getElement = (element, p) ->
-		e = undefined
-		unless typeof (jQuery) is "undefined"
-			if p
-				e = jQuery(element).parent().get(0)
-			else
-				e = jQuery(element).get(0)
-			e
-
-	VMM.bindEvent = (element, the_handler, the_event_type, event_data) ->
-		e = undefined
-		_event_type = "click"
-		_event_data = {}
-		_event_type = the_event_type    if the_event_type? and the_event_type isnt ""
-		_event_data = event_data    if _event_data? and _event_data isnt ""
-		jQuery(element).bind _event_type, _event_data, the_handler    unless typeof (jQuery) is "undefined"
 
 	
-	#return e;
-	VMM.unbindEvent = (element, the_handler, the_event_type) ->
-		e = undefined
-		_event_type = "click"
-		_event_data = {}
-		_event_type = the_event_type    if the_event_type? and the_event_type isnt ""
-		jQuery(element).unbind _event_type, the_handler    unless typeof (jQuery) is "undefined"
-
-	
-	#return e;
-	VMM.fireEvent = (element, the_event_type, the_data) ->
-		e = undefined
-		_event_type = "click"
-		_data = []
-		_event_type = the_event_type    if the_event_type? and the_event_type isnt ""
-		_data = the_data    if the_data? and the_data isnt ""
-		jQuery(element).trigger _event_type, _data    unless typeof (jQuery) is "undefined"
-
-	
-	#return e;
-	VMM.getJSON = (url, data, callback) ->
-		unless typeof (jQuery) is "undefined"
-			jQuery.ajaxSetup timeout: 3000
-			
-			# CHECK FOR IE
-			#			================================================== 
-			if browser.browser is "Explorer" and parseInt(browser.version, 10) >= 7 and window.XDomainRequest
-				trace "IE JSON"
-				ie_url = url
-				if ie_url.match("^http://")
-					jQuery.getJSON ie_url, data, callback
-				else if ie_url.match("^https://")
-					ie_url = ie_url.replace("https://", "http://")
-					jQuery.getJSON ie_url, data, callback
-				else
-					jQuery.getJSON url, data, callback
-			else
-				jQuery.getJSON url, data, callback
-
-	VMM.parseJSON = (the_json) ->
-		jQuery.parseJSON the_json    unless typeof (jQuery) is "undefined"
-
-	
-	# ADD ELEMENT AND RETURN IT
-	VMM.appendAndGetElement = (append_to_element, tag, cName, content) ->
-		e = undefined
-		_tag = "<div>"
-		_class = ""
-		_content = ""
-		_id = ""
-		_tag = tag    if tag? and tag isnt ""
-		_class = cName    if cName? and cName isnt ""
-		_content = content    if content? and content isnt ""
-		unless typeof (jQuery) is "undefined"
-			e = jQuery(tag)
-			e.addClass _class
-			e.html _content
-			jQuery(append_to_element).append e
-		e
 
 	library =
 		init: ->
@@ -300,5 +201,151 @@ define [
 							queue: _que
 							duration: _duration
 							easing: _ease
+		smoothScrollTo: (elem, duration, ease) ->
+			unless typeof (jQuery) is "undefined"
+				_ease = "easein"
+				_duration = 1000
+				if duration?
+					if duration < 1
+						_duration = 1
+					else
+						_duration = Math.round(duration)
+				_ease = ease    if ease? and ease isnt ""
+				unless jQuery(window).scrollTop() is library.offset(elem).top
+					library.animate "html,body", _duration, _ease,
+						scrollTop: library.offset(elem).top
+		attachElement: (element, content) ->
+			jQuery(element).html content    unless typeof (jQuery) is "undefined"
+		appendElement: (element, content) ->
+			jQuery(element).append content    unless typeof (jQuery) is "undefined"
+		getHTML: (element) ->
+			e = undefined
+			unless typeof (jQuery) is "undefined"
+				e = jQuery(element).html()
+				e
+
+
+		getElement: (element, p) ->
+			e = undefined
+			unless typeof (jQuery) is "undefined"
+				if p
+					e = jQuery(element).parent().get(0)
+				else
+					e = jQuery(element).get(0)
+				e
+
+		bindEvent: (element, the_handler, the_event_type, event_data) ->
+			e = undefined
+			_event_type = "click"
+			_event_data = {}
+			_event_type = the_event_type    if the_event_type? and the_event_type isnt ""
+			_event_data = event_data    if _event_data? and _event_data isnt ""
+			jQuery(element).bind _event_type, _event_data, the_handler    unless typeof (jQuery) is "undefined"
 
 	
+		#return e;
+		unbindEvent: (element, the_handler, the_event_type) ->
+			e = undefined
+			_event_type = "click"
+			_event_data = {}
+			_event_type = the_event_type    if the_event_type? and the_event_type isnt ""
+			jQuery(element).unbind _event_type, the_handler    unless typeof (jQuery) is "undefined"
+
+	
+		#return e;
+		fireEvent: (element, the_event_type, the_data) ->
+			e = undefined
+			_event_type = "click"
+			_data = []
+			_event_type = the_event_type    if the_event_type? and the_event_type isnt ""
+			_data = the_data    if the_data? and the_data isnt ""
+			jQuery(element).trigger _event_type, _data    unless typeof (jQuery) is "undefined"
+
+	
+		#return e;
+		getJSON: (url, data, callback) ->
+			unless typeof (jQuery) is "undefined"
+				jQuery.ajaxSetup timeout: 3000
+			
+				# CHECK FOR IE
+				#			================================================== 
+				if browser.browser is "Explorer" and parseInt(browser.version, 10) >= 7 and window.XDomainRequest
+					trace "IE JSON"
+					ie_url = url
+					if ie_url.match("^http://")
+						jQuery.getJSON ie_url, data, callback
+					else if ie_url.match("^https://")
+						ie_url = ie_url.replace("https://", "http://")
+						jQuery.getJSON ie_url, data, callback
+					else
+						jQuery.getJSON url, data, callback
+				else
+					jQuery.getJSON url, data, callback
+
+		parseJSON: (the_json) ->
+			jQuery.parseJSON the_json    unless typeof (jQuery) is "undefined"
+
+	
+		# ADD ELEMENT AND RETURN IT
+		appendAndGetElement: (append_to_element, tag, cName, content) ->
+			e = undefined
+			_tag = "<div>"
+			_class = ""
+			_content = ""
+			_id = ""
+			_tag = tag    if tag? and tag isnt ""
+			_class = cName    if cName? and cName isnt ""
+			_content = content    if content? and content isnt ""
+			unless typeof (jQuery) is "undefined"
+				e = jQuery(tag)
+				e.addClass _class
+				e.html _content
+				jQuery(append_to_element).append e
+			e
+		createElement: (tag, value, cName, attrs, styles) ->
+			ce = ""
+			if tag? and tag isnt ""
+				ce += "<" + tag
+				ce += " class='" + cName + "'"    if cName? and cName isnt ""
+				ce += " " + attrs    if attrs? and attrs isnt ""
+				ce += " style='" + styles + "'"    if styles? and styles isnt ""
+				ce += ">"
+				ce += value    if value? and value isnt ""
+				ce = ce + "</" + tag + ">"
+			ce
+
+		createMediaElement: (media, caption, credit) ->
+			ce = ""
+			_valid = false
+			ce += "<div class='media'>"
+			if media? and media isnt ""
+				valid = true
+				ce += "<img src='" + media + "'>"
+				ce += library.createElement("div", credit, "credit")    if credit? and credit isnt ""
+				ce += library.createElement("div", caption, "caption")    if caption? and caption isnt ""
+			ce += "</div>"
+			ce
+
+		hideUrlBar: ->
+			win = window
+			doc = win.document
+			if not location.hash or not win.addEventListener
+				window.scrollTo 0, 1
+				scrollTop = 1
+				bodycheck = setInterval(->
+					if doc.body
+						clearInterval bodycheck
+						scrollTop = (if "scrollTop" of doc.body then doc.body.scrollTop else 1)
+						win.scrollTo 0, (if scrollTop is 1 then 0 else 1)
+					return
+				, 15)
+				win.addEventListener "load", (->
+					setTimeout (->
+						win.scrollTo 0, (if scrollTop is 1 then 0 else 1)
+						return
+					), 0
+					return
+				), false
+			return
+		loadingmessage: (m) ->
+			"<div class='vco-loading'><div class='vco-loading-container'><div class='vco-loading-icon'></div>" + "<div class='vco-message'><p>" + m + "</p></div></div></div>"

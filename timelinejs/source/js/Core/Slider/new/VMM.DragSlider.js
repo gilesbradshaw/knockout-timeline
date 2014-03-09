@@ -1,24 +1,26 @@
 (function() {
-  define(["VMM", "VMM.Library", "trace"], function(VMM, library, trace) {
-    return VMM.DragSlider = function() {
+  define(["VMM.Library", "trace"], function(library, trace) {
+    var DragSlider;
+
+    return DragSlider = function() {
       var drag, dragEnd, dragMomentum, dragMove, dragStart, dragevent, dragslider, getLeft, is_sticky, makeDraggable, mousedrag, onDragEnd, onDragLeave, onDragMove, onDragStart, touchdrag;
 
       makeDraggable = function(drag_object, move_object) {
-        VMM.bindEvent(drag_object, onDragStart, dragevent.down, {
+        library.bindEvent(drag_object, onDragStart, dragevent.down, {
           element: move_object,
           delement: drag_object
         });
-        VMM.bindEvent(drag_object, onDragEnd, dragevent.up, {
+        library.bindEvent(drag_object, onDragEnd, dragevent.up, {
           element: move_object,
           delement: drag_object
         });
-        return VMM.bindEvent(drag_object, onDragLeave, dragevent.leave, {
+        return library.bindEvent(drag_object, onDragLeave, dragevent.leave, {
           element: move_object,
           delement: drag_object
         });
       };
       onDragLeave = function(e) {
-        VMM.unbindEvent(e.data.delement, onDragMove, dragevent.move);
+        library.unbindEvent(e.data.delement, onDragMove, dragevent.move);
         if (!drag.touch) {
           e.preventDefault();
         }
@@ -66,12 +68,12 @@
         drag.left.start = getLeft(elem);
         drag.time.start = new Date().getTime();
         library.stop(elem);
-        return VMM.bindEvent(delem, onDragMove, dragevent.move, {
+        return library.bindEvent(delem, onDragMove, dragevent.move, {
           element: elem
         });
       };
       dragEnd = function(elem, delem, e) {
-        VMM.unbindEvent(delem, onDragMove, dragevent.move);
+        library.unbindEvent(delem, onDragMove, dragevent.move);
         return dragMomentum(elem, e);
       };
       dragMove = function(elem, e) {
@@ -131,7 +133,7 @@
             }
           }
         }
-        VMM.fireEvent(dragslider, "DRAGUPDATE", [drag_info]);
+        library.fireEvent(dragslider, "DRAGUPDATE", [drag_info]);
         if (!is_sticky) {
           if (drag_info.time > 0) {
             if (drag.touch) {
@@ -222,7 +224,7 @@
         return drag.constraint = constraint;
       };
       this.cancelSlide = function(e) {
-        VMM.unbindEvent(drag.element, onDragMove, dragevent.move);
+        library.unbindEvent(drag.element, onDragMove, dragevent.move);
         return true;
       };
     };

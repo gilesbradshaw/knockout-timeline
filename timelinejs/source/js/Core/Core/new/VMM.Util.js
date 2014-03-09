@@ -1,6 +1,8 @@
 (function() {
-  define(["VMM", "trace"], function(VMM, trace) {
-    return VMM.Util = {
+  define(["trace"], function(trace) {
+    var util;
+
+    return util = {
       init: function() {
         return this;
       },
