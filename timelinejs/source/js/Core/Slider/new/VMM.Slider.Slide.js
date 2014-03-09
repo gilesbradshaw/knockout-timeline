@@ -1,5 +1,5 @@
 (function() {
-  define(["VMM", "trace", "type", "VMM.Date", "VMM.Slider", "VMM.TextElement"], function(VMM, trace, type, vDate) {
+  define(["VMM", "trace", "type", "VMM.Date", "VMM.Library", "VMM.Slider", "VMM.TextElement"], function(VMM, trace, type, vDate, library) {
     return VMM.Slider.Slide = function(d, _parent) {
       var $media, $slide, $text, $wrap, buildSlide, c, data, element, is_skinny, loaded, media, preloaded, reLayout, reloadLayout, removeSlide, render, slide, timer, times, _class, _enqueue, _id, _removeque;
 
@@ -39,7 +39,7 @@
       element = VMM.appendAndGetElement(_parent, "<div>", "slider-item");
       if (typeof data.classname !== "undefined") {
         trace("HAS CLASSNAME");
-        VMM.Lib.addClass(element, data.classname);
+        library.addClass(element, data.classname);
       } else {
         trace("NO CLASSNAME");
         trace(data);
@@ -91,36 +91,36 @@
         return element;
       };
       this.position = function() {
-        return VMM.Lib.position(element);
+        return library.position(element);
       };
       this.leftpos = function(p) {
         if (typeof p !== "undefined") {
-          return VMM.Lib.css(element, "left", p);
+          return library.css(element, "left", p);
         } else {
-          return VMM.Lib.position(element).left;
+          return library.position(element).left;
         }
       };
       this.animate = function(d, e, p) {
-        VMM.Lib.animate(element, d, e, p);
+        library.animate(element, d, e, p);
       };
       this.css = function(p, v) {
-        VMM.Lib.css(element, p, v);
+        library.css(element, p, v);
       };
       this.opacity = function(p) {
-        VMM.Lib.css(element, "opacity", p);
+        library.css(element, "opacity", p);
       };
       this.width = function() {
-        return VMM.Lib.width(element);
+        return library.width(element);
       };
       this.height = function() {
-        return VMM.Lib.height(element);
+        return library.height(element);
       };
       this.content_height = function() {
         var ch;
 
-        ch = VMM.Lib.find(element, ".content")[0];
+        ch = library.find(element, ".content")[0];
         if (ch !== "undefined" && (ch != null)) {
-          return VMM.Lib.height(ch);
+          return library.height(ch);
         } else {
           return 0;
         }
@@ -138,8 +138,8 @@
       removeSlide = function() {
         trace("REMOVE SLIDE TIMER FINISHED");
         loaded = false;
-        VMM.Lib.detach($text);
-        VMM.Lib.detach($media);
+        library.detach($text);
+        library.detach($media);
       };
       reloadLayout = function() {
         loaded = true;
@@ -149,30 +149,30 @@
         if (c.has.text) {
           if (skinny) {
             if (!is_skinny || reload) {
-              VMM.Lib.removeClass($slide, "pad-left");
-              VMM.Lib.detach($text);
-              VMM.Lib.detach($media);
-              VMM.Lib.append($slide, $text);
-              VMM.Lib.append($slide, $media);
+              library.removeClass($slide, "pad-left");
+              library.detach($text);
+              library.detach($media);
+              library.append($slide, $text);
+              library.append($slide, $media);
               is_skinny = true;
             }
           } else {
             if (is_skinny || reload) {
-              VMM.Lib.addClass($slide, "pad-left");
-              VMM.Lib.detach($text);
-              VMM.Lib.detach($media);
-              VMM.Lib.append($slide, $media);
-              VMM.Lib.append($slide, $text);
+              library.addClass($slide, "pad-left");
+              library.detach($text);
+              library.detach($media);
+              library.append($slide, $media);
+              library.append($slide, $text);
               is_skinny = false;
             }
           }
         } else if (reload) {
           if (c.has.headline) {
-            VMM.Lib.detach($text);
-            VMM.Lib.append($slide, $text);
+            library.detach($text);
+            library.append($slide, $text);
           }
-          VMM.Lib.detach($media);
-          VMM.Lib.append($slide, $media);
+          library.detach($media);
+          library.append($slide, $media);
         }
       };
       buildSlide = function() {
@@ -231,16 +231,16 @@
         }
         if (c.has.text) {
           if (timer.skinny) {
-            VMM.Lib.addClass($slide, c.layout);
+            library.addClass($slide, c.layout);
             is_skinny = true;
           } else {
-            VMM.Lib.addClass($slide, c.layout);
-            VMM.Lib.addClass($slide, "pad-left");
-            VMM.Lib.detach($text);
-            VMM.Lib.append($slide, $text);
+            library.addClass($slide, c.layout);
+            library.addClass($slide, "pad-left");
+            library.detach($text);
+            library.append($slide, $text);
           }
         } else {
-          VMM.Lib.addClass($slide, c.layout);
+          library.addClass($slide, c.layout);
         }
       };
     };

@@ -1,6 +1,14 @@
 # Slider Slide 
 #================================================== 
-define ["VMM", "trace", "type", "VMM.Date", "VMM.Slider", "VMM.TextElement"], (VMM, trace, type, vDate)->
+define [
+	"VMM"
+	"trace"
+	"type"
+	"VMM.Date"
+	"VMM.Library"
+	"VMM.Slider"
+	"VMM.TextElement"
+], (VMM, trace, type, vDate, library)->
 	VMM.Slider.Slide = (d, _parent) ->
 		$media = undefined
 		$text = undefined
@@ -38,7 +46,7 @@ define ["VMM", "trace", "type", "VMM.Date", "VMM.Slider", "VMM.TextElement"], (V
 		element = VMM.appendAndGetElement(_parent, "<div>", "slider-item")
 		unless typeof data.classname is "undefined"
 			trace "HAS CLASSNAME"
-			VMM.Lib.addClass element, data.classname
+			library.addClass element, data.classname
 		else
 			trace "NO CLASSNAME"
 			trace data
@@ -92,37 +100,37 @@ define ["VMM", "trace", "type", "VMM.Date", "VMM.Slider", "VMM.TextElement"], (V
 			element
 
 		@position = ->
-			VMM.Lib.position element
+			library.position element
 
 		@leftpos = (p) ->
 			unless typeof p is "undefined"
-				VMM.Lib.css element, "left", p
+				library.css element, "left", p
 			else
-				VMM.Lib.position(element).left
+				library.position(element).left
 			#return
 
 		@animate = (d, e, p) ->
-			VMM.Lib.animate element, d, e, p
+			library.animate element, d, e, p
 			return
 
 		@css = (p, v) ->
-			VMM.Lib.css element, p, v
+			library.css element, p, v
 			return
 
 		@opacity = (p) ->
-			VMM.Lib.css element, "opacity", p
+			library.css element, "opacity", p
 			return
 
 		@width = ->
-			VMM.Lib.width element
+			library.width element
 
 		@height = ->
-			VMM.Lib.height element
+			library.height element
 
 		@content_height = ->
-			ch = VMM.Lib.find(element, ".content")[0]
+			ch = library.find(element, ".content")[0]
 			if ch isnt "undefined" and ch?
-				VMM.Lib.height ch
+				library.height ch
 			else
 				0
 
@@ -145,8 +153,8 @@ define ["VMM", "trace", "type", "VMM.Date", "VMM.Slider", "VMM.TextElement"], (V
 			#VMM.attachElement(element, "");
 			trace "REMOVE SLIDE TIMER FINISHED"
 			loaded = false
-			VMM.Lib.detach $text
-			VMM.Lib.detach $media
+			library.detach $text
+			library.detach $media
 			return
 
 		reloadLayout = ->
@@ -158,26 +166,26 @@ define ["VMM", "trace", "type", "VMM.Date", "VMM.Slider", "VMM.TextElement"], (V
 			if c.has.text
 				if skinny
 					if not is_skinny or reload
-						VMM.Lib.removeClass $slide, "pad-left"
-						VMM.Lib.detach $text
-						VMM.Lib.detach $media
-						VMM.Lib.append $slide, $text
-						VMM.Lib.append $slide, $media
+						library.removeClass $slide, "pad-left"
+						library.detach $text
+						library.detach $media
+						library.append $slide, $text
+						library.append $slide, $media
 						is_skinny = true
 				else
 					if is_skinny or reload
-						VMM.Lib.addClass $slide, "pad-left"
-						VMM.Lib.detach $text
-						VMM.Lib.detach $media
-						VMM.Lib.append $slide, $media
-						VMM.Lib.append $slide, $text
+						library.addClass $slide, "pad-left"
+						library.detach $text
+						library.detach $media
+						library.append $slide, $media
+						library.append $slide, $text
 						is_skinny = false
 			else if reload
 				if c.has.headline
-					VMM.Lib.detach $text
-					VMM.Lib.append $slide, $text
-				VMM.Lib.detach $media
-				VMM.Lib.append $slide, $media
+					library.detach $text
+					library.append $slide, $text
+				library.detach $media
+				library.append $slide, $media
 			return
 
 		buildSlide = ->
@@ -239,15 +247,15 @@ define ["VMM", "trace", "type", "VMM.Date", "VMM.Slider", "VMM.TextElement"], (V
 			c.layout += "-media"    if c.has.media
 			if c.has.text
 				if timer.skinny
-					VMM.Lib.addClass $slide, c.layout
+					library.addClass $slide, c.layout
 					is_skinny = true
 				else
-					VMM.Lib.addClass $slide, c.layout
-					VMM.Lib.addClass $slide, "pad-left"
-					VMM.Lib.detach $text
-					VMM.Lib.append $slide, $text
+					library.addClass $slide, c.layout
+					library.addClass $slide, "pad-left"
+					library.detach $text
+					library.append $slide, $text
 			else
-				VMM.Lib.addClass $slide, c.layout
+				library.addClass $slide, c.layout
 			return
 
 		return

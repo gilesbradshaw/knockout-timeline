@@ -1,5 +1,7 @@
 (function() {
-  define(["jquery", "VMM", "trace", "VMM.Browser", "easing"], function(jQuery, VMM, trace, browser) {
+  define(["jquery", "VMM", "trace", "VMM.Browser", "jQueryExtender"], function(jQuery, VMM, trace, browser) {
+    var library;
+
     VMM.smoothScrollTo = function(elem, duration, ease) {
       var _duration, _ease;
 
@@ -16,9 +18,9 @@
         if ((ease != null) && ease !== "") {
           _ease = ease;
         }
-        if (jQuery(window).scrollTop() !== VMM.Lib.offset(elem).top) {
-          return VMM.Lib.animate("html,body", _duration, _ease, {
-            scrollTop: VMM.Lib.offset(elem).top
+        if (jQuery(window).scrollTop() !== library.offset(elem).top) {
+          return library.animate("html,body", _duration, _ease, {
+            scrollTop: library.offset(elem).top
           });
         }
       }
@@ -153,7 +155,7 @@
       }
       return e;
     };
-    VMM.Lib = {
+    return library = {
       init: function() {
         return this;
       },
@@ -235,7 +237,7 @@
       },
       prop: function(element, aName, value) {
         if (typeof jQuery === "undefined" || !/[1-9]\.[3-9].[1-9]/.test(jQuery.fn.jquery)) {
-          return VMM.Lib.attribute(element, aName, value);
+          return library.attribute(element, aName, value);
         } else {
           return jQuery(element).prop(aName, value);
         }
@@ -372,12 +374,12 @@
         if (browser.device === "mobile" || browser.device === "tablet") {
           _tdd = Math.round((duration / 1500) * 10) / 10;
           __duration = _tdd + "s";
-          VMM.Lib.css(element, "-webkit-transition", "all " + __duration + " ease");
-          VMM.Lib.css(element, "-moz-transition", "all " + __duration + " ease");
-          VMM.Lib.css(element, "-o-transition", "all " + __duration + " ease");
-          VMM.Lib.css(element, "-ms-transition", "all " + __duration + " ease");
-          VMM.Lib.css(element, "transition", "all " + __duration + " ease");
-          return VMM.Lib.cssmultiple(element, _att);
+          library.css(element, "-webkit-transition", "all " + __duration + " ease");
+          library.css(element, "-moz-transition", "all " + __duration + " ease");
+          library.css(element, "-o-transition", "all " + __duration + " ease");
+          library.css(element, "-ms-transition", "all " + __duration + " ease");
+          library.css(element, "transition", "all " + __duration + " ease");
+          return library.cssmultiple(element, _att);
         } else {
           if (typeof jQuery !== "undefined") {
             return jQuery(element).delay(delay).animate(att, {
@@ -421,14 +423,14 @@
           for (x in _att) {
             if (Object.prototype.hasOwnProperty.call(_att, x)) {
               trace(x + " to " + _att[x]);
-              VMM.Lib.css(element, "-webkit-transition", x + " " + __duration + _ease);
-              VMM.Lib.css(element, "-moz-transition", x + " " + __duration + _ease);
-              VMM.Lib.css(element, "-o-transition", x + " " + __duration + _ease);
-              VMM.Lib.css(element, "-ms-transition", x + " " + __duration + _ease);
-              VMM.Lib.css(element, "transition", x + " " + __duration + _ease);
+              library.css(element, "-webkit-transition", x + " " + __duration + _ease);
+              library.css(element, "-moz-transition", x + " " + __duration + _ease);
+              library.css(element, "-o-transition", x + " " + __duration + _ease);
+              library.css(element, "-ms-transition", x + " " + __duration + _ease);
+              library.css(element, "transition", x + " " + __duration + _ease);
             }
           }
-          return VMM.Lib.cssmultiple(element, _att);
+          return library.cssmultiple(element, _att);
         } else {
           if (typeof jQuery !== "undefined") {
             if ((callback_function != null) && callback_function !== "") {
@@ -449,100 +451,6 @@
         }
       }
     };
-    (function(jQuery) {
-      if (window.XDomainRequest) {
-        jQuery.ajaxTransport(function(s) {
-          var xdr;
-
-          if (s.crossDomain && s.async) {
-            if (s.timeout) {
-              s.xdrTimeout = s.timeout;
-              delete s.timeout;
-            }
-            xdr = void 0;
-            return {
-              send: function(_, complete) {
-                var callback;
-
-                callback = function(status, statusText, responses, responseHeaders) {
-                  xdr.onload = xdr.onerror = xdr.ontimeout = jQuery.noop;
-                  xdr = undefined;
-                  complete(status, statusText, responses, responseHeaders);
-                };
-                xdr = new XDomainRequest();
-                xdr.open(s.type, s.url);
-                xdr.onload = function() {
-                  callback(200, "OK", {
-                    text: xdr.responseText
-                  }, "Content-Type: " + xdr.contentType);
-                };
-                xdr.onerror = function() {
-                  callback(404, "Not Found");
-                };
-                if (s.xdrTimeout) {
-                  xdr.ontimeout = function() {
-                    callback(0, "timeout");
-                  };
-                  xdr.timeout = s.xdrTimeout;
-                }
-                xdr.send((s.hasContent && s.data) || null);
-              },
-              abort: function() {
-                if (xdr) {
-                  xdr.onerror = jQuery.noop();
-                  xdr.abort();
-                }
-              }
-            };
-          }
-        });
-      }
-    })(jQuery);
-    jQuery.easing["jswing"] = jQuery.easing["swing"];
-    return jQuery.extend(jQuery.easing, {
-      def: "easeOutQuad",
-      swing: function(x, t, b, c, d) {
-        return jQuery.easing[jQuery.easing.def](x, t, b, c, d);
-      },
-      easeInExpo: function(x, t, b, c, d) {
-        if (t === 0) {
-          return b;
-        } else {
-          return c * Math.pow(2, 10 * (t / d - 1)) + b;
-        }
-      },
-      easeOutExpo: function(x, t, b, c, d) {
-        if (t === d) {
-          return b + c;
-        } else {
-          return c * (-Math.pow(2, -10 * t / d) + 1) + b;
-        }
-      },
-      easeInOutExpo: function(x, t, b, c, d) {
-        if (t === 0) {
-          return b;
-        }
-        if (t === d) {
-          return b + c;
-        }
-        if ((t /= d / 2) < 1) {
-          return c / 2 * Math.pow(2, 10 * (t - 1)) + b;
-        }
-        return c / 2 * (-Math.pow(2, -10 * --t) + 2) + b;
-      },
-      easeInQuad: function(x, t, b, c, d) {
-        return c * (t /= d) * t + b;
-      },
-      easeOutQuad: function(x, t, b, c, d) {
-        return -c * (t /= d) * (t - 2) + b;
-      },
-      easeInOutQuad: function(x, t, b, c, d) {
-        if ((t /= d / 2) < 1) {
-          return c / 2 * t * t + b;
-        }
-        return -c / 2 * ((--t) * (t - 2) - 1) + b;
-      }
-    });
   });
 
 }).call(this);

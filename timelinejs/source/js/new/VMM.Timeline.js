@@ -1,5 +1,5 @@
 (function() {
-  define(["VMM", "type", "trace", "global", "VMM.Browser", "VMM.Date", "VMM.Language"], function(VMM, type, trace, global, browser, vDate) {
+  define(["VMM", "type", "trace", "global", "VMM.Browser", "VMM.Date", "VMM.Library", "VMM.Language"], function(VMM, type, trace, global, browser, vDate, library) {
     VMM.Timeline = function(_timeline_id, w, h) {
       var $container, $feature, $feedback, $navigation, $slider, $timeline, build, buildDates, config, createConfig, createStructure, data, detachMessege, events, getData, getViewport, goToEvent, has_height, has_width, hash, hideMessege, ie7, is_moving, onComponentLoaded, onDataReady, onDatesProcessed, onMarkerUpdate, onSlideUpdate, onSliderLoaded, onTimeNavLoaded, orientationChange, reSize, searchOrientation, setHash, setViewport, showMessege, slider, timeline_id, timenav, updateSize, version, _dates;
 
@@ -54,32 +54,32 @@
       };
       createStructure = function() {
         $timeline = VMM.getElement(timeline_id);
-        VMM.Lib.addClass($timeline, "vco-timeline");
-        VMM.Lib.addClass($timeline, "vco-storyjs");
+        library.addClass($timeline, "vco-timeline");
+        library.addClass($timeline, "vco-storyjs");
         $container = VMM.appendAndGetElement($timeline, "<div>", "vco-container vco-main");
         $feature = VMM.appendAndGetElement($container, "<div>", "vco-feature");
         $slider = VMM.appendAndGetElement($feature, "<div>", "vco-slider");
         $navigation = VMM.appendAndGetElement($container, "<div>", "vco-navigation");
         $feedback = VMM.appendAndGetElement($timeline, "<div>", "vco-feedback", "");
         if (typeof config.language.right_to_left !== "undefined") {
-          VMM.Lib.addClass($timeline, "vco-right-to-left");
+          library.addClass($timeline, "vco-right-to-left");
         }
         slider = new VMM.Slider($slider, config);
         timenav = new VMM.Timeline.TimeNav($navigation);
         if (!has_width) {
-          config.width = VMM.Lib.width($timeline);
+          config.width = library.width($timeline);
         } else {
-          VMM.Lib.width($timeline, config.width);
+          library.width($timeline, config.width);
         }
         if (!has_height) {
-          config.height = VMM.Lib.height($timeline);
+          config.height = library.height($timeline);
         } else {
-          VMM.Lib.height($timeline, config.height);
+          library.height($timeline, config.height);
         }
         if (config.touch) {
-          VMM.Lib.addClass($timeline, "vco-touch");
+          library.addClass($timeline, "vco-touch");
         } else {
-          VMM.Lib.addClass($timeline, "vco-notouch");
+          library.addClass($timeline, "vco-notouch");
         }
       };
       onDataReady = function(e, d) {
@@ -203,12 +203,12 @@
         }
       };
       hideMessege = function() {
-        VMM.Lib.animate($feedback, config.duration, config.ease * 4, {
+        library.animate($feedback, config.duration, config.ease * 4, {
           opacity: 0
         }, detachMessege);
       };
       detachMessege = function() {
-        VMM.Lib.detach($feedback);
+        library.detach($feedback);
       };
       build = function() {
         if (parseInt(config.start_at_slide) > 0 && config.current_slide === 0) {
@@ -236,8 +236,8 @@
         var dontcrashjs2coffee;
 
         trace("UPDATE SIZE");
-        config.width = VMM.Lib.width($timeline);
-        config.height = VMM.Lib.height($timeline);
+        config.width = library.width($timeline);
+        config.height = library.height($timeline);
         config.nav.width = config.width;
         config.feature.width = config.width;
         config.feature.height = config.height - config.nav.height - 3;
@@ -245,9 +245,9 @@
           dontcrashjs2coffee = 0;
         }
         if (config.width < 641) {
-          VMM.Lib.addClass($timeline, "vco-skinny");
+          library.addClass($timeline, "vco-skinny");
         } else {
-          VMM.Lib.removeClass($timeline, "vco-skinny");
+          library.removeClass($timeline, "vco-skinny");
         }
       };
       buildDates = function() {

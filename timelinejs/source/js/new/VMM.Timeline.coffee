@@ -10,7 +10,16 @@
 
 # Timeline
 #================================================== 
-define ["VMM", "type", "trace", "global", "VMM.Browser", "VMM.Date", "VMM.Language"], (VMM, type, trace, global, browser, vDate)->
+define [
+	"VMM"
+	"type"
+	"trace"
+	"global"
+	"VMM.Browser"
+	"VMM.Date"
+	"VMM.Library"
+	"VMM.Language"
+], (VMM, type, trace, global, browser, vDate, library)->
 	VMM.Timeline = (_timeline_id, w, h) ->
 
 
@@ -67,28 +76,28 @@ define ["VMM", "type", "trace", "global", "VMM.Browser", "VMM.Date", "VMM.Langua
 			
 			# CREATE DOM STRUCTURE
 			$timeline = VMM.getElement(timeline_id)
-			VMM.Lib.addClass $timeline, "vco-timeline"
-			VMM.Lib.addClass $timeline, "vco-storyjs"
+			library.addClass $timeline, "vco-timeline"
+			library.addClass $timeline, "vco-storyjs"
 			$container = VMM.appendAndGetElement($timeline, "<div>", "vco-container vco-main")
 			$feature = VMM.appendAndGetElement($container, "<div>", "vco-feature")
 			$slider = VMM.appendAndGetElement($feature, "<div>", "vco-slider")
 			$navigation = VMM.appendAndGetElement($container, "<div>", "vco-navigation")
 			$feedback = VMM.appendAndGetElement($timeline, "<div>", "vco-feedback", "")
-			VMM.Lib.addClass $timeline, "vco-right-to-left"    unless typeof config.language.right_to_left is "undefined"
+			library.addClass $timeline, "vco-right-to-left"    unless typeof config.language.right_to_left is "undefined"
 			slider = new VMM.Slider($slider, config)
 			timenav = new VMM.Timeline.TimeNav($navigation)
 			unless has_width
-				config.width = VMM.Lib.width($timeline)
+				config.width = library.width($timeline)
 			else
-				VMM.Lib.width $timeline, config.width
+				library.width $timeline, config.width
 			unless has_height
-				config.height = VMM.Lib.height($timeline)
+				config.height = library.height($timeline)
 			else
-				VMM.Lib.height $timeline, config.height
+				library.height $timeline, config.height
 			if config.touch
-				VMM.Lib.addClass $timeline, "vco-touch"
+				library.addClass $timeline, "vco-touch"
 			else
-				VMM.Lib.addClass $timeline, "vco-notouch"
+				library.addClass $timeline, "vco-notouch"
 			return
 		
 		# ON EVENT
@@ -160,7 +169,7 @@ define ["VMM", "type", "trace", "global", "VMM.Browser", "VMM.Date", "VMM.Langua
 			if document.getElementById("viewport")
 				dontcrashjs2coffee = 0
 			
-			#VMM.Lib.attr("#viewport", "content", viewport_content);
+			#library.attr("#viewport", "content", viewport_content);
 			else
 				dontcrashjs2coffee = 0
 			return
@@ -222,12 +231,12 @@ define ["VMM", "type", "trace", "global", "VMM.Browser", "VMM.Date", "VMM.Langua
 				VMM.attachElement $feedback, VMM.MediaElement.loadingmessage(msg)
 			return
 		hideMessege = ->
-			VMM.Lib.animate $feedback, config.duration, config.ease * 4,
+			library.animate $feedback, config.duration, config.ease * 4,
 				opacity: 0
 			, detachMessege
 			return
 		detachMessege = ->
-			VMM.Lib.detach $feedback
+			library.detach $feedback
 			return
 		
 		# BUILD DISPLAY
@@ -263,8 +272,8 @@ define ["VMM", "type", "trace", "global", "VMM.Browser", "VMM.Date", "VMM.Langua
 			return
 		updateSize = ->
 			trace "UPDATE SIZE"
-			config.width = VMM.Lib.width($timeline)
-			config.height = VMM.Lib.height($timeline)
+			config.width = library.width($timeline)
+			config.height = library.height($timeline)
 			config.nav.width = config.width
 			config.feature.width = config.width
 			config.feature.height = config.height - config.nav.height - 3
@@ -282,9 +291,9 @@ define ["VMM", "type", "trace", "global", "VMM.Browser", "VMM.Date", "VMM.Langua
 			#				}
 			#				
 			if config.width < 641
-				VMM.Lib.addClass $timeline, "vco-skinny"
+				library.addClass $timeline, "vco-skinny"
 			else
-				VMM.Lib.removeClass $timeline, "vco-skinny"
+				library.removeClass $timeline, "vco-skinny"
 			return
 		
 		# BUILD DATE OBJECTS

@@ -3,7 +3,15 @@
 #	This class handles the bottom timeline navigation.
 #	It requires the VMM.Util class and VMM.Date class
 #================================================== 
-define ["VMM","trace", "type", "VMM.Browser", "VMM.Date", "VMM.Timeline"], (VMM, trace, type, browser, vDate)->
+define [
+	"VMM"
+	"trace"
+	"type"
+	"VMM.Browser"
+	"VMM.Date"
+	"VMM.Library"
+	"VMM.Timeline"
+], (VMM, trace, type, browser, vDate, library)->
 	VMM.Timeline.TimeNav = (parent, content_width, content_height) ->
 		
 		trace "VMM.Timeline.TimeNav"
@@ -151,8 +159,8 @@ define ["VMM","trace", "type", "VMM.Browser", "VMM.Date", "VMM.Timeline"], (VMM,
 			config.nav.constraint.left = (config.width / 2)
 			config.nav.constraint.right = config.nav.constraint.right_min - (config.width / 2)
 			$dragslide.updateConstraint config.nav.constraint
-			VMM.Lib.css $timenavline, "left", Math.round(config.width / 2) + 2
-			VMM.Lib.css $timenavindicator, "left", Math.round(config.width / 2) - 8
+			library.css $timenavline, "left", Math.round(config.width / 2) + 2
+			library.css $timenavindicator, "left", Math.round(config.width / 2) - 8
 			goToMarker config.current_slide, config.ease, config.duration, true, firstrun
 			return
 		upDate = ->
@@ -221,14 +229,14 @@ define ["VMM","trace", "type", "VMM.Browser", "VMM.Date", "VMM.Timeline"], (VMM,
 				e.returnValue = false
 			
 			# Stop from scrolling too far
-			scroll_to = VMM.Lib.position($timenav).left + delta
+			scroll_to = library.position($timenav).left + delta
 			if scroll_to > config.nav.constraint.left
 				scroll_to = config.width / 2
 			else scroll_to = config.nav.constraint.right    if scroll_to < config.nav.constraint.right
 			
-			#VMM.Lib.stop($timenav);
-			#VMM.Lib.animate($timenav, config.duration/2, "linear", {"left": scroll_to});
-			VMM.Lib.css $timenav, "left", scroll_to
+			#library.stop($timenav);
+			#library.animate($timenav, config.duration/2, "linear", {"left": scroll_to});
+			library.css $timenav, "left", scroll_to
 			return
 		refreshTimeline = ->
 			trace "config.nav.multiplier " + config.nav.multiplier.current
@@ -249,7 +257,7 @@ define ["VMM","trace", "type", "VMM.Browser", "VMM.Date", "VMM.Timeline"], (VMM,
 			upDate()
 			return
 		onMarkerHover = (e) ->
-			VMM.Lib.toggleClass e.data.elem, "zFront"
+			library.toggleClass e.data.elem, "zFront"
 			return
 		goToMarker = (n, ease, duration, fast, firstrun) ->
 			trace "GO TO MARKER"
@@ -270,16 +278,16 @@ define ["VMM","trace", "type", "VMM.Browser", "VMM.Date", "VMM.Timeline"], (VMM,
 			i = 0
 
 			while i < markers.length
-				VMM.Lib.removeClass markers[i].marker, "active"
+				library.removeClass markers[i].marker, "active"
 				i++
 			if config.start_page and markers[0].type is "start"
-				VMM.Lib.visible markers[0].marker, false
-				VMM.Lib.addClass markers[0].marker, "start"
-			VMM.Lib.addClass markers[current_marker].marker, "active"
+				library.visible markers[0].marker, false
+				library.addClass markers[0].marker, "start"
+			library.addClass markers[current_marker].marker, "active"
 			
 			# ANIMATE MARKER
-			VMM.Lib.stop $timenav
-			VMM.Lib.animate $timenav, _duration, _ease,
+			library.stop $timenav
+			library.animate $timenav, _duration, _ease,
 				left: timenav_pos.left
 
 			return
@@ -287,7 +295,7 @@ define ["VMM","trace", "type", "VMM.Browser", "VMM.Date", "VMM.Timeline"], (VMM,
 		# TOUCH EVENTS
 		#		================================================== 
 		onTouchUpdate = (e, b) ->
-			VMM.Lib.animate $timenav, b.time / 2, config.ease,
+			library.animate $timenav, b.time / 2, config.ease,
 				left: b.left
 
 			return
@@ -605,9 +613,9 @@ define ["VMM","trace", "type", "VMM.Browser", "VMM.Date", "VMM.Timeline"], (VMM,
 			i = 0
 			k = 0
 			config.nav.minor_width = config.width
-			VMM.Lib.removeClass ".flag", "row1"
-			VMM.Lib.removeClass ".flag", "row2"
-			VMM.Lib.removeClass ".flag", "row3"
+			library.removeClass ".flag", "row1"
+			library.removeClass ".flag", "row2"
+			library.removeClass ".flag", "row3"
 			i = 0
 			while i < markers.length
 				line = undefined
@@ -637,25 +645,25 @@ define ["VMM","trace", "type", "VMM.Browser", "VMM.Date", "VMM.Timeline"], (VMM,
 				
 				# APPLY POSITION TO MARKER
 				if is_animated
-					VMM.Lib.stop marker.marker
-					VMM.Lib.animate marker.marker, config.duration / 2, config.ease,
+					library.stop marker.marker
+					library.animate marker.marker, config.duration / 2, config.ease,
 						left: pos.begin
 
 				else
-					VMM.Lib.stop marker.marker
-					VMM.Lib.css marker.marker, "left", pos.begin
+					library.stop marker.marker
+					library.css marker.marker, "left", pos.begin
 				cur_mark = pos.begin    if i is current_marker
 				
 				# EVENT LENGTH LINE
 				if line > 5
-					VMM.Lib.css marker.lineevent, "height", line_height
-					VMM.Lib.css marker.lineevent, "top", line_last_height_pos
+					library.css marker.lineevent, "height", line_height
+					library.css marker.lineevent, "top", line_last_height_pos
 					if is_animated
-						VMM.Lib.animate marker.lineevent, config.duration / 2, config.ease,
+						library.animate marker.lineevent, config.duration / 2, config.ease,
 							width: line
 
 					else
-						VMM.Lib.css marker.lineevent, "width", line
+						library.css marker.lineevent, "width", line
 				
 				# CONTROL ROW POSITION
 				if tags.length > 0
@@ -666,7 +674,7 @@ define ["VMM","trace", "type", "VMM.Browser", "VMM.Date", "VMM.Timeline"], (VMM,
 								row = k
 								if k is config.nav.rows.current.length - 1
 									trace "ON LAST ROW"
-									VMM.Lib.addClass marker.flag, "flag-small-last"
+									library.addClass marker.flag, "flag-small-last"
 						k++
 					row_pos = config.nav.rows.current[row]
 				else
@@ -692,31 +700,31 @@ define ["VMM","trace", "type", "VMM.Browser", "VMM.Date", "VMM.Timeline"], (VMM,
 				
 				#if (is_animated && is_in_view) {
 				if is_animated
-					VMM.Lib.stop marker.flag
-					VMM.Lib.animate marker.flag, config.duration, config.ease,
+					library.stop marker.flag
+					library.animate marker.flag, config.duration, config.ease,
 						top: row_pos
 
 				else
-					VMM.Lib.stop marker.flag
-					VMM.Lib.css marker.flag, "top", row_pos
+					library.stop marker.flag
+					library.css marker.flag, "top", row_pos
 				
 				# IS THE MARKER A REPRESENTATION OF A START SCREEN?
-				VMM.Lib.visible marker.marker, false    if config.start_page and markers[i].type is "start"
+				library.visible marker.marker, false    if config.start_page and markers[i].type is "start"
 				config.nav.minor_width = pos    if pos > config.nav.minor_width
 				config.nav.minor_left = pos    if pos < config.nav.minor_left
 				i++
 			
 			# ANIMATE THE TIMELINE TO ADJUST TO CHANGES
 			if is_animated
-				VMM.Lib.stop $timenav
-				VMM.Lib.animate $timenav, config.duration / 2, config.ease,
+				library.stop $timenav
+				library.animate $timenav, config.duration / 2, config.ease,
 					left: (config.width / 2) - (cur_mark)
 
 			else
 
 			return
 		
-		#VMM.Lib.delay_animate(config.duration, $timenav, config.duration/2, config.ease, {"left": (config.width/2) - (cur_mark)});
+		#library.delay_animate(config.duration, $timenav, config.duration/2, config.ease, {"left": (config.width/2) - (cur_mark)});
 		positionEras = (is_animated) ->
 			i = 0
 			p = 0
@@ -742,25 +750,25 @@ define ["VMM","trace", "type", "VMM.Browser", "VMM.Date", "VMM.Timeline"], (VMM,
 				
 				# APPLY POSITION TO MARKER
 				if is_animated
-					VMM.Lib.stop era.content
-					VMM.Lib.stop era.text_content
-					VMM.Lib.animate era.content, config.duration / 2, config.ease,
+					library.stop era.content
+					library.stop era.text_content
+					library.animate era.content, config.duration / 2, config.ease,
 						top: row_pos
 						left: pos.begin
 						width: era_length
 						height: era_height
 
-					VMM.Lib.animate era.text_content, config.duration / 2, config.ease,
+					library.animate era.text_content, config.duration / 2, config.ease,
 						left: pos.begin
 
 				else
-					VMM.Lib.stop era.content
-					VMM.Lib.stop era.text_content
-					VMM.Lib.css era.content, "left", pos.begin
-					VMM.Lib.css era.content, "width", era_length
-					VMM.Lib.css era.content, "height", era_height
-					VMM.Lib.css era.content, "top", row_pos
-					VMM.Lib.css era.text_content, "left", pos.begin
+					library.stop era.content
+					library.stop era.text_content
+					library.css era.content, "left", pos.begin
+					library.css era.content, "width", era_length
+					library.css era.content, "height", era_height
+					library.css era.content, "top", row_pos
+					library.css era.text_content, "left", pos.begin
 				i++
 			return
 		positionInterval = (the_main_element, the_intervals, is_animated, is_minor) ->
@@ -810,11 +818,11 @@ define ["VMM","trace", "type", "VMM.Browser", "VMM.Date", "VMM.Timeline"], (VMM,
 								is_visible = false    unless VMM.Util.isEven(i)
 					if is_visible
 						if the_intervals[i].is_detached
-							VMM.Lib.append the_main_element, _interval
+							library.append the_main_element, _interval
 							the_intervals[i].is_detached = false
 					else
 						the_intervals[i].is_detached = true
-						VMM.Lib.detach _interval
+						library.detach _interval
 					if _interval_visible
 						unless is_visible
 							_animation.opacity = "0"
@@ -837,18 +845,18 @@ define ["VMM","trace", "type", "VMM.Browser", "VMM.Date", "VMM.Timeline"], (VMM,
 					config.nav.minor_width = pos    if pos > config.nav.minor_width
 					config.nav.minor_left = pos    if pos < config.nav.minor_left
 				if _animation.animate
-					VMM.Lib.animate _interval, config.duration / 2, config.ease,
+					library.animate _interval, config.duration / 2, config.ease,
 						opacity: _animation.opacity
 						left: _animation.pos
 
 				else
-					VMM.Lib.css _interval, "opacity", _animation.opacity
-					VMM.Lib.css _interval, "left", pos
+					library.css _interval, "opacity", _animation.opacity
+					library.css _interval, "left", pos
 				i++
 			config.nav.constraint.right_min = -(config.nav.minor_width) + (config.width)
 			config.nav.constraint.right = config.nav.constraint.right_min + (config.width / 2)
-			VMM.Lib.css $timeintervalminor_minor, "left", config.nav.minor_left - (config.width) / 2
-			VMM.Lib.width $timeintervalminor_minor, (config.nav.minor_width) + (config.width) + Math.abs(config.nav.minor_left)
+			library.css $timeintervalminor_minor, "left", config.nav.minor_left - (config.width) / 2
+			library.width $timeintervalminor_minor, (config.nav.minor_width) + (config.width) + Math.abs(config.nav.minor_left)
 			return
 		
 		# Interval Elements
@@ -992,13 +1000,13 @@ define ["VMM","trace", "type", "VMM.Browser", "VMM.Date", "VMM.Timeline"], (VMM,
 				
 				# Add the time string to the element and position it.
 				VMM.appendElement int_obj.element, int_obj.date_string
-				VMM.Lib.css int_obj.element, "text-indent", -(VMM.Lib.width(int_obj.element) / 2)
-				VMM.Lib.css int_obj.element, "opacity", "0"
+				library.css int_obj.element, "text-indent", -(library.width(int_obj.element) / 2)
+				library.css int_obj.element, "opacity", "0"
 				
 				# add the interval element to the array
 				_array.push int_obj
 				i++
-			VMM.Lib.width $timeintervalminor_minor, _largest_pos
+			library.width $timeintervalminor_minor, _largest_pos
 			positionInterval _element_parent, _array
 			return
 		
@@ -1031,18 +1039,18 @@ define ["VMM","trace", "type", "VMM.Browser", "VMM.Date", "VMM.Timeline"], (VMM,
 			if config.start_page
 				$backhome = VMM.appendAndGetElement($toolbar, "<div>", "back-home", "<div class='icon'></div>")
 				VMM.bindEvent ".back-home", onBackHome, "click"
-				VMM.Lib.attribute $backhome, "title", VMM.master_config.language.messages.return_to_title
-				VMM.Lib.attribute $backhome, "rel", "timeline-tooltip"
+				library.attribute $backhome, "title", VMM.master_config.language.messages.return_to_title
+				library.attribute $backhome, "rel", "timeline-tooltip"
 			
 			# MAKE TIMELINE DRAGGABLE/TOUCHABLE
 			$dragslide = new VMM.DragSlider
 			$dragslide.createPanel layout, $timenav, config.nav.constraint, config.touch
 			if config.touch and config.start_page
-				VMM.Lib.addClass $toolbar, "touch"
-				VMM.Lib.css $toolbar, "top", 55
-				VMM.Lib.css $toolbar, "left", 10
+				library.addClass $toolbar, "touch"
+				library.css $toolbar, "top", 55
+				library.css $toolbar, "left", 10
 			else
-				VMM.Lib.css $toolbar, "top", 27    if config.start_page
+				library.css $toolbar, "top", 27    if config.start_page
 				$zoomin = VMM.appendAndGetElement($toolbar, "<div>", "zoom-in", "<div class='icon'></div>")
 				$zoomout = VMM.appendAndGetElement($toolbar, "<div>", "zoom-out", "<div class='icon'></div>")
 				
@@ -1051,10 +1059,10 @@ define ["VMM","trace", "type", "VMM.Browser", "VMM.Date", "VMM.Timeline"], (VMM,
 				VMM.bindEvent $zoomout, onZoomOut, "click"
 				
 				# TOOLTIP
-				VMM.Lib.attribute $zoomin, "title", VMM.master_config.language.messages.expand_timeline
-				VMM.Lib.attribute $zoomin, "rel", "timeline-tooltip"
-				VMM.Lib.attribute $zoomout, "title", VMM.master_config.language.messages.contract_timeline
-				VMM.Lib.attribute $zoomout, "rel", "timeline-tooltip"
+				library.attribute $zoomin, "title", VMM.master_config.language.messages.expand_timeline
+				library.attribute $zoomin, "rel", "timeline-tooltip"
+				library.attribute $zoomout, "title", VMM.master_config.language.messages.contract_timeline
+				library.attribute $zoomout, "rel", "timeline-tooltip"
 				$toolbar.tooltip
 					selector: "div[rel=timeline-tooltip]"
 					placement: "right"
@@ -1231,7 +1239,7 @@ define ["VMM","trace", "type", "VMM.Browser", "VMM.Date", "VMM.Timeline"], (VMM,
 					VMM.appendElement _marker_content, "<h3 id='marker_content_" + data[i].uniqueid + "'>" + _marker_title + "</h3>"
 				
 				# ADD ID
-				VMM.Lib.attr _marker, "id", ("marker_" + data[i].uniqueid).toString()
+				library.attr _marker, "id", ("marker_" + data[i].uniqueid).toString()
 				
 				# MARKER CLICK
 				VMM.bindEvent _marker_flag, onMarkerClick, "",
@@ -1270,11 +1278,11 @@ define ["VMM","trace", "type", "VMM.Browser", "VMM.Date", "VMM.Timeline"], (VMM,
 			while k < tags.length
 				if k < config.nav.rows.current.length
 					tag_element = VMM.appendAndGetElement($timebackground, "<div>", "timenav-tag")
-					VMM.Lib.addClass tag_element, "timenav-tag-row-" + (k + 1)
+					library.addClass tag_element, "timenav-tag-row-" + (k + 1)
 					if tags.length > 3
-						VMM.Lib.addClass tag_element, "timenav-tag-size-half"
+						library.addClass tag_element, "timenav-tag-size-half"
 					else
-						VMM.Lib.addClass tag_element, "timenav-tag-size-full"
+						library.addClass tag_element, "timenav-tag-size-full"
 					VMM.appendElement tag_element, "<div><h3>" + tags[k] + "</h3></div>"
 				k++
 			
@@ -1282,7 +1290,7 @@ define ["VMM","trace", "type", "VMM.Browser", "VMM.Date", "VMM.Timeline"], (VMM,
 			if tags.length > 3
 				l = 0
 				while l < markers.length
-					VMM.Lib.addClass markers[l].flag, "flag-small"
+					library.addClass markers[l].flag, "flag-small"
 					markers[l].full = false
 					l++
 			return
@@ -1309,12 +1317,12 @@ define ["VMM","trace", "type", "VMM.Browser", "VMM.Date", "VMM.Timeline"], (VMM,
 				era_text = "<div>&nbsp;</div>"
 				era.tag = eras[j].tag    unless typeof eras[j].tag is "undefined"
 				era.relative_pos = positionRelative(interval, era.startdate, era.enddate)
-				VMM.Lib.attr era.content, "id", era.uniqueid
-				VMM.Lib.attr era.text_content, "id", era.uniqueid + "_text"
+				library.attr era.content, "id", era.uniqueid
+				library.attr era.text_content, "id", era.uniqueid + "_text"
 				
 				# Background Color
-				VMM.Lib.addClass era.content, "era" + (current_color + 1)
-				VMM.Lib.addClass era.text_content, "era" + (current_color + 1)
+				library.addClass era.content, "era" + (current_color + 1)
+				library.addClass era.text_content, "era" + (current_color + 1)
 				if current_color < number_of_colors
 					current_color++
 				else

@@ -1,5 +1,5 @@
 (function() {
-  define(["VMM", "global", "trace", "type", "VMM.Timeline"], function(VMM, global, trace, type) {
+  define(["VMM", "global", "trace", "type", "VMM.Library", "VMM.Timeline"], function(VMM, global, trace, type, library) {
     return VMM.Timeline.DataObj = {
       data_obj: {},
       model_array: [],
@@ -51,30 +51,30 @@
         trace("parseHTML");
         trace("WARNING: THIS IS STILL ALPHA AND WILL NOT WORK WITH ID's other than #timeline");
         _data_obj = VMM.Timeline.DataObj.data_template_obj;
-        if (VMM.Lib.find("#timeline section", "time")[0]) {
-          _data_obj.timeline.startDate = VMM.Lib.html(VMM.Lib.find("#timeline section", "time")[0]);
-          _data_obj.timeline.headline = VMM.Lib.html(VMM.Lib.find("#timeline section", "h2"));
-          _data_obj.timeline.text = VMM.Lib.html(VMM.Lib.find("#timeline section", "article"));
+        if (library.find("#timeline section", "time")[0]) {
+          _data_obj.timeline.startDate = library.html(library.find("#timeline section", "time")[0]);
+          _data_obj.timeline.headline = library.html(library.find("#timeline section", "h2"));
+          _data_obj.timeline.text = library.html(library.find("#timeline section", "article"));
           found_main_media = false;
-          if (VMM.Lib.find("#timeline section", "figure img").length !== 0) {
+          if (library.find("#timeline section", "figure img").length !== 0) {
             found_main_media = true;
-            _data_obj.timeline.asset.media = VMM.Lib.attr(VMM.Lib.find("#timeline section", "figure img"), "src");
-          } else if (VMM.Lib.find("#timeline section", "figure a").length !== 0) {
+            _data_obj.timeline.asset.media = library.attr(library.find("#timeline section", "figure img"), "src");
+          } else if (library.find("#timeline section", "figure a").length !== 0) {
             found_main_media = true;
-            _data_obj.timeline.asset.media = VMM.Lib.attr(VMM.Lib.find("#timeline section", "figure a"), "href");
+            _data_obj.timeline.asset.media = library.attr(library.find("#timeline section", "figure a"), "href");
           } else {
 
           }
           if (found_main_media) {
-            if (VMM.Lib.find("#timeline section", "cite").length !== 0) {
-              _data_obj.timeline.asset.credit = VMM.Lib.html(VMM.Lib.find("#timeline section", "cite"));
+            if (library.find("#timeline section", "cite").length !== 0) {
+              _data_obj.timeline.asset.credit = library.html(library.find("#timeline section", "cite"));
             }
-            if (VMM.Lib.find(this, "figcaption").length !== 0) {
-              _data_obj.timeline.asset.caption = VMM.Lib.html(VMM.Lib.find("#timeline section", "figcaption"));
+            if (library.find(this, "figcaption").length !== 0) {
+              _data_obj.timeline.asset.caption = library.html(library.find("#timeline section", "figcaption"));
             }
           }
         }
-        VMM.Lib.each("#timeline li", function(i, elem) {
+        library.each("#timeline li", function(i, elem) {
           var found_media, valid_date, _date;
 
           valid_date = false;
@@ -90,30 +90,30 @@
             },
             tags: "Optional"
           };
-          if (VMM.Lib.find(this, "time") !== 0) {
+          if (library.find(this, "time") !== 0) {
             valid_date = true;
-            _date.startDate = VMM.Lib.html(VMM.Lib.find(this, "time")[0]);
-            if (VMM.Lib.find(this, "time")[1]) {
-              _date.endDate = VMM.Lib.html(VMM.Lib.find(this, "time")[1]);
+            _date.startDate = library.html(library.find(this, "time")[0]);
+            if (library.find(this, "time")[1]) {
+              _date.endDate = library.html(library.find(this, "time")[1]);
             }
-            _date.headline = VMM.Lib.html(VMM.Lib.find(this, "h3"));
-            _date.text = VMM.Lib.html(VMM.Lib.find(this, "article"));
+            _date.headline = library.html(library.find(this, "h3"));
+            _date.text = library.html(library.find(this, "article"));
             found_media = false;
-            if (VMM.Lib.find(this, "figure img").length !== 0) {
+            if (library.find(this, "figure img").length !== 0) {
               found_media = true;
-              _date.asset.media = VMM.Lib.attr(VMM.Lib.find(this, "figure img"), "src");
-            } else if (VMM.Lib.find(this, "figure a").length !== 0) {
+              _date.asset.media = library.attr(library.find(this, "figure img"), "src");
+            } else if (library.find(this, "figure a").length !== 0) {
               found_media = true;
-              _date.asset.media = VMM.Lib.attr(VMM.Lib.find(this, "figure a"), "href");
+              _date.asset.media = library.attr(library.find(this, "figure a"), "href");
             } else {
 
             }
             if (found_media) {
-              if (VMM.Lib.find(this, "cite").length !== 0) {
-                _date.asset.credit = VMM.Lib.html(VMM.Lib.find(this, "cite"));
+              if (library.find(this, "cite").length !== 0) {
+                _date.asset.credit = library.html(library.find(this, "cite"));
               }
-              if (VMM.Lib.find(this, "figcaption").length !== 0) {
-                _date.asset.caption = VMM.Lib.html(VMM.Lib.find(this, "figcaption"));
+              if (library.find(this, "figcaption").length !== 0) {
+                _date.asset.caption = library.html(library.find(this, "figcaption"));
               }
             }
             trace(_date);

@@ -1,5 +1,5 @@
 (function() {
-  define(["VMM", "trace"], function(VMM, trace) {
+  define(["VMM", "VMM.Library", "trace"], function(VMM, library, trace) {
     return VMM.DragSlider = function() {
       var drag, dragEnd, dragMomentum, dragMove, dragStart, dragevent, dragslider, getLeft, is_sticky, makeDraggable, mousedrag, onDragEnd, onDragLeave, onDragMove, onDragStart, touchdrag;
 
@@ -56,7 +56,7 @@
       dragStart = function(elem, delem, e) {
         if (drag.touch) {
           trace("IS TOUCH");
-          VMM.Lib.css(elem, "-webkit-transition-duration", "0");
+          library.css(elem, "-webkit-transition-duration", "0");
           drag.pagex.start = e.originalEvent.touches[0].screenX;
           drag.pagey.start = e.originalEvent.touches[0].screenY;
         } else {
@@ -65,7 +65,7 @@
         }
         drag.left.start = getLeft(elem);
         drag.time.start = new Date().getTime();
-        VMM.Lib.stop(elem);
+        library.stop(elem);
         return VMM.bindEvent(delem, onDragMove, dragevent.move, {
           element: elem
         });
@@ -94,7 +94,7 @@
           trace(Math.abs(drag.pagey.start) - Math.abs(drag.pagey.end));
         }
         if (Math.abs(drag_to - drag.left.start) > 10) {
-          VMM.Lib.css(elem, "left", drag_to);
+          library.css(elem, "left", drag_to);
           e.preventDefault();
           return e.stopPropagation();
         }
@@ -135,11 +135,11 @@
         if (!is_sticky) {
           if (drag_info.time > 0) {
             if (drag.touch) {
-              return VMM.Lib.animate(elem, drag_info.time, "easeOutCirc", {
+              return library.animate(elem, drag_info.time, "easeOutCirc", {
                 left: drag_info.left
               });
             } else {
-              return VMM.Lib.animate(elem, drag_info.time, drag.ease, {
+              return library.animate(elem, drag_info.time, drag.ease, {
                 left: drag_info.left
               });
             }
@@ -147,7 +147,7 @@
         }
       };
       getLeft = function(elem) {
-        return parseInt(VMM.Lib.css(elem, "left").substring(0, VMM.Lib.css(elem, "left").length - 2), 10);
+        return parseInt(library.css(elem, "left").substring(0, library.css(elem, "left").length - 2), 10);
       };
       drag = {
         element: "",

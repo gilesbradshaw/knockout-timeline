@@ -14,6 +14,7 @@
       "Date.extensions": "/source/js/core/core/new/Date.extensions",
       "is_": "/source/js/core/core/new/is_",
       "type": "/source/js/core/core/new/type",
+      "jQueryExtender": "/source/js/core/core/new/jQueryExtender",
       "easing": "/source/js/core/Library/Jquery/easing",
       "lazyload": "/source/js/core/Library/LazyLoad",
       "aes": "/source/js/core/Library/Aes",

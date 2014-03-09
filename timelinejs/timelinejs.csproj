@@ -82,6 +82,9 @@
     <Content Include="source\js\Core\Core\new\is_.js">
       <DependentUpon>is_.coffee</DependentUpon>
     </Content>
+    <Content Include="source\js\Core\Core\new\jQueryExtender.js">
+      <DependentUpon>jQueryExtender.coffee</DependentUpon>
+    </Content>
     <Content Include="source\js\Core\Core\new\trace.coffee" />
     <Content Include="source\js\Core\Core\new\type.js">
       <DependentUpon>type.coffee</DependentUpon>
@@ -91,6 +94,7 @@
     <Content Include="source\js\Core\Core\new\Date.extensions.coffee" />
     <Content Include="source\js\Core\Core\new\is_.coffee" />
     <Content Include="Scripts\jquery-2.1.0.min.map" />
+    <Content Include="source\js\Core\Core\new\jQueryExtender.coffee" />
     <None Include="source\js\Core\Core\new\VMM.Browser.coffee" />
     <Content Include="source\js\Core\Core\new\trace.js">
       <DependentUpon>trace.coffee</DependentUpon>

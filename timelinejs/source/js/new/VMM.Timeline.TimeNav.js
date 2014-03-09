@@ -1,5 +1,5 @@
 (function() {
-  define(["VMM", "trace", "type", "VMM.Browser", "VMM.Date", "VMM.Timeline"], function(VMM, trace, type, browser, vDate) {
+  define(["VMM", "trace", "type", "VMM.Browser", "VMM.Date", "VMM.Library", "VMM.Timeline"], function(VMM, trace, type, browser, vDate, library) {
     return VMM.Timeline.TimeNav = function(parent, content_width, content_height) {
       var $content, $dragslide, $time, $timebackground, $timeinterval, $timeintervalbackground, $timeintervalmajor, $timeintervalminor, $timeintervalminor_minor, $timenav, $timenavindicator, $timenavline, $toolbar, $zoomin, $zoomout, averageDateDistance, averageMarkerPositionDistance, build, buildEras, buildInterval, buildMarkers, calculateInterval, calculateMultiplier, config, content, createIntervalElements, current_marker, data, dateFractionBrowser, era_markers, eras, events, getDateFractions, goToMarker, interval, interval_array, interval_calc, interval_macro, interval_major, interval_major_array, layout, markers, onBackHome, onConfigSet, onMarkerClick, onMarkerHover, onMouseScroll, onTouchUpdate, onZoomIn, onZoomOut, positionEras, positionInterval, positionMarkers, positionOnTimeline, positionRelative, reSize, refreshTimeline, row_height, tags, timelookup, timenav_pos, timeouts, timespan, upDate, _active;
 
@@ -144,8 +144,8 @@
         config.nav.constraint.left = config.width / 2;
         config.nav.constraint.right = config.nav.constraint.right_min - (config.width / 2);
         $dragslide.updateConstraint(config.nav.constraint);
-        VMM.Lib.css($timenavline, "left", Math.round(config.width / 2) + 2);
-        VMM.Lib.css($timenavindicator, "left", Math.round(config.width / 2) - 8);
+        library.css($timenavline, "left", Math.round(config.width / 2) + 2);
+        library.css($timenavindicator, "left", Math.round(config.width / 2) - 8);
         goToMarker(config.current_slide, config.ease, config.duration, true, firstrun);
       };
       upDate = function() {
@@ -221,7 +221,7 @@
           }
           e.returnValue = false;
         }
-        scroll_to = VMM.Lib.position($timenav).left + delta;
+        scroll_to = library.position($timenav).left + delta;
         if (scroll_to > config.nav.constraint.left) {
           scroll_to = config.width / 2;
         } else {
@@ -229,7 +229,7 @@
             scroll_to = config.nav.constraint.right;
           }
         }
-        VMM.Lib.css($timenav, "left", scroll_to);
+        library.css($timenav, "left", scroll_to);
       };
       refreshTimeline = function() {
         trace("config.nav.multiplier " + config.nav.multiplier.current);
@@ -247,7 +247,7 @@
         upDate();
       };
       onMarkerHover = function(e) {
-        VMM.Lib.toggleClass(e.data.elem, "zFront");
+        library.toggleClass(e.data.elem, "zFront");
       };
       goToMarker = function(n, ease, duration, fast, firstrun) {
         var i, is_first, is_last, _duration, _ease;
@@ -275,21 +275,21 @@
         }
         i = 0;
         while (i < markers.length) {
-          VMM.Lib.removeClass(markers[i].marker, "active");
+          library.removeClass(markers[i].marker, "active");
           i++;
         }
         if (config.start_page && markers[0].type === "start") {
-          VMM.Lib.visible(markers[0].marker, false);
-          VMM.Lib.addClass(markers[0].marker, "start");
+          library.visible(markers[0].marker, false);
+          library.addClass(markers[0].marker, "start");
         }
-        VMM.Lib.addClass(markers[current_marker].marker, "active");
-        VMM.Lib.stop($timenav);
-        VMM.Lib.animate($timenav, _duration, _ease, {
+        library.addClass(markers[current_marker].marker, "active");
+        library.stop($timenav);
+        library.animate($timenav, _duration, _ease, {
           left: timenav_pos.left
         });
       };
       onTouchUpdate = function(e, b) {
-        VMM.Lib.animate($timenav, b.time / 2, config.ease, {
+        library.animate($timenav, b.time / 2, config.ease, {
           left: b.left
         });
       };
@@ -584,9 +584,9 @@
         i = 0;
         k = 0;
         config.nav.minor_width = config.width;
-        VMM.Lib.removeClass(".flag", "row1");
-        VMM.Lib.removeClass(".flag", "row2");
-        VMM.Lib.removeClass(".flag", "row3");
+        library.removeClass(".flag", "row1");
+        library.removeClass(".flag", "row2");
+        library.removeClass(".flag", "row3");
         i = 0;
         while (i < markers.length) {
           line = void 0;
@@ -615,26 +615,26 @@
             is_in_view = true;
           }
           if (is_animated) {
-            VMM.Lib.stop(marker.marker);
-            VMM.Lib.animate(marker.marker, config.duration / 2, config.ease, {
+            library.stop(marker.marker);
+            library.animate(marker.marker, config.duration / 2, config.ease, {
               left: pos.begin
             });
           } else {
-            VMM.Lib.stop(marker.marker);
-            VMM.Lib.css(marker.marker, "left", pos.begin);
+            library.stop(marker.marker);
+            library.css(marker.marker, "left", pos.begin);
           }
           if (i === current_marker) {
             cur_mark = pos.begin;
           }
           if (line > 5) {
-            VMM.Lib.css(marker.lineevent, "height", line_height);
-            VMM.Lib.css(marker.lineevent, "top", line_last_height_pos);
+            library.css(marker.lineevent, "height", line_height);
+            library.css(marker.lineevent, "top", line_last_height_pos);
             if (is_animated) {
-              VMM.Lib.animate(marker.lineevent, config.duration / 2, config.ease, {
+              library.animate(marker.lineevent, config.duration / 2, config.ease, {
                 width: line
               });
             } else {
-              VMM.Lib.css(marker.lineevent, "width", line);
+              library.css(marker.lineevent, "width", line);
             }
           }
           if (tags.length > 0) {
@@ -645,7 +645,7 @@
                   row = k;
                   if (k === config.nav.rows.current.length - 1) {
                     trace("ON LAST ROW");
-                    VMM.Lib.addClass(marker.flag, "flag-small-last");
+                    library.addClass(marker.flag, "flag-small-last");
                   }
                 }
               }
@@ -674,16 +674,16 @@
             VMM.Util.removeRange(pos_cache_array, 0);
           }
           if (is_animated) {
-            VMM.Lib.stop(marker.flag);
-            VMM.Lib.animate(marker.flag, config.duration, config.ease, {
+            library.stop(marker.flag);
+            library.animate(marker.flag, config.duration, config.ease, {
               top: row_pos
             });
           } else {
-            VMM.Lib.stop(marker.flag);
-            VMM.Lib.css(marker.flag, "top", row_pos);
+            library.stop(marker.flag);
+            library.css(marker.flag, "top", row_pos);
           }
           if (config.start_page && markers[i].type === "start") {
-            VMM.Lib.visible(marker.marker, false);
+            library.visible(marker.marker, false);
           }
           if (pos > config.nav.minor_width) {
             config.nav.minor_width = pos;
@@ -694,8 +694,8 @@
           i++;
         }
         if (is_animated) {
-          VMM.Lib.stop($timenav);
-          VMM.Lib.animate($timenav, config.duration / 2, config.ease, {
+          library.stop($timenav);
+          library.animate($timenav, config.duration / 2, config.ease, {
             left: (config.width / 2) - cur_mark
           });
         } else {
@@ -729,25 +729,25 @@
             row_pos = -1;
           }
           if (is_animated) {
-            VMM.Lib.stop(era.content);
-            VMM.Lib.stop(era.text_content);
-            VMM.Lib.animate(era.content, config.duration / 2, config.ease, {
+            library.stop(era.content);
+            library.stop(era.text_content);
+            library.animate(era.content, config.duration / 2, config.ease, {
               top: row_pos,
               left: pos.begin,
               width: era_length,
               height: era_height
             });
-            VMM.Lib.animate(era.text_content, config.duration / 2, config.ease, {
+            library.animate(era.text_content, config.duration / 2, config.ease, {
               left: pos.begin
             });
           } else {
-            VMM.Lib.stop(era.content);
-            VMM.Lib.stop(era.text_content);
-            VMM.Lib.css(era.content, "left", pos.begin);
-            VMM.Lib.css(era.content, "width", era_length);
-            VMM.Lib.css(era.content, "height", era_height);
-            VMM.Lib.css(era.content, "top", row_pos);
-            VMM.Lib.css(era.text_content, "left", pos.begin);
+            library.stop(era.content);
+            library.stop(era.text_content);
+            library.css(era.content, "left", pos.begin);
+            library.css(era.content, "width", era_length);
+            library.css(era.content, "height", era_height);
+            library.css(era.content, "top", row_pos);
+            library.css(era.text_content, "left", pos.begin);
           }
           i++;
         }
@@ -807,12 +807,12 @@
             }
             if (is_visible) {
               if (the_intervals[i].is_detached) {
-                VMM.Lib.append(the_main_element, _interval);
+                library.append(the_main_element, _interval);
                 the_intervals[i].is_detached = false;
               }
             } else {
               the_intervals[i].is_detached = true;
-              VMM.Lib.detach(_interval);
+              library.detach(_interval);
             }
             if (_interval_visible) {
               if (!is_visible) {
@@ -853,20 +853,20 @@
             }
           }
           if (_animation.animate) {
-            VMM.Lib.animate(_interval, config.duration / 2, config.ease, {
+            library.animate(_interval, config.duration / 2, config.ease, {
               opacity: _animation.opacity,
               left: _animation.pos
             });
           } else {
-            VMM.Lib.css(_interval, "opacity", _animation.opacity);
-            VMM.Lib.css(_interval, "left", pos);
+            library.css(_interval, "opacity", _animation.opacity);
+            library.css(_interval, "left", pos);
           }
           i++;
         }
         config.nav.constraint.right_min = -config.nav.minor_width + config.width;
         config.nav.constraint.right = config.nav.constraint.right_min + (config.width / 2);
-        VMM.Lib.css($timeintervalminor_minor, "left", config.nav.minor_left - config.width / 2);
-        VMM.Lib.width($timeintervalminor_minor, config.nav.minor_width + config.width + Math.abs(config.nav.minor_left));
+        library.css($timeintervalminor_minor, "left", config.nav.minor_left - config.width / 2);
+        library.width($timeintervalminor_minor, config.nav.minor_width + config.width + Math.abs(config.nav.minor_left));
       };
       createIntervalElements = function(_interval, _array, _element_parent) {
         var firefox, i, inc_time, int_number, int_obj, _first_date, _first_run, _is_year, _largest_pos, _last_date, _last_pos, _timezone_offset;
@@ -1037,12 +1037,12 @@
             _largest_pos = int_obj.relative_pos.begin;
           }
           VMM.appendElement(int_obj.element, int_obj.date_string);
-          VMM.Lib.css(int_obj.element, "text-indent", -(VMM.Lib.width(int_obj.element) / 2));
-          VMM.Lib.css(int_obj.element, "opacity", "0");
+          library.css(int_obj.element, "text-indent", -(library.width(int_obj.element) / 2));
+          library.css(int_obj.element, "opacity", "0");
           _array.push(int_obj);
           i++;
         }
-        VMM.Lib.width($timeintervalminor_minor, _largest_pos);
+        library.width($timeintervalminor_minor, _largest_pos);
         positionInterval(_element_parent, _array);
       };
       build = function() {
@@ -1074,27 +1074,27 @@
         if (config.start_page) {
           $backhome = VMM.appendAndGetElement($toolbar, "<div>", "back-home", "<div class='icon'></div>");
           VMM.bindEvent(".back-home", onBackHome, "click");
-          VMM.Lib.attribute($backhome, "title", VMM.master_config.language.messages.return_to_title);
-          VMM.Lib.attribute($backhome, "rel", "timeline-tooltip");
+          library.attribute($backhome, "title", VMM.master_config.language.messages.return_to_title);
+          library.attribute($backhome, "rel", "timeline-tooltip");
         }
         $dragslide = new VMM.DragSlider;
         $dragslide.createPanel(layout, $timenav, config.nav.constraint, config.touch);
         if (config.touch && config.start_page) {
-          VMM.Lib.addClass($toolbar, "touch");
-          VMM.Lib.css($toolbar, "top", 55);
-          VMM.Lib.css($toolbar, "left", 10);
+          library.addClass($toolbar, "touch");
+          library.css($toolbar, "top", 55);
+          library.css($toolbar, "left", 10);
         } else {
           if (config.start_page) {
-            VMM.Lib.css($toolbar, "top", 27);
+            library.css($toolbar, "top", 27);
           }
           $zoomin = VMM.appendAndGetElement($toolbar, "<div>", "zoom-in", "<div class='icon'></div>");
           $zoomout = VMM.appendAndGetElement($toolbar, "<div>", "zoom-out", "<div class='icon'></div>");
           VMM.bindEvent($zoomin, onZoomIn, "click");
           VMM.bindEvent($zoomout, onZoomOut, "click");
-          VMM.Lib.attribute($zoomin, "title", VMM.master_config.language.messages.expand_timeline);
-          VMM.Lib.attribute($zoomin, "rel", "timeline-tooltip");
-          VMM.Lib.attribute($zoomout, "title", VMM.master_config.language.messages.contract_timeline);
-          VMM.Lib.attribute($zoomout, "rel", "timeline-tooltip");
+          library.attribute($zoomin, "title", VMM.master_config.language.messages.expand_timeline);
+          library.attribute($zoomin, "rel", "timeline-tooltip");
+          library.attribute($zoomout, "title", VMM.master_config.language.messages.contract_timeline);
+          library.attribute($zoomout, "rel", "timeline-tooltip");
           $toolbar.tooltip({
             selector: "div[rel=timeline-tooltip]",
             placement: "right"
@@ -1246,7 +1246,7 @@
             VMM.appendElement(_marker_content, "<h3>" + _marker_title + "</h3>");
             VMM.appendElement(_marker_content, "<h3 id='marker_content_" + data[i].uniqueid + "'>" + _marker_title + "</h3>");
           }
-          VMM.Lib.attr(_marker, "id", ("marker_" + data[i].uniqueid).toString());
+          library.attr(_marker, "id", ("marker_" + data[i].uniqueid).toString());
           VMM.bindEvent(_marker_flag, onMarkerClick, "", {
             number: i
           });
@@ -1288,11 +1288,11 @@
         while (k < tags.length) {
           if (k < config.nav.rows.current.length) {
             tag_element = VMM.appendAndGetElement($timebackground, "<div>", "timenav-tag");
-            VMM.Lib.addClass(tag_element, "timenav-tag-row-" + (k + 1));
+            library.addClass(tag_element, "timenav-tag-row-" + (k + 1));
             if (tags.length > 3) {
-              VMM.Lib.addClass(tag_element, "timenav-tag-size-half");
+              library.addClass(tag_element, "timenav-tag-size-half");
             } else {
-              VMM.Lib.addClass(tag_element, "timenav-tag-size-full");
+              library.addClass(tag_element, "timenav-tag-size-full");
             }
             VMM.appendElement(tag_element, "<div><h3>" + tags[k] + "</h3></div>");
           }
@@ -1301,7 +1301,7 @@
         if (tags.length > 3) {
           l = 0;
           while (l < markers.length) {
-            VMM.Lib.addClass(markers[l].flag, "flag-small");
+            library.addClass(markers[l].flag, "flag-small");
             markers[l].full = false;
             l++;
           }
@@ -1332,10 +1332,10 @@
             era.tag = eras[j].tag;
           }
           era.relative_pos = positionRelative(interval, era.startdate, era.enddate);
-          VMM.Lib.attr(era.content, "id", era.uniqueid);
-          VMM.Lib.attr(era.text_content, "id", era.uniqueid + "_text");
-          VMM.Lib.addClass(era.content, "era" + (current_color + 1));
-          VMM.Lib.addClass(era.text_content, "era" + (current_color + 1));
+          library.attr(era.content, "id", era.uniqueid);
+          library.attr(era.text_content, "id", era.uniqueid + "_text");
+          library.addClass(era.content, "era" + (current_color + 1));
+          library.addClass(era.text_content, "era" + (current_color + 1));
           if (current_color < number_of_colors) {
             current_color++;
           } else {

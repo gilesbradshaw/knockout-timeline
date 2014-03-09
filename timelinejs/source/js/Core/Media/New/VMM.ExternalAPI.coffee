@@ -187,7 +187,15 @@
 #	Can't find a way to customize this callback and keep it in the VMM namespace
 #	Youtube wants it to be this function. 
 #================================================== 
-define ["global", "trace", "VMM","VMM.LoadLib", "VMM.Browser", "VMM.Date"], (global,trace,VMM, LoadLib, browser, vDate)->
+define [
+	"global"
+	"trace"
+	"VMM"
+	"VMM.LoadLib"
+	"VMM.Browser"
+	"VMM.Date"
+	"VMM.Library"
+], (global,trace,VMM, LoadLib, browser, vDate, library)->
 	global.onYouTubePlayerAPIReady = ->
 		trace "GLOBAL YOUTUBE API CALLED"
 		VMM.ExternalAPI.youtube.onAPIReady()
@@ -985,7 +993,7 @@ define ["global", "trace", "VMM","VMM.LoadLib", "VMM.Browser", "VMM.Date"], (glo
 						i++
 					flickr_img_size = d.sizes.size[d.sizes.size.length - 2].source    unless flickr_size_found
 					flickr_img_thumb = d.sizes.size[0].source
-					VMM.Lib.attr flickr_large_id, "src", flickr_img_size
+					library.attr flickr_large_id, "src", flickr_img_size
 					VMM.attachElement flickr_thumb_id, "<img src='" + flickr_img_thumb + "'>"
 					return
 				).error((jqXHR, textStatus, errorThrown) ->

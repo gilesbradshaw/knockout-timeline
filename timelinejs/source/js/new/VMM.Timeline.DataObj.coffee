@@ -1,7 +1,14 @@
 #	VMM.Timeline.DataObj.js
 #        TIMELINE SOURCE DATA PROCESSOR
 #================================================== 
-define ["VMM", "global", "trace", "type", "VMM.Timeline"], (VMM, global, trace, type)->
+define [
+	"VMM"
+	"global"
+	"trace"
+	"type"
+	"VMM.Library"
+	"VMM.Timeline"
+], (VMM, global, trace, type, library)->
 	VMM.Timeline.DataObj =
 		data_obj: {}
 		model_array: []
@@ -53,28 +60,28 @@ define ["VMM", "global", "trace", "type", "VMM.Timeline"], (VMM, global, trace, 
 			
 			#	Timeline start slide
 			#			================================================== 
-			if VMM.Lib.find("#timeline section", "time")[0]
-				_data_obj.timeline.startDate = VMM.Lib.html(VMM.Lib.find("#timeline section", "time")[0])
-				_data_obj.timeline.headline = VMM.Lib.html(VMM.Lib.find("#timeline section", "h2"))
-				_data_obj.timeline.text = VMM.Lib.html(VMM.Lib.find("#timeline section", "article"))
+			if library.find("#timeline section", "time")[0]
+				_data_obj.timeline.startDate = library.html(library.find("#timeline section", "time")[0])
+				_data_obj.timeline.headline = library.html(library.find("#timeline section", "h2"))
+				_data_obj.timeline.text = library.html(library.find("#timeline section", "article"))
 				found_main_media = false
-				unless VMM.Lib.find("#timeline section", "figure img").length is 0
+				unless library.find("#timeline section", "figure img").length is 0
 					found_main_media = true
-					_data_obj.timeline.asset.media = VMM.Lib.attr(VMM.Lib.find("#timeline section", "figure img"), "src")
-				else unless VMM.Lib.find("#timeline section", "figure a").length is 0
+					_data_obj.timeline.asset.media = library.attr(library.find("#timeline section", "figure img"), "src")
+				else unless library.find("#timeline section", "figure a").length is 0
 					found_main_media = true
-					_data_obj.timeline.asset.media = VMM.Lib.attr(VMM.Lib.find("#timeline section", "figure a"), "href")
+					_data_obj.timeline.asset.media = library.attr(library.find("#timeline section", "figure a"), "href")
 				else
 
 				
 				#trace("NOT FOUND");
 				if found_main_media
-					_data_obj.timeline.asset.credit = VMM.Lib.html(VMM.Lib.find("#timeline section", "cite"))    unless VMM.Lib.find("#timeline section", "cite").length is 0
-					_data_obj.timeline.asset.caption = VMM.Lib.html(VMM.Lib.find("#timeline section", "figcaption"))    unless VMM.Lib.find(this, "figcaption").length is 0
+					_data_obj.timeline.asset.credit = library.html(library.find("#timeline section", "cite"))    unless library.find("#timeline section", "cite").length is 0
+					_data_obj.timeline.asset.caption = library.html(library.find("#timeline section", "figcaption"))    unless library.find(this, "figcaption").length is 0
 			
 			#	Timeline Date Slides
 			#			================================================== 
-			VMM.Lib.each "#timeline li", (i, elem) ->
+			library.each "#timeline li", (i, elem) ->
 				valid_date = false
 				_date =
 					type: "default"
@@ -88,26 +95,26 @@ define ["VMM", "global", "trace", "type", "VMM.Timeline"], (VMM, global, trace, 
 
 					tags: "Optional"
 
-				unless VMM.Lib.find(this, "time") is 0
+				unless library.find(this, "time") is 0
 					valid_date = true
-					_date.startDate = VMM.Lib.html(VMM.Lib.find(this, "time")[0])
-					_date.endDate = VMM.Lib.html(VMM.Lib.find(this, "time")[1])    if VMM.Lib.find(this, "time")[1]
-					_date.headline = VMM.Lib.html(VMM.Lib.find(this, "h3"))
-					_date.text = VMM.Lib.html(VMM.Lib.find(this, "article"))
+					_date.startDate = library.html(library.find(this, "time")[0])
+					_date.endDate = library.html(library.find(this, "time")[1])    if library.find(this, "time")[1]
+					_date.headline = library.html(library.find(this, "h3"))
+					_date.text = library.html(library.find(this, "article"))
 					found_media = false
-					unless VMM.Lib.find(this, "figure img").length is 0
+					unless library.find(this, "figure img").length is 0
 						found_media = true
-						_date.asset.media = VMM.Lib.attr(VMM.Lib.find(this, "figure img"), "src")
-					else unless VMM.Lib.find(this, "figure a").length is 0
+						_date.asset.media = library.attr(library.find(this, "figure img"), "src")
+					else unless library.find(this, "figure a").length is 0
 						found_media = true
-						_date.asset.media = VMM.Lib.attr(VMM.Lib.find(this, "figure a"), "href")
+						_date.asset.media = library.attr(library.find(this, "figure a"), "href")
 					else
 
 					
 					#trace("NOT FOUND");
 					if found_media
-						_date.asset.credit = VMM.Lib.html(VMM.Lib.find(this, "cite"))    unless VMM.Lib.find(this, "cite").length is 0
-						_date.asset.caption = VMM.Lib.html(VMM.Lib.find(this, "figcaption"))    unless VMM.Lib.find(this, "figcaption").length is 0
+						_date.asset.credit = library.html(library.find(this, "cite"))    unless library.find(this, "cite").length is 0
+						_date.asset.caption = library.html(library.find(this, "figcaption"))    unless library.find(this, "figcaption").length is 0
 					trace _date
 					_data_obj.timeline.date.push _date
 				return

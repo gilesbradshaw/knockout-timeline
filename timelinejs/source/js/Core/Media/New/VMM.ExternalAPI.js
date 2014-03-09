@@ -1,5 +1,5 @@
 (function() {
-  define(["global", "trace", "VMM", "VMM.LoadLib", "VMM.Browser", "VMM.Date"], function(global, trace, VMM, LoadLib, browser, vDate) {
+  define(["global", "trace", "VMM", "VMM.LoadLib", "VMM.Browser", "VMM.Date", "VMM.Library"], function(global, trace, VMM, LoadLib, browser, vDate, library) {
     global.onYouTubePlayerAPIReady = function() {
       trace("GLOBAL YOUTUBE API CALLED");
       VMM.ExternalAPI.youtube.onAPIReady();
@@ -928,7 +928,7 @@
               flickr_img_size = d.sizes.size[d.sizes.size.length - 2].source;
             }
             flickr_img_thumb = d.sizes.size[0].source;
-            VMM.Lib.attr(flickr_large_id, "src", flickr_img_size);
+            library.attr(flickr_large_id, "src", flickr_img_size);
             VMM.attachElement(flickr_thumb_id, "<img src='" + flickr_img_thumb + "'>");
           }).error(function(jqXHR, textStatus, errorThrown) {
             trace("FLICKR error");

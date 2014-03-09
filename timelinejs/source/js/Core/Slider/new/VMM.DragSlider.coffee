@@ -1,6 +1,10 @@
 # DRAG SLIDER
 #================================================== 
-define ["VMM", "trace"], (VMM, trace)->
+define [
+	"VMM"
+	"VMM.Library"
+	"trace"
+], (VMM,library, trace)->
 	VMM.DragSlider = ->
 		
 		# PUBLIC FUNCTIONS
@@ -53,7 +57,7 @@ define ["VMM", "trace"], (VMM, trace)->
 		dragStart = (elem, delem, e) ->
 			if drag.touch
 				trace "IS TOUCH"
-				VMM.Lib.css elem, "-webkit-transition-duration", "0"
+				library.css elem, "-webkit-transition-duration", "0"
 				drag.pagex.start = e.originalEvent.touches[0].screenX
 				drag.pagey.start = e.originalEvent.touches[0].screenY
 			else
@@ -61,7 +65,7 @@ define ["VMM", "trace"], (VMM, trace)->
 				drag.pagey.start = e.pageY
 			drag.left.start = getLeft(elem)
 			drag.time.start = new Date().getTime()
-			VMM.Lib.stop elem
+			library.stop elem
 			VMM.bindEvent delem, onDragMove, dragevent.move,
 				element: elem
 
@@ -84,7 +88,7 @@ define ["VMM", "trace"], (VMM, trace)->
 				trace "SCROLLING Y"
 				trace Math.abs(drag.pagey.start) - Math.abs(drag.pagey.end)
 			if Math.abs(drag_to - drag.left.start) > 10
-				VMM.Lib.css elem, "left", drag_to
+				library.css elem, "left", drag_to
 				e.preventDefault()
 				e.stopPropagation()
 		dragMomentum = (elem, e) ->
@@ -113,15 +117,15 @@ define ["VMM", "trace"], (VMM, trace)->
 			unless is_sticky
 				if drag_info.time > 0
 					if drag.touch
-						VMM.Lib.animate elem, drag_info.time, "easeOutCirc",
+						library.animate elem, drag_info.time, "easeOutCirc",
 							left: drag_info.left
 
 					else
-						VMM.Lib.animate elem, drag_info.time, drag.ease,
+						library.animate elem, drag_info.time, drag.ease,
 							left: drag_info.left
 
 		getLeft = (elem) ->
-			parseInt VMM.Lib.css(elem, "left").substring(0, VMM.Lib.css(elem, "left").length - 2), 10
+			parseInt library.css(elem, "left").substring(0, library.css(elem, "left").length - 2), 10
 		drag =
 			element: ""
 			element_move: ""
