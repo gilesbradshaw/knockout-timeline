@@ -1,4 +1,4 @@
-﻿define ["jquery", "VMM", "trace", "VMM.ExternalAPI"], ($,VMM, trace)->
+﻿define ["jquery", "VMM", "trace", "VMM.FileExtension", "VMM.ExternalAPI"], ($,VMM, trace, fileExtension)->
 	mediaTypes=[]
 	unknownMediaType=undefined
 	$.extend VMM.ExternalAPI,
@@ -232,7 +232,7 @@
 	VMM.ExternalAPI.addMediaType "googledocs",$.extend VMM.ExternalAPI.googledocs,
 		assetTest:(asset,media, d)->
 			if d
-				if VMM.FileExtention.googleDocType(d)
+				if fileExtension.googleDocType(d)
 					$.extend media,
 						type: "googledoc"
 						id: d

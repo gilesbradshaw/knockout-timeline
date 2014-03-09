@@ -1,5 +1,5 @@
 (function() {
-  define(["VMM", "trace"], function(VMM, trace) {
+  define(["VMM", "trace", "VMM.Browser", "VMM.Date"], function(VMM, trace, browser, vDate) {
     return VMM.Slider = function(parent, parent_config) {
       var $dragslide, $explainer, $slider, $slider_container, $slider_mask, $slides_items, backToCurrentSlide, build, buildNavigation, buildSlides, config, content, current_slide, current_width, data, detachMessege, events, getData, goToSlide, hideMessege, layout, navigation, onConfigSet, onDragFinish, onExplainerClick, onKeypressNav, onNextClick, onPrevClick, onTouchUpdate, opacitySlides, positionSlides, preloadSlides, preloadTimeOutSlides, reSize, showMessege, sizeSlide, sizeSlides, slide_positions, slides, slides_content, timer, touch, upDate, _active;
 
@@ -34,7 +34,7 @@
         }
         current_width = config.slider.width;
         config.slider.nav.height = VMM.Lib.height(navigation.prevBtnContainer);
-        if (VMM.Browser.device === "mobile" || current_width <= 640) {
+        if (browser.device === "mobile" || current_width <= 640) {
           config.slider.content.padding = 10;
         } else {
           config.slider.content.padding = config.slider.content.padding_default;
@@ -249,7 +249,7 @@
             }
           }
         };
-        if (VMM.Browser.device === "mobile" || current_width < 641) {
+        if (browser.device === "mobile" || current_width < 641) {
           is_skinny = true;
         }
         VMM.master_config.sizes.api.width = mediasize.media.width;
@@ -401,7 +401,7 @@
         if ((duration != null) && duration !== "") {
           _duration = duration;
         }
-        if (VMM.Browser.device === "mobile") {
+        if (browser.device === "mobile") {
           VMM.Lib.visible(navigation.prevBtn, false);
           VMM.Lib.visible(navigation.nextBtn, false);
         } else {
@@ -415,7 +415,7 @@
                 VMM.attachElement(navigation.prevDate, _title);
                 VMM.attachElement(navigation.prevTitle, "");
               } else {
-                VMM.attachElement(navigation.prevDate, VMM.Date.prettyDate(data[current_slide - 1].startdate, false, data[current_slide - 1].precisiondate));
+                VMM.attachElement(navigation.prevDate, vDate.prettyDate(data[current_slide - 1].startdate, false, data[current_slide - 1].precisiondate));
                 VMM.attachElement(navigation.prevTitle, _title);
               }
             } else {
@@ -432,7 +432,7 @@
                 VMM.attachElement(navigation.nextDate, _title);
                 VMM.attachElement(navigation.nextTitle, "");
               } else {
-                VMM.attachElement(navigation.nextDate, VMM.Date.prettyDate(data[current_slide + 1].startdate, false, data[current_slide + 1].precisiondate));
+                VMM.attachElement(navigation.nextDate, vDate.prettyDate(data[current_slide + 1].startdate, false, data[current_slide + 1].precisiondate));
                 VMM.attachElement(navigation.nextTitle, _title);
               }
             } else {
@@ -516,7 +516,7 @@
         $slides_items = VMM.appendAndGetElement($slider_container, "<div>", "slider-item-container");
         buildNavigation();
         buildSlides(data);
-        if (VMM.Browser.device === "tablet" || VMM.Browser.device === "mobile") {
+        if (browser.device === "tablet" || browser.device === "mobile") {
           config.duration = 500;
           __duration = 1000;
           $dragslide = new VMM.DragSlider();

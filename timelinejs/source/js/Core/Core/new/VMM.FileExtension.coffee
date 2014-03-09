@@ -1,7 +1,7 @@
-#	* File Extention
+#	* File Extension
 #================================================== 
 define ["VMM", "trace"], (VMM, trace)->
-	VMM.FileExtention = googleDocType: (url) ->
+	fileExtension = googleDocType: (url) ->
 		fileName = url.replace(/\s\s*$/, "")
 		fileExtension = ""
 		validFileExtensions = [

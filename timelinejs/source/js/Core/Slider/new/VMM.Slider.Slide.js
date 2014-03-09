@@ -1,5 +1,5 @@
 (function() {
-  define(["VMM", "trace", "type", "VMM.Slider", "VMM.TextElement"], function(VMM, trace, type) {
+  define(["VMM", "trace", "type", "VMM.Date", "VMM.Slider", "VMM.TextElement"], function(VMM, trace, type, vDate) {
     return VMM.Slider.Slide = function(d, _parent) {
       var $media, $slide, $text, $wrap, buildSlide, c, data, element, is_skinny, loaded, media, preloaded, reLayout, reloadLayout, removeSlide, render, slide, timer, times, _class, _enqueue, _id, _removeque;
 
@@ -184,8 +184,8 @@
         if ((data.startdate != null) && data.startdate !== "") {
           if (type.of(data.startdate) === "date") {
             if (data.type !== "start") {
-              st = VMM.Date.prettyDate(data.startdate, false, data.precisiondate);
-              en = VMM.Date.prettyDate(data.enddate, false, data.precisiondate);
+              st = vDate.prettyDate(data.startdate, false, data.precisiondate);
+              en = vDate.prettyDate(data.enddate, false, data.precisiondate);
               tag = "";
               if ((data.tag != null) && data.tag !== "") {
                 tag = VMM.createElement("span", data.tag, "slide-tag");

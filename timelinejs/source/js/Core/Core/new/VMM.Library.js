@@ -1,5 +1,5 @@
 (function() {
-  define(["jquery", "VMM", "trace", "easing"], function(jQuery, VMM, trace) {
+  define(["jquery", "VMM", "trace", "VMM.Browser", "easing"], function(jQuery, VMM, trace, browser) {
     VMM.smoothScrollTo = function(elem, duration, ease) {
       var _duration, _ease;
 
@@ -107,7 +107,7 @@
         jQuery.ajaxSetup({
           timeout: 3000
         });
-        if (VMM.Browser.browser === "Explorer" && parseInt(VMM.Browser.version, 10) >= 7 && window.XDomainRequest) {
+        if (browser.browser === "Explorer" && parseInt(browser.version, 10) >= 7 && window.XDomainRequest) {
           trace("IE JSON");
           ie_url = url;
           if (ie_url.match("^http://")) {
@@ -369,7 +369,7 @@
       delay_animate: function(delay, element, duration, ease, att, callback_function) {
         var __duration, _tdd;
 
-        if (VMM.Browser.device === "mobile" || VMM.Browser.device === "tablet") {
+        if (browser.device === "mobile" || browser.device === "tablet") {
           _tdd = Math.round((duration / 1500) * 10) / 10;
           __duration = _tdd + "s";
           VMM.Lib.css(element, "-webkit-transition", "all " + __duration + " ease");
@@ -414,7 +414,7 @@
             opacity: 0
           };
         }
-        if (VMM.Browser.device === "mobile" || VMM.Browser.device === "tablet") {
+        if (browser.device === "mobile" || browser.device === "tablet") {
           _tdd = Math.round((_duration / 1500) * 10) / 10;
           __duration = _tdd + "s";
           _ease = " cubic-bezier(0.33, 0.66, 0.66, 1)";

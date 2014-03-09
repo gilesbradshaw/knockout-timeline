@@ -1,5 +1,5 @@
 (function() {
-  define(["jquery", "VMM", "trace", "VMM.ExternalAPI"], function($, VMM, trace) {
+  define(["jquery", "VMM", "trace", "VMM.FileExtension", "VMM.ExternalAPI"], function($, VMM, trace, fileExtension) {
     var mediaTypes, unknownMediaType;
 
     mediaTypes = [];
@@ -353,7 +353,7 @@
     VMM.ExternalAPI.addMediaType("googledocs", $.extend(VMM.ExternalAPI.googledocs, {
       assetTest: function(asset, media, d) {
         if (d) {
-          if (VMM.FileExtention.googleDocType(d)) {
+          if (fileExtension.googleDocType(d)) {
             return $.extend(media, {
               type: "googledoc",
               id: d,

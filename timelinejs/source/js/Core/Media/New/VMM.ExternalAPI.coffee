@@ -187,7 +187,7 @@
 #	Can't find a way to customize this callback and keep it in the VMM namespace
 #	Youtube wants it to be this function. 
 #================================================== 
-define ["global", "trace", "VMM","VMM.LoadLib"], (global,trace,VMM, LoadLib)->
+define ["global", "trace", "VMM","VMM.LoadLib", "VMM.Browser", "VMM.Date"], (global,trace,VMM, LoadLib, browser, vDate)->
 	global.onYouTubePlayerAPIReady = ->
 		trace "GLOBAL YOUTUBE API CALLED"
 		VMM.ExternalAPI.youtube.onAPIReady()
@@ -321,7 +321,7 @@ define ["global", "trace", "VMM","VMM.LoadLib"], (global,trace,VMM, LoadLib)->
 
 			prettyParseTwitterDate: (d) ->
 				date = new Date(Date.parse(d))
-				VMM.Date.prettyDate date, true
+				vDate.prettyDate date, true
 
 			getTweets: (tweets) ->
 				tweetArray = []
@@ -1090,7 +1090,7 @@ define ["global", "trace", "VMM","VMM.LoadLib"], (global,trace,VMM, LoadLib)->
 			create: (m, callback) ->
 				the_url = "//" + m.lang + ".wikipedia.org/w/api.php?action=query&prop=extracts&redirects=&titles=" + m.id + "&exintro=1&format=json&callback=?"
 				callback_timeout = setTimeout(callback, VMM.master_config.timers.api, m)
-				if VMM.Browser.browser is "Explorer" and parseInt(VMM.Browser.version, 10) >= 7 and window.XDomainRequest
+				if browser.browser is "Explorer" and parseInt(browser.version, 10) >= 7 and window.XDomainRequest
 					temp_text = "<h4><a href='http://" + VMM.master_config.language.api.wikipedia + ".wikipedia.org/wiki/" + m.id + "' target='_blank'>" + m.url + "</a></h4>"
 					temp_text += "<span class='wiki-source'>" + VMM.master_config.language.messages.wikipedia + "</span>"
 					temp_text += "<p>Wikipedia entry unable to load using Internet Explorer 8 or below.</p>"
@@ -1236,8 +1236,8 @@ define ["global", "trace", "VMM","VMM.LoadLib"], (global,trace,VMM, LoadLib)->
 
 				while i < VMM.master_config.youtube.array.length
 					if VMM.master_config.youtube.array[i].playing
-						the_name = VMM.master_config.youtube.array[i].name
-						VMM.master_config.youtube.array[i].player[the_name].stopVideo()
+						#the_name = VMM.master_config.youtube.array[i].name
+						VMM.master_config.youtube.array[i].player[Object.keys(VMM.master_config.youtube.array[i].player)[0]].stopVideo()
 					i++
 				return
 
@@ -1245,8 +1245,8 @@ define ["global", "trace", "VMM","VMM.LoadLib"], (global,trace,VMM, LoadLib)->
 				i = 0
 
 				while i < VMM.master_config.youtube.array.length
-					the_name = VMM.master_config.youtube.array[i].name
-					if VMM.master_config.youtube.array[i].player[the_name] is e.target
+					#the_name = VMM.master_config.youtube.array[i].name
+					if VMM.master_config.youtube.array[i].player[Object.keys(VMM.master_config.youtube.array[i].player)[0]] is e.target
 						if e.data is YT.PlayerState.PLAYING
 							VMM.master_config.youtube.array[i].playing = true
 							trace VMM.master_config.youtube.array[i].hd

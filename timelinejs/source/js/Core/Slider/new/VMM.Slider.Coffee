@@ -6,7 +6,7 @@
 #================================================== 
 
 # @codekit-append "VMM.Slider.Slide.js";
-define ["VMM", "trace"], (VMM, trace)->
+define ["VMM", "trace","VMM.Browser", "VMM.Date"], (VMM, trace, browser, vDate)->
 	VMM.Slider = (parent, parent_config) ->
 		
 
@@ -51,7 +51,7 @@ define ["VMM", "trace"], (VMM, trace)->
 			config.slider.nav.height = VMM.Lib.height(navigation.prevBtnContainer)
 			
 			# Handle smaller sizes
-			if VMM.Browser.device is "mobile" or current_width <= 640
+			if browser.device is "mobile" or current_width <= 640
 				config.slider.content.padding = 10
 			else
 				config.slider.content.padding = config.slider.content.padding_default
@@ -254,7 +254,7 @@ define ["VMM", "trace"], (VMM, trace)->
 
 			
 			# Handle smaller sizes
-			is_skinny = true    if VMM.Browser.device is "mobile" or current_width < 641
+			is_skinny = true    if browser.device is "mobile" or current_width < 641
 			VMM.master_config.sizes.api.width = mediasize.media.width
 			VMM.master_config.sizes.api.height = mediasize.media.height
 			mediasize.text_media.video = VMM.Util.ratio.fit(mediasize.text_media.width, mediasize.text_media.height, 16, 9)
@@ -431,7 +431,7 @@ define ["VMM", "trace"], (VMM, trace)->
 			#			================================================== 
 			
 			# Handle smaller sizes
-			if VMM.Browser.device is "mobile"
+			if browser.device is "mobile"
 				
 				#if (VMM.Browser.device == "mobile" || current_width <= 640) {
 				VMM.Lib.visible navigation.prevBtn, false
@@ -447,7 +447,7 @@ define ["VMM", "trace"], (VMM, trace)->
 							VMM.attachElement navigation.prevDate, _title
 							VMM.attachElement navigation.prevTitle, ""
 						else
-							VMM.attachElement navigation.prevDate, VMM.Date.prettyDate(data[current_slide - 1].startdate, false, data[current_slide - 1].precisiondate)
+							VMM.attachElement navigation.prevDate, vDate.prettyDate(data[current_slide - 1].startdate, false, data[current_slide - 1].precisiondate)
 							VMM.attachElement navigation.prevTitle, _title
 					else
 						VMM.attachElement navigation.prevTitle, _title
@@ -461,7 +461,7 @@ define ["VMM", "trace"], (VMM, trace)->
 							VMM.attachElement navigation.nextDate, _title
 							VMM.attachElement navigation.nextTitle, ""
 						else
-							VMM.attachElement navigation.nextDate, VMM.Date.prettyDate(data[current_slide + 1].startdate, false, data[current_slide + 1].precisiondate)
+							VMM.attachElement navigation.nextDate, vDate.prettyDate(data[current_slide + 1].startdate, false, data[current_slide + 1].precisiondate)
 							VMM.attachElement navigation.nextTitle, _title
 					else
 						VMM.attachElement navigation.nextTitle, _title
@@ -558,7 +558,7 @@ define ["VMM", "trace"], (VMM, trace)->
 			
 			# MAKE SLIDER DRAGGABLE/TOUCHABLE
 			#			================================================== 
-			if VMM.Browser.device is "tablet" or VMM.Browser.device is "mobile"
+			if browser.device is "tablet" or browser.device is "mobile"
 				
 				# Different Animation duration for touch
 				config.duration = 500

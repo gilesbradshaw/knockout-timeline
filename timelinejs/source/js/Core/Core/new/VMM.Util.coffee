@@ -388,7 +388,7 @@ define ["VMM", "trace"], (VMM, trace)->
 			x1 + x2
 
 		toTitleCase: (t) ->
-			if VMM.Browser.browser is "Explorer" and parseInt(VMM.Browser.version, 10) >= 7
+			if browser.browser is "Explorer" and parseInt(browser.version, 10) >= 7
 				t.replace "_", "%20"
 			else
 				__TitleCase =

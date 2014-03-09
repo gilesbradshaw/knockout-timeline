@@ -4,8 +4,9 @@ define [
 	"jquery"
 	"VMM"
 	"trace"
+	"VMM.Browser"
 	"easing"
-] , (jQuery,VMM, trace)->
+] , (jQuery,VMM, trace, browser)->
 	VMM.smoothScrollTo = (elem, duration, ease) ->
 		unless typeof (jQuery) is "undefined"
 			_ease = "easein"
@@ -76,7 +77,7 @@ define [
 			
 			# CHECK FOR IE
 			#			================================================== 
-			if VMM.Browser.browser is "Explorer" and parseInt(VMM.Browser.version, 10) >= 7 and window.XDomainRequest
+			if browser.browser is "Explorer" and parseInt(browser.version, 10) >= 7 and window.XDomainRequest
 				trace "IE JSON"
 				ie_url = url
 				if ie_url.match("^http://")
@@ -239,7 +240,7 @@ define [
 			jQuery(element).stop()    unless typeof (jQuery) is "undefined"
 
 		delay_animate: (delay, element, duration, ease, att, callback_function) ->
-			if VMM.Browser.device is "mobile" or VMM.Browser.device is "tablet"
+			if browser.device is "mobile" or browser.device is "tablet"
 				_tdd = Math.round((duration / 1500) * 10) / 10
 				__duration = _tdd + "s"
 				VMM.Lib.css element, "-webkit-transition", "all " + __duration + " ease"
@@ -270,7 +271,7 @@ define [
 				_att = att
 			else
 				_att = opacity: 0
-			if VMM.Browser.device is "mobile" or VMM.Browser.device is "tablet"
+			if browser.device is "mobile" or browser.device is "tablet"
 				_tdd = Math.round((_duration / 1500) * 10) / 10
 				__duration = _tdd + "s"
 				_ease = " cubic-bezier(0.33, 0.66, 0.66, 1)"
@@ -301,7 +302,7 @@ define [
 							easing: _ease
 
 	
-	#	XDR AJAX EXTENTION FOR jQuery
+	#	XDR AJAX Extension FOR jQuery
 	#		https://github.com/jaubourg/ajaxHooks/blob/master/src/ajax/xdr.js
 	#	================================================== 
 	((jQuery) ->

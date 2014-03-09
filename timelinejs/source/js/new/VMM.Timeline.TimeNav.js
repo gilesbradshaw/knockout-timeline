@@ -1,5 +1,5 @@
 (function() {
-  define(["VMM", "trace", "type", "VMM.Timeline"], function(VMM, trace, type) {
+  define(["VMM", "trace", "type", "VMM.Browser", "VMM.Date", "VMM.Timeline"], function(VMM, trace, type, browser, vDate) {
     return VMM.Timeline.TimeNav = function(parent, content_width, content_height) {
       var $content, $dragslide, $time, $timebackground, $timeinterval, $timeintervalbackground, $timeintervalmajor, $timeintervalminor, $timeintervalminor_minor, $timenav, $timenavindicator, $timenavline, $toolbar, $zoomin, $zoomout, averageDateDistance, averageMarkerPositionDistance, build, buildEras, buildInterval, buildMarkers, calculateInterval, calculateMultiplier, config, content, createIntervalElements, current_marker, data, dateFractionBrowser, era_markers, eras, events, getDateFractions, goToMarker, interval, interval_array, interval_calc, interval_macro, interval_major, interval_major_array, layout, markers, onBackHome, onConfigSet, onMarkerClick, onMarkerHover, onMouseScroll, onTouchUpdate, onZoomIn, onZoomOut, positionEras, positionInterval, positionMarkers, positionOnTimeline, positionRelative, reSize, refreshTimeline, row_height, tags, timelookup, timenav_pos, timeouts, timespan, upDate, _active;
 
@@ -1005,7 +1005,7 @@
             int_obj.date.setSeconds(data[0].startdate.getSeconds());
             int_obj.date.setMilliseconds(_first_date + inc_time);
           }
-          if (VMM.Browser.browser === "Firefox") {
+          if (browser.browser === "Firefox") {
             if (int_obj.date.getFullYear() === "1970" && int_obj.date.getTimezoneOffset() !== _timezone_offset) {
               trace("FIREFOX 1970 TIMEZONE OFFSET " + int_obj.date.getTimezoneOffset() + " SHOULD BE " + _timezone_offset);
               trace(_interval.type + " " + _interval.date);
@@ -1027,7 +1027,7 @@
               int_obj.date_string = int_obj.date.getFullYear();
             }
           } else {
-            int_obj.date_string = VMM.Date.prettyDate(int_obj.date, true);
+            int_obj.date_string = vDate.prettyDate(int_obj.date, true);
           }
           inc_time = inc_time + 1;
           _first_run = false;
@@ -1318,15 +1318,15 @@
           era = {
             content: VMM.appendAndGetElement($content, "<div>", "era"),
             text_content: VMM.appendAndGetElement($timeinterval, "<div>", "era"),
-            startdate: VMM.Date.parse(eras[j].startDate),
-            enddate: VMM.Date.parse(eras[j].endDate),
+            startdate: vDate.parse(eras[j].startDate),
+            enddate: vDate.parse(eras[j].endDate),
             title: eras[j].headline,
             uniqueid: VMM.Util.unique_ID(6),
             tag: "",
             relative_pos: ""
           };
-          st = VMM.Date.prettyDate(era.startdate);
-          en = VMM.Date.prettyDate(era.enddate);
+          st = vDate.prettyDate(era.startdate);
+          en = vDate.prettyDate(era.enddate);
           era_text = "<div>&nbsp;</div>";
           if (typeof eras[j].tag !== "undefined") {
             era.tag = eras[j].tag;

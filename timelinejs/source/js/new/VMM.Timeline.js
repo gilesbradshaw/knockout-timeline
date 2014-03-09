@@ -1,5 +1,5 @@
 (function() {
-  define(["VMM", "type", "trace", "global", "VMM.Language"], function(VMM, type, trace, global) {
+  define(["VMM", "type", "trace", "global", "VMM.Browser", "VMM.Date", "VMM.Language"], function(VMM, type, trace, global, browser, vDate) {
     VMM.Timeline = function(_timeline_id, w, h) {
       var $container, $feature, $feedback, $navigation, $slider, $timeline, build, buildDates, config, createConfig, createStructure, data, detachMessege, events, getData, getViewport, goToEvent, has_height, has_width, hash, hideMessege, ie7, is_moving, onComponentLoaded, onDataReady, onDatesProcessed, onMarkerUpdate, onSlideUpdate, onSliderLoaded, onTimeNavLoaded, orientationChange, reSize, searchOrientation, setHash, setViewport, showMessege, slider, timeline_id, timenav, updateSize, version, _dates;
 
@@ -35,7 +35,7 @@
             config = VMM.Util.mergeConfig(config, conf);
           }
         }
-        if (VMM.Browser.device === "mobile" || VMM.Browser.device === "tablet") {
+        if (browser.device === "mobile" || browser.device === "tablet") {
           config.touch = true;
         }
         config.nav.width = config.width;
@@ -145,7 +145,7 @@
 
         viewport_content = "";
         viewport_orientation = searchOrientation(window.orientation);
-        if (VMM.Browser.device === "mobile") {
+        if (browser.device === "mobile") {
           if (viewport_orientation === "portrait") {
             viewport_content = "width=device-width; initial-scale=0.5, maximum-scale=0.5";
           } else if (viewport_orientation === "landscape") {
@@ -154,7 +154,7 @@
             viewport_content = "width=device-width, initial-scale=1, maximum-scale=1.0";
           }
         } else {
-          if (VMM.Browser.device === "tablet") {
+          if (browser.device === "tablet") {
             dontcrashjs2coffee = 0;
           }
         }
@@ -219,7 +219,7 @@
         }
         if (ie7) {
           ie7 = true;
-          VMM.fireEvent(global, config.events.messege, "Internet Explorer " + VMM.Browser.version + " is not supported by TimelineJS. Please update your browser to version 8 or higher.");
+          VMM.fireEvent(global, config.events.messege, "Internet Explorer " + browser.version + " is not supported by TimelineJS. Please update your browser to version 8 or higher.");
         } else {
           detachMessege();
           reSize();
@@ -241,7 +241,7 @@
         config.nav.width = config.width;
         config.feature.width = config.width;
         config.feature.height = config.height - config.nav.height - 3;
-        if (VMM.Browser.device === "mobile") {
+        if (browser.device === "mobile") {
           dontcrashjs2coffee = 0;
         }
         if (config.width < 641) {
@@ -260,13 +260,13 @@
         while (i < data.date.length) {
           if ((data.date[i].startDate != null) && data.date[i].startDate !== "") {
             _date = {};
-            do_start = VMM.Date.parse(data.date[i].startDate, true);
+            do_start = vDate.parse(data.date[i].startDate, true);
             do_end = void 0;
             _date.startdate = do_start.date;
             _date.precisiondate = do_start.precision;
             if (!isNaN(_date.startdate)) {
               if ((data.date[i].endDate != null) && data.date[i].endDate !== "") {
-                _date.enddate = VMM.Date.parse(data.date[i].endDate);
+                _date.enddate = vDate.parse(data.date[i].endDate);
               } else {
                 _date.enddate = _date.startdate;
               }
@@ -277,7 +277,7 @@
               _date.title = data.date[i].headline;
               _date.headline = data.date[i].headline;
               _date.type = data.date[i].type;
-              _date.date = VMM.Date.prettyDate(_date.startdate, false, _date.precisiondate);
+              _date.date = vDate.prettyDate(_date.startdate, false, _date.precisiondate);
               _date.asset = data.date[i].asset;
               _date.fulldate = _date.startdate.getTime();
               _date.text = data.date[i].text;
@@ -303,7 +303,7 @@
           td_num = 0;
           td = void 0;
           if (typeof data.startDate !== "undefined") {
-            do_start = VMM.Date.parse(data.startDate, true);
+            do_start = vDate.parse(data.startDate, true);
             startpage_date = do_start.date;
           } else {
             startpage_date = false;
@@ -334,7 +334,7 @@
           _date.headline = data.headline;
           _date.text = data.text;
           _date.type = "start";
-          _date.date = VMM.Date.prettyDate(data.startDate, false, _date.precisiondate);
+          _date.date = vDate.prettyDate(data.startDate, false, _date.precisiondate);
           _date.asset = data.asset;
           _date.slug = false;
           _date.needs_slug = false;
@@ -483,14 +483,14 @@
         if (type.of(_data) === "string") {
           config.source = _data;
         }
-        VMM.Date.setLanguage(config.language);
+        vDate.setLanguage(config.language);
         VMM.master_config.language = config.language;
         VMM.ExternalAPI.setKeys(config.api_keys);
         VMM.ExternalAPI.googlemaps.setMapType(config.maptype);
         VMM.bindEvent(global, onDataReady, config.events.data_ready);
         VMM.bindEvent(global, showMessege, config.events.messege);
         VMM.fireEvent(global, config.events.messege, config.language.messages.loading_timeline);
-        if (VMM.Browser.browser === "Explorer" || VMM.Browser.browser === "MSIE" ? parseInt(VMM.Browser.version, 10) <= 7 : void 0) {
+        if (browser.browser === "Explorer" || browser.browser === "MSIE" ? parseInt(browser.version, 10) <= 7 : void 0) {
           ie7 = true;
         }
         if (type.of(config.source) === "string" || type.of(config.source) === "object") {

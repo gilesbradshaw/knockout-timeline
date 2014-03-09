@@ -1,7 +1,7 @@
 #	* DEVICE AND BROWSER DETECTION
 #================================================== 
 define ["VMM"], (VMM)->
-	VMM.Browser =
+	Browser =
 		init: ->
 			@browser = @searchString(@dataBrowser) or "An unknown browser"
 			@version = @searchVersion(navigator.userAgent) or @searchVersion(navigator.appVersion) or "an unknown version"
@@ -147,4 +147,5 @@ define ["VMM"], (VMM)->
 			}
 		]
 
-	VMM.Browser.init()
+	Browser.init()
+	Browser

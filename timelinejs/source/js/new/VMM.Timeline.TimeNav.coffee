@@ -3,7 +3,7 @@
 #	This class handles the bottom timeline navigation.
 #	It requires the VMM.Util class and VMM.Date class
 #================================================== 
-define ["VMM","trace", "type", "VMM.Timeline"], (VMM, trace, type)->
+define ["VMM","trace", "type", "VMM.Browser", "VMM.Date", "VMM.Timeline"], (VMM, trace, type, browser, vDate)->
 	VMM.Timeline.TimeNav = (parent, content_width, content_height) ->
 		
 		trace "VMM.Timeline.TimeNav"
@@ -958,7 +958,7 @@ define ["VMM","trace", "type", "VMM.Timeline"], (VMM, trace, type)->
 					int_obj.date.setMilliseconds _first_date + inc_time
 				
 				# FIX WEIRD FIREFOX BUG FOR GMT TIME FORMATTING
-				if VMM.Browser.browser is "Firefox"
+				if browser.browser is "Firefox"
 					if int_obj.date.getFullYear() is "1970" and int_obj.date.getTimezoneOffset() isnt _timezone_offset
 						trace "FIREFOX 1970 TIMEZONE OFFSET " + int_obj.date.getTimezoneOffset() + " SHOULD BE " + _timezone_offset
 						trace _interval.type + " " + _interval.date
@@ -979,7 +979,7 @@ define ["VMM","trace", "type", "VMM.Timeline"], (VMM, trace, type)->
 					else
 						int_obj.date_string = int_obj.date.getFullYear()
 				else
-					int_obj.date_string = VMM.Date.prettyDate(int_obj.date, true)
+					int_obj.date_string = vDate.prettyDate(int_obj.date, true)
 				
 				# Increment Time
 				inc_time = inc_time + 1
@@ -1297,15 +1297,15 @@ define ["VMM","trace", "type", "VMM.Timeline"], (VMM, trace, type)->
 				era =
 					content: VMM.appendAndGetElement($content, "<div>", "era")
 					text_content: VMM.appendAndGetElement($timeinterval, "<div>", "era")
-					startdate: VMM.Date.parse(eras[j].startDate)
-					enddate: VMM.Date.parse(eras[j].endDate)
+					startdate: vDate.parse(eras[j].startDate)
+					enddate: vDate.parse(eras[j].endDate)
 					title: eras[j].headline
 					uniqueid: VMM.Util.unique_ID(6)
 					tag: ""
 					relative_pos: ""
 
-				st = VMM.Date.prettyDate(era.startdate)
-				en = VMM.Date.prettyDate(era.enddate)
+				st = vDate.prettyDate(era.startdate)
+				en = vDate.prettyDate(era.enddate)
 				era_text = "<div>&nbsp;</div>"
 				era.tag = eras[j].tag    unless typeof eras[j].tag is "undefined"
 				era.relative_pos = positionRelative(interval, era.startdate, era.enddate)

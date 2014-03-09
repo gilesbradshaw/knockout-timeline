@@ -95,9 +95,8 @@
     <Content Include="source\js\Core\Core\new\trace.js">
       <DependentUpon>trace.coffee</DependentUpon>
     </Content>
-    <Content Include="source\js\Core\Core\new\VMM.Core.js" />
     <None Include="source\js\Core\Core\new\VMM.Date.coffee" />
-    <None Include="source\js\Core\Core\new\VMM.FileExtention.coffee" />
+    <None Include="source\js\Core\Core\new\VMM.FileExtension.coffee" />
     <None Include="source\js\Core\Core\new\VMM.coffee" />
     <None Include="source\js\Core\Core\new\VMM.Library.coffee" />
     <None Include="source\js\Core\Core\new\VMM.LoadLib.coffee" />
@@ -108,8 +107,8 @@
     <Content Include="source\js\Core\Core\new\VMM.Date.js">
       <DependentUpon>VMM.Date.coffee</DependentUpon>
     </Content>
-    <Content Include="source\js\Core\Core\new\VMM.FileExtention.js">
-      <DependentUpon>VMM.FileExtention.coffee</DependentUpon>
+    <Content Include="source\js\Core\Core\new\VMM.FileExtension.js">
+      <DependentUpon>VMM.FileExtension.coffee</DependentUpon>
     </Content>
     <Content Include="source\js\Core\Core\new\VMM.js">
       <DependentUpon>VMM.coffee</DependentUpon>
@@ -124,14 +123,12 @@
       <DependentUpon>VMM.Util.coffee</DependentUpon>
     </Content>
     <Content Include="source\js\Core\LICENSE" />
-    <Content Include="source\js\Core\Media\New\newmedia.js" />
     <Content Include="source\js\Core\Media\New\VMM.Extender.js">
       <DependentUpon>VMM.Extender.coffee</DependentUpon>
     </Content>
     <Content Include="source\js\Core\Media\New\VMM.ExternalAPI.js">
       <DependentUpon>VMM.ExternalAPI.coffee</DependentUpon>
     </Content>
-    <Content Include="source\js\Core\Media\New\VMM.Media.js" />
     <Content Include="source\js\Core\Core\new\type.coffee" />
     <None Include="source\js\Core\Media\New\VMM.Extender.coffee" />
     <None Include="source\js\Core\Media\New\VMM.MediaElement.coffee" />
@@ -167,14 +164,6 @@
     <Content Include="source\css\timeline.png" />
     <Content Include="source\embed\index.html" />
     <Content Include="source\js\Core\.gitignore" />
-    <Content Include="source\js\Core\Core\VMM.Browser.js" />
-    <Content Include="source\js\Core\Core\VMM.Core.js" />
-    <Content Include="source\js\Core\Core\VMM.Date.js" />
-    <Content Include="source\js\Core\Core\VMM.FileExtention.js" />
-    <Content Include="source\js\Core\Core\VMM.js" />
-    <Content Include="source\js\Core\Core\VMM.Library.js" />
-    <Content Include="source\js\Core\Core\VMM.LoadLib.js" />
-    <Content Include="source\js\Core\Core\VMM.Util.js" />
     <Content Include="source\js\Core\Embed\Embed.CDN.Generator.js" />
     <Content Include="source\js\Core\Embed\Embed.CDN.js" />
     <Content Include="source\js\Core\Embed\Embed.js" />
@@ -238,11 +227,6 @@
     <Content Include="source\js\Core\Library\jQuery\easing.js" />
     <Content Include="source\js\Core\Library\LazyLoad.js" />
     <Content Include="source\js\Core\Library\Leaflet.js" />
-    <Content Include="source\js\Core\Media\VMM.ExternalAPI.js" />
-    <Content Include="source\js\Core\Media\VMM.Media.js" />
-    <Content Include="source\js\Core\Media\VMM.MediaElement.js" />
-    <Content Include="source\js\Core\Media\VMM.MediaType.js" />
-    <Content Include="source\js\Core\Media\VMM.TextElement.js" />
     <None Include="source\js\Core\Slider\new\VMM.Slider.Slide.coffee" />
     <None Include="source\js\Core\Slider\new\VMM.DragSlider.coffee" />
     <Content Include="source\js\Core\Slider\new\VMM.DragSlider.js">
@@ -255,9 +239,6 @@
     <Content Include="source\js\Core\Slider\new\VMM.Slider.Slide.js">
       <DependentUpon>VMM.Slider.Slide.coffee</DependentUpon>
     </Content>
-    <Content Include="source\js\Core\Slider\VMM.DragSlider.js" />
-    <Content Include="source\js\Core\Slider\VMM.Slider.js" />
-    <Content Include="source\js\Core\Slider\VMM.Slider.Slide.js" />
     <Content Include="source\js\Core\VMM.StoryJS.js" />
     <None Include="source\js\new\VMM.Timeline.DataObj.coffee" />
     <None Include="source\js\new\VMM.Timeline.coffee" />
@@ -271,10 +252,6 @@
     <Content Include="source\js\new\VMM.Timeline.TimeNav.js">
       <DependentUpon>VMM.Timeline.TimeNav.coffee</DependentUpon>
     </Content>
-    <Content Include="source\js\VMM.Timeline.DataObj.js" />
-    <Content Include="source\js\VMM.Timeline.js" />
-    <Content Include="source\js\VMM.TImeline.Min.js" />
-    <Content Include="source\js\VMM.Timeline.TimeNav.js" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>

@@ -359,7 +359,7 @@
       toTitleCase: function(t) {
         var __TitleCase;
 
-        if (VMM.Browser.browser === "Explorer" && parseInt(VMM.Browser.version, 10) >= 7) {
+        if (browser.browser === "Explorer" && parseInt(browser.version, 10) >= 7) {
           return t.replace("_", "%20");
         } else {
           __TitleCase = {

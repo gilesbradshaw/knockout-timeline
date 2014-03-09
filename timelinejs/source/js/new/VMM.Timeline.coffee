@@ -10,7 +10,7 @@
 
 # Timeline
 #================================================== 
-define ["VMM", "type", "trace", "global", "VMM.Language"], (VMM, type, trace, global)->
+define ["VMM", "type", "trace", "global", "VMM.Browser", "VMM.Date", "VMM.Language"], (VMM, type, trace, global, browser, vDate)->
 	VMM.Timeline = (_timeline_id, w, h) ->
 
 
@@ -47,7 +47,7 @@ define ["VMM", "type", "trace", "global", "VMM.Language"], (VMM, type, trace, gl
 				trace "HAS TIMELINE CONFIG"
 				config = VMM.Util.mergeConfig(config, timeline_config)
 			else config = VMM.Util.mergeConfig(config, conf)    if typeof conf is "object"
-			config.touch = true    if VMM.Browser.device is "mobile" or VMM.Browser.device is "tablet"
+			config.touch = true    if browser.device is "mobile" or browser.device is "tablet"
 			config.nav.width = config.width
 			config.nav.height = 200
 			config.feature.width = config.width
@@ -145,7 +145,7 @@ define ["VMM", "type", "trace", "global", "VMM.Language"], (VMM, type, trace, gl
 		setViewport = ->
 			viewport_content = ""
 			viewport_orientation = searchOrientation(window.orientation)
-			if VMM.Browser.device is "mobile"
+			if browser.device is "mobile"
 				if viewport_orientation is "portrait"
 					
 					#viewport_content	= "width=device-width; initial-scale=0.75, maximum-scale=0.75";
@@ -154,7 +154,7 @@ define ["VMM", "type", "trace", "global", "VMM.Language"], (VMM, type, trace, gl
 					viewport_content = "width=device-width; initial-scale=0.5, maximum-scale=0.5"
 				else
 					viewport_content = "width=device-width, initial-scale=1, maximum-scale=1.0"
-			else dontcrashjs2coffee = 0    if VMM.Browser.device is "tablet"
+			else dontcrashjs2coffee = 0    if browser.device is "tablet"
 			
 			#viewport_content		= "width=device-width, initial-scale=1, maximum-scale=1.0";
 			if document.getElementById("viewport")
@@ -243,7 +243,7 @@ define ["VMM", "type", "trace", "global", "VMM.Language"], (VMM, type, trace, gl
 			# IE7
 			if ie7
 				ie7 = true
-				VMM.fireEvent global, config.events.messege, "Internet Explorer " + VMM.Browser.version + " is not supported by TimelineJS. Please update your browser to version 8 or higher."
+				VMM.fireEvent global, config.events.messege, "Internet Explorer " + browser.version + " is not supported by TimelineJS. Please update your browser to version 8 or higher."
 			else
 				detachMessege()
 				reSize()
@@ -268,13 +268,13 @@ define ["VMM", "type", "trace", "global", "VMM.Language"], (VMM, type, trace, gl
 			config.nav.width = config.width
 			config.feature.width = config.width
 			config.feature.height = config.height - config.nav.height - 3
-			dontcrashjs2coffee = 0    if VMM.Browser.device is "mobile"
+			dontcrashjs2coffee = 0    if browser.device is "mobile"
 			
 			#
-			#				if (VMM.Browser.orientation == "portrait") {
+			#				if (browser.orientation == "portrait") {
 			#					config.feature.height	= 480;
 			#					config.height			= 480 + config.nav.height;
-			#				} else if(VMM.Browser.orientation == "landscape") {
+			#				} else if(browser.orientation == "landscape") {
 			#					config.feature.height	= 320;
 			#					config.height			= 320 + config.nav.height;
 			#				} else {
@@ -297,7 +297,7 @@ define ["VMM", "type", "trace", "global", "VMM.Language"], (VMM, type, trace, gl
 			while i < data.date.length
 				if data.date[i].startDate? and data.date[i].startDate isnt ""
 					_date = {}
-					do_start = VMM.Date.parse(data.date[i].startDate, true)
+					do_start = vDate.parse(data.date[i].startDate, true)
 					do_end = undefined
 					_date.startdate = do_start.date
 					_date.precisiondate = do_start.precision
@@ -305,7 +305,7 @@ define ["VMM", "type", "trace", "global", "VMM.Language"], (VMM, type, trace, gl
 						
 						# END DATE
 						if data.date[i].endDate? and data.date[i].endDate isnt ""
-							_date.enddate = VMM.Date.parse(data.date[i].endDate)
+							_date.enddate = vDate.parse(data.date[i].endDate)
 						else
 							_date.enddate = _date.startdate
 						_date.needs_slug = false
@@ -313,7 +313,7 @@ define ["VMM", "type", "trace", "global", "VMM.Language"], (VMM, type, trace, gl
 						_date.title = data.date[i].headline
 						_date.headline = data.date[i].headline
 						_date.type = data.date[i].type
-						_date.date = VMM.Date.prettyDate(_date.startdate, false, _date.precisiondate)
+						_date.date = vDate.prettyDate(_date.startdate, false, _date.precisiondate)
 						_date.asset = data.date[i].asset
 						_date.fulldate = _date.startdate.getTime()
 						_date.text = data.date[i].text
@@ -341,7 +341,7 @@ define ["VMM", "type", "trace", "global", "VMM.Language"], (VMM, type, trace, gl
 				td_num = 0
 				td = undefined
 				unless typeof data.startDate is "undefined"
-					do_start = VMM.Date.parse(data.startDate, true)
+					do_start = vDate.parse(data.startDate, true)
 					startpage_date = do_start.date
 				else
 					startpage_date = false
@@ -379,7 +379,7 @@ define ["VMM", "type", "trace", "global", "VMM.Language"], (VMM, type, trace, gl
 				_date.headline = data.headline
 				_date.text = data.text
 				_date.type = "start"
-				_date.date = VMM.Date.prettyDate(data.startDate, false, _date.precisiondate)
+				_date.date = vDate.prettyDate(data.startDate, false, _date.precisiondate)
 				_date.asset = data.asset
 				_date.slug = false
 				_date.needs_slug = false
@@ -520,14 +520,14 @@ define ["VMM", "type", "trace", "global", "VMM.Language"], (VMM, type, trace, gl
 			createConfig c
 			createStructure()
 			config.source = _data    if type.of(_data) is "string"
-			VMM.Date.setLanguage config.language
+			vDate.setLanguage config.language
 			VMM.master_config.language = config.language
 			VMM.ExternalAPI.setKeys config.api_keys
 			VMM.ExternalAPI.googlemaps.setMapType config.maptype
 			VMM.bindEvent global, onDataReady, config.events.data_ready
 			VMM.bindEvent global, showMessege, config.events.messege
 			VMM.fireEvent global, config.events.messege, config.language.messages.loading_timeline
-			ie7 = true    if parseInt(VMM.Browser.version, 10) <= 7    if VMM.Browser.browser is "Explorer" or VMM.Browser.browser is "MSIE"
+			ie7 = true    if parseInt(browser.version, 10) <= 7    if browser.browser is "Explorer" or browser.browser is "MSIE"
 			if type.of(config.source) is "string" or type.of(config.source) is "object"
 				VMM.Timeline.DataObj.getData config.source
 			else

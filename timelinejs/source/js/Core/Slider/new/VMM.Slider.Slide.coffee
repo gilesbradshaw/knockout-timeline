@@ -1,6 +1,6 @@
 # Slider Slide 
 #================================================== 
-define ["VMM", "trace", "type", "VMM.Slider", "VMM.TextElement"], (VMM, trace, type)->
+define ["VMM", "trace", "type", "VMM.Date", "VMM.Slider", "VMM.TextElement"], (VMM, trace, type, vDate)->
 	VMM.Slider.Slide = (d, _parent) ->
 		$media = undefined
 		$text = undefined
@@ -190,8 +190,8 @@ define ["VMM", "trace", "type", "VMM.Slider", "VMM.TextElement"], (VMM, trace, t
 			if data.startdate? and data.startdate isnt ""
 				if type.of(data.startdate) is "date"
 					unless data.type is "start"
-						st = VMM.Date.prettyDate(data.startdate, false, data.precisiondate)
-						en = VMM.Date.prettyDate(data.enddate, false, data.precisiondate)
+						st = vDate.prettyDate(data.startdate, false, data.precisiondate)
+						en = vDate.prettyDate(data.enddate, false, data.precisiondate)
 						tag = ""
 						
 						# TAG / CATEGORY

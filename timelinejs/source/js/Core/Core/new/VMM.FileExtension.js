@@ -1,8 +1,10 @@
 (function() {
   define(["VMM", "trace"], function(VMM, trace) {
-    return VMM.FileExtention = {
+    var fileExtension;
+
+    return fileExtension = {
       googleDocType: function(url) {
-        var fileExtension, fileName, flag, i, validFileExtensions;
+        var fileName, flag, i, validFileExtensions;
 
         fileName = url.replace(/\s\s*$/, "");
         fileExtension = "";

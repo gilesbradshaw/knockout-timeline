@@ -1,5 +1,5 @@
 (function() {
-  define(["global", "trace", "VMM", "VMM.LoadLib"], function(global, trace, VMM, LoadLib) {
+  define(["global", "trace", "VMM", "VMM.LoadLib", "VMM.Browser", "VMM.Date"], function(global, trace, VMM, LoadLib, browser, vDate) {
     global.onYouTubePlayerAPIReady = function() {
       trace("GLOBAL YOUTUBE API CALLED");
       VMM.ExternalAPI.youtube.onAPIReady();
@@ -162,7 +162,7 @@
           var date;
 
           date = new Date(Date.parse(d));
-          return VMM.Date.prettyDate(date, true);
+          return vDate.prettyDate(date, true);
         },
         getTweets: function(tweets) {
           var i, number_of_tweets, the_url, tweetArray, twitter_id;
@@ -1050,7 +1050,7 @@
 
           the_url = "//" + m.lang + ".wikipedia.org/w/api.php?action=query&prop=extracts&redirects=&titles=" + m.id + "&exintro=1&format=json&callback=?";
           callback_timeout = setTimeout(callback, VMM.master_config.timers.api, m);
-          if (VMM.Browser.browser === "Explorer" && parseInt(VMM.Browser.version, 10) >= 7 && window.XDomainRequest) {
+          if (browser.browser === "Explorer" && parseInt(browser.version, 10) >= 7 && window.XDomainRequest) {
             temp_text = "<h4><a href='http://" + VMM.master_config.language.api.wikipedia + ".wikipedia.org/wiki/" + m.id + "' target='_blank'>" + m.url + "</a></h4>";
             temp_text += "<span class='wiki-source'>" + VMM.master_config.language.messages.wikipedia + "</span>";
             temp_text += "<p>Wikipedia entry unable to load using Internet Explorer 8 or below.</p>";
@@ -1207,24 +1207,22 @@
           VMM.ExternalAPI.youtube.pushQue();
         },
         stopPlayers: function() {
-          var i, the_name;
+          var i;
 
           i = 0;
           while (i < VMM.master_config.youtube.array.length) {
             if (VMM.master_config.youtube.array[i].playing) {
-              the_name = VMM.master_config.youtube.array[i].name;
-              VMM.master_config.youtube.array[i].player[the_name].stopVideo();
+              VMM.master_config.youtube.array[i].player[Object.keys(VMM.master_config.youtube.array[i].player)[0]].stopVideo();
             }
             i++;
           }
         },
         onStateChange: function(e) {
-          var dontcrashjs2coffee, i, the_name;
+          var dontcrashjs2coffee, i;
 
           i = 0;
           while (i < VMM.master_config.youtube.array.length) {
-            the_name = VMM.master_config.youtube.array[i].name;
-            if (VMM.master_config.youtube.array[i].player[the_name] === e.target) {
+            if (VMM.master_config.youtube.array[i].player[Object.keys(VMM.master_config.youtube.array[i].player)[0]] === e.target) {
               if (e.data === YT.PlayerState.PLAYING) {
                 VMM.master_config.youtube.array[i].playing = true;
                 trace(VMM.master_config.youtube.array[i].hd);

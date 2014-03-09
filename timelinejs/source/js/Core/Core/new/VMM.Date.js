@@ -1,8 +1,107 @@
 (function() {
   define(["VMM", "trace", "type"], function(VMM, trace, type) {
-    var dateFormat;
+    var dateFormat, vDate;
 
-    VMM.Date = {
+    dateFormat = (function() {
+      var pad, timezone, timezoneClip, token;
+
+      token = /d{1,4}|m{1,4}|yy(?:yy)?|([HhMsTt])\1?|[LloSZ]|"[^"]*"|'[^']*'/g;
+      timezone = /\b(?:[PMCEA][SDP]T|(?:Pacific|Mountain|Central|Eastern|Atlantic) (?:Standard|Daylight|Prevailing) Time|(?:GMT|UTC)(?:[-+]\d{4})?)\b/g;
+      timezoneClip = /[^-+\dA-Z]/g;
+      pad = function(val, len) {
+        val = String(val);
+        len = len || 2;
+        while (val.length < len) {
+          val = "0" + val;
+        }
+        return val;
+      };
+      return function(date, mask, utc) {
+        var D, H, L, M, d, dF, flags, m, o, s, y, _;
+
+        dF = dateFormat;
+        if (arguments.length === 1 && Object.prototype.toString.call(date) === "[object String]" && !/\d/.test(date)) {
+          mask = date;
+          date = undefined;
+        }
+        if (isNaN(date)) {
+          trace("invalid date " + date);
+        }
+        mask = String(dF.masks[mask] || mask || dF.masks["default"]);
+        if (mask.slice(0, 4) === "UTC:") {
+          mask = mask.slice(4);
+          utc = true;
+        }
+        _ = (utc ? "getUTC" : "get");
+        d = date[_ + "Date"]();
+        D = date[_ + "Day"]();
+        m = date[_ + "Month"]();
+        y = date[_ + "FullYear"]();
+        H = date[_ + "Hours"]();
+        M = date[_ + "Minutes"]();
+        s = date[_ + "Seconds"]();
+        L = date[_ + "Milliseconds"]();
+        o = (utc ? 0 : date.getTimezoneOffset());
+        flags = {
+          d: d,
+          dd: pad(d),
+          ddd: dF.i18n.dayNames[D],
+          dddd: dF.i18n.dayNames[D + 7],
+          m: m + 1,
+          mm: pad(m + 1),
+          mmm: dF.i18n.monthNames[m],
+          mmmm: dF.i18n.monthNames[m + 12],
+          yy: String(y).slice(2),
+          yyyy: y,
+          h: H % 12 || 12,
+          hh: pad(H % 12 || 12),
+          H: H,
+          HH: pad(H),
+          M: M,
+          MM: pad(M),
+          s: s,
+          ss: pad(s),
+          l: pad(L, 3),
+          L: pad((L > 99 ? Math.round(L / 10) : L)),
+          t: (H < 12 ? "a" : "p"),
+          tt: (H < 12 ? "am" : "pm"),
+          T: (H < 12 ? "A" : "P"),
+          TT: (H < 12 ? "AM" : "PM"),
+          Z: (utc ? "UTC" : (String(date).match(timezone) || [""]).pop().replace(timezoneClip, "")),
+          o: (o > 0 ? "-" : "+") + pad(Math.floor(Math.abs(o) / 60) * 100 + Math.abs(o) % 60, 4),
+          S: ["th", "st", "nd", "rd"][(d % 10 > 3 ? 0 : (d % 100 - d % 10 !== 10) * d % 10)]
+        };
+        return mask.replace(token, function($0) {
+          if ($0 in flags) {
+            return flags[$0];
+          } else {
+            return $0.slice(1, $0.length - 1);
+          }
+        });
+      };
+    })();
+    dateFormat.masks = {
+      "default": "ddd mmm dd yyyy HH:MM:ss",
+      shortDate: "m/d/yy",
+      mediumDate: "mmm d, yyyy",
+      longDate: "mmmm d, yyyy",
+      fullDate: "dddd, mmmm d, yyyy",
+      shortTime: "h:MM TT",
+      mediumTime: "h:MM:ss TT",
+      longTime: "h:MM:ss TT Z",
+      isoDate: "yyyy-mm-dd",
+      isoTime: "HH:MM:ss",
+      isoDateTime: "yyyy-mm-dd'T'HH:MM:ss",
+      isoUtcDateTime: "UTC:yyyy-mm-dd'T'HH:MM:ss'Z'"
+    };
+    dateFormat.i18n = {
+      dayNames: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+      monthNames: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+    };
+    Date.prototype.format = function(mask, utc) {
+      return dateFormat(this, mask, utc);
+    };
+    return vDate = {
       init: function() {
         return this;
       },
@@ -37,11 +136,11 @@
       },
       setLanguage: function(lang) {
         trace("SET DATE LANGUAGE");
-        VMM.Date.dateformats = lang.dateformats;
-        VMM.Date.month = lang.date.month;
-        VMM.Date.month_abbr = lang.date.month_abbr;
-        VMM.Date.day = lang.date.day;
-        VMM.Date.day_abbr = lang.date.day_abbr;
+        vDate.dateformats = lang.dateformats;
+        vDate.month = lang.date.month;
+        vDate.month_abbr = lang.date.month_abbr;
+        vDate.day = lang.date.day;
+        vDate.day_abbr = lang.date.day_abbr;
         dateFormat.i18n.dayNames = lang.date.day_abbr.concat(lang.date.day);
         dateFormat.i18n.monthNames = lang.date.month_abbr.concat(lang.date.month);
       },
@@ -290,65 +389,65 @@
           if (type.of(p) === "object") {
             if (p.millisecond || p.second && d.getSeconds() >= 1) {
               if (is_abbr) {
-                format = VMM.Date.dateformats.time_short;
+                format = vDate.dateformats.time_short;
               } else {
-                format = VMM.Date.dateformats.time_short;
+                format = vDate.dateformats.time_short;
               }
             } else if (p.minute) {
               if (is_abbr) {
-                format = VMM.Date.dateformats.time_no_seconds_short;
+                format = vDate.dateformats.time_no_seconds_short;
               } else {
-                format = VMM.Date.dateformats.time_no_seconds_small_date;
+                format = vDate.dateformats.time_no_seconds_small_date;
               }
             } else if (p.hour) {
               if (is_abbr) {
-                format = VMM.Date.dateformats.time_no_seconds_short;
+                format = vDate.dateformats.time_no_seconds_short;
               } else {
-                format = VMM.Date.dateformats.time_no_seconds_small_date;
+                format = vDate.dateformats.time_no_seconds_small_date;
               }
             } else if (p.day) {
               if (is_abbr) {
-                format = VMM.Date.dateformats.full_short;
+                format = vDate.dateformats.full_short;
               } else {
-                format = VMM.Date.dateformats.full;
+                format = vDate.dateformats.full;
               }
             } else if (p.month) {
               if (is_abbr) {
-                format = VMM.Date.dateformats.month_short;
+                format = vDate.dateformats.month_short;
               } else {
-                format = VMM.Date.dateformats.month;
+                format = vDate.dateformats.month;
               }
             } else if (p.year) {
-              format = VMM.Date.dateformats.year;
+              format = vDate.dateformats.year;
             } else {
-              format = VMM.Date.dateformats.year;
+              format = vDate.dateformats.year;
             }
           } else {
             if (d.getMonth() === 0 && d.getDate() === 1 && d.getHours() === 0 && d.getMinutes() === 0) {
-              format = VMM.Date.dateformats.year;
+              format = vDate.dateformats.year;
             } else if (d.getDate() <= 1 && d.getHours() === 0 && d.getMinutes() === 0) {
               if (is_abbr) {
-                format = VMM.Date.dateformats.month_short;
+                format = vDate.dateformats.month_short;
               } else {
-                format = VMM.Date.dateformats.month;
+                format = vDate.dateformats.month;
               }
             } else if (d.getHours() === 0 && d.getMinutes() === 0) {
               if (is_abbr) {
-                format = VMM.Date.dateformats.full_short;
+                format = vDate.dateformats.full_short;
               } else {
-                format = VMM.Date.dateformats.full;
+                format = vDate.dateformats.full;
               }
             } else if (d.getMinutes() === 0) {
               if (is_abbr) {
-                format = VMM.Date.dateformats.time_no_seconds_short;
+                format = vDate.dateformats.time_no_seconds_short;
               } else {
-                format = VMM.Date.dateformats.time_no_seconds_small_date;
+                format = vDate.dateformats.time_no_seconds_small_date;
               }
             } else {
               if (is_abbr) {
-                format = VMM.Date.dateformats.time_no_seconds_short;
+                format = vDate.dateformats.time_no_seconds_short;
               } else {
-                format = VMM.Date.dateformats.full_long;
+                format = vDate.dateformats.full_long;
               }
             }
           }
@@ -391,105 +490,6 @@
         }
       }
     }.init();
-    dateFormat = (function() {
-      var pad, timezone, timezoneClip, token;
-
-      token = /d{1,4}|m{1,4}|yy(?:yy)?|([HhMsTt])\1?|[LloSZ]|"[^"]*"|'[^']*'/g;
-      timezone = /\b(?:[PMCEA][SDP]T|(?:Pacific|Mountain|Central|Eastern|Atlantic) (?:Standard|Daylight|Prevailing) Time|(?:GMT|UTC)(?:[-+]\d{4})?)\b/g;
-      timezoneClip = /[^-+\dA-Z]/g;
-      pad = function(val, len) {
-        val = String(val);
-        len = len || 2;
-        while (val.length < len) {
-          val = "0" + val;
-        }
-        return val;
-      };
-      return function(date, mask, utc) {
-        var D, H, L, M, d, dF, flags, m, o, s, y, _;
-
-        dF = dateFormat;
-        if (arguments.length === 1 && Object.prototype.toString.call(date) === "[object String]" && !/\d/.test(date)) {
-          mask = date;
-          date = undefined;
-        }
-        if (isNaN(date)) {
-          trace("invalid date " + date);
-        }
-        mask = String(dF.masks[mask] || mask || dF.masks["default"]);
-        if (mask.slice(0, 4) === "UTC:") {
-          mask = mask.slice(4);
-          utc = true;
-        }
-        _ = (utc ? "getUTC" : "get");
-        d = date[_ + "Date"]();
-        D = date[_ + "Day"]();
-        m = date[_ + "Month"]();
-        y = date[_ + "FullYear"]();
-        H = date[_ + "Hours"]();
-        M = date[_ + "Minutes"]();
-        s = date[_ + "Seconds"]();
-        L = date[_ + "Milliseconds"]();
-        o = (utc ? 0 : date.getTimezoneOffset());
-        flags = {
-          d: d,
-          dd: pad(d),
-          ddd: dF.i18n.dayNames[D],
-          dddd: dF.i18n.dayNames[D + 7],
-          m: m + 1,
-          mm: pad(m + 1),
-          mmm: dF.i18n.monthNames[m],
-          mmmm: dF.i18n.monthNames[m + 12],
-          yy: String(y).slice(2),
-          yyyy: y,
-          h: H % 12 || 12,
-          hh: pad(H % 12 || 12),
-          H: H,
-          HH: pad(H),
-          M: M,
-          MM: pad(M),
-          s: s,
-          ss: pad(s),
-          l: pad(L, 3),
-          L: pad((L > 99 ? Math.round(L / 10) : L)),
-          t: (H < 12 ? "a" : "p"),
-          tt: (H < 12 ? "am" : "pm"),
-          T: (H < 12 ? "A" : "P"),
-          TT: (H < 12 ? "AM" : "PM"),
-          Z: (utc ? "UTC" : (String(date).match(timezone) || [""]).pop().replace(timezoneClip, "")),
-          o: (o > 0 ? "-" : "+") + pad(Math.floor(Math.abs(o) / 60) * 100 + Math.abs(o) % 60, 4),
-          S: ["th", "st", "nd", "rd"][(d % 10 > 3 ? 0 : (d % 100 - d % 10 !== 10) * d % 10)]
-        };
-        return mask.replace(token, function($0) {
-          if ($0 in flags) {
-            return flags[$0];
-          } else {
-            return $0.slice(1, $0.length - 1);
-          }
-        });
-      };
-    })();
-    dateFormat.masks = {
-      "default": "ddd mmm dd yyyy HH:MM:ss",
-      shortDate: "m/d/yy",
-      mediumDate: "mmm d, yyyy",
-      longDate: "mmmm d, yyyy",
-      fullDate: "dddd, mmmm d, yyyy",
-      shortTime: "h:MM TT",
-      mediumTime: "h:MM:ss TT",
-      longTime: "h:MM:ss TT Z",
-      isoDate: "yyyy-mm-dd",
-      isoTime: "HH:MM:ss",
-      isoDateTime: "yyyy-mm-dd'T'HH:MM:ss",
-      isoUtcDateTime: "UTC:yyyy-mm-dd'T'HH:MM:ss'Z'"
-    };
-    dateFormat.i18n = {
-      dayNames: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-      monthNames: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-    };
-    return Date.prototype.format = function(mask, utc) {
-      return dateFormat(this, mask, utc);
-    };
   });
 
 }).call(this);
