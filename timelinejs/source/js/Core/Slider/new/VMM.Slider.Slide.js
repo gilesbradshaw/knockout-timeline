@@ -3,7 +3,7 @@
     var Slide;
 
     return Slide = function(d, _parent) {
-      var $media, $slide, $text, $wrap, buildSlide, c, data, element, is_skinny, loaded, media, preloaded, reLayout, reloadLayout, removeSlide, render, slide, timer, times, _class, _enqueue, _id, _removeque;
+      var $media, $slide, $text, $wrap, buildSlide, c, data, element, is_skinny, loaded, media, preloaded, reLayout, reloadLayout, removeSlide, render, slide, timer, times, _class, _enqueue, _id, _removequeue;
 
       $media = void 0;
       $text = void 0;
@@ -19,18 +19,18 @@
       preloaded = false;
       is_skinny = false;
       _enqueue = true;
-      _removeque = false;
+      _removequeue = false;
       _id = "slide_";
       _class = 0;
       timer = {
-        pushque: "",
+        pushqueue: "",
         render: "",
         relayout: "",
         remove: "",
         skinny: false
       };
       times = {
-        pushque: 500,
+        pushqueue: 500,
         render: 100,
         relayout: 100,
         remove: 30000
@@ -61,7 +61,7 @@
       this.show = function(skinny) {
         _enqueue = false;
         timer.skinny = skinny;
-        _removeque = false;
+        _removequeue = false;
         clearTimeout(timer.remove);
         if (!loaded) {
           if (preloaded) {
@@ -73,15 +73,15 @@
         }
       };
       this.hide = function() {
-        if (loaded && !_removeque) {
-          _removeque = true;
+        if (loaded && !_removequeue) {
+          _removequeue = true;
           clearTimeout(timer.remove);
           timer.remove = setTimeout(removeSlide, times.remove);
         }
       };
       this.clearTimers = function() {
         clearTimeout(timer.relayout);
-        clearTimeout(timer.pushque);
+        clearTimeout(timer.pushqueue);
         clearTimeout(timer.render);
       };
       this.layout = function(skinny) {
@@ -133,9 +133,9 @@
         preloaded = true;
         timer.skinny = skinny;
         buildSlide();
-        clearTimeout(timer.pushque);
+        clearTimeout(timer.pushqueue);
         clearTimeout(timer.render);
-        timer.pushque = setTimeout(ExternalAPI.pushQues, times.pushque);
+        timer.pushqueue = setTimeout(ExternalAPI.pushQueues, times.pushqueue);
       };
       removeSlide = function() {
         trace("REMOVE SLIDE TIMER FINISHED");

@@ -156,9 +156,9 @@ define [
 						duration: duration
 						easing: ease
 
-		animate: (element, duration, ease, att, que, callback_function) ->
+		animate: (element, duration, ease, att, queue, callback_function) ->
 			_ease = "easein"
-			_que = false
+			_queue = false
 			_duration = 1000
 			_att = {}
 			if duration?
@@ -167,7 +167,7 @@ define [
 				else
 					_duration = Math.round(duration)
 			_ease = ease    if ease? and ease isnt ""
-			_que = que    if que? and que isnt ""
+			_queue = queue    if queue? and queue isnt ""
 			if att?
 				_att = att
 			else
@@ -191,14 +191,14 @@ define [
 				unless typeof (jQuery) is "undefined"
 					if callback_function? and callback_function isnt ""
 						jQuery(element).animate _att,
-							queue: _que
+							queue: _queue
 							duration: _duration
 							easing: _ease
 							complete: callback_function
 
 					else
 						jQuery(element).animate _att,
-							queue: _que
+							queue: _queue
 							duration: _duration
 							easing: _ease
 		smoothScrollTo: (elem, duration, ease) ->
@@ -295,7 +295,7 @@ define [
 			_id = ""
 			_tag = tag    if tag? and tag isnt ""
 			_class = cName    if cName? and cName isnt ""
-			_content = content    if content? and content isnt ""
+			_content = content    if content
 			unless typeof (jQuery) is "undefined"
 				e = jQuery(tag)
 				e.addClass _class

@@ -1,7 +1,7 @@
 ﻿# External API
 #================================================== 
 
-#masterConfig.api.pushques.push(VMM.ExternalAPI.twitter.pushQue);
+#masterConfig.api.pushqueues.push(VMM.ExternalAPI.twitter.pushQueue);
 
 #twitter_timeout	= setTimeout(VMM.ExternalAPI.twitter.errorTimeOut, masterConfig.timers.api, tweet),
 #callback_timeout= setTimeout(callback, masterConfig.timers.api, tweet);
@@ -151,10 +151,10 @@
 #mediaElem		=	"<div class='googleplus'>";
 
 #
-#				for(var i = 0; i < masterConfig.googleplus.que.length; i++) {
-#					VMM.ExternalAPI.googleplus.create(masterConfig.googleplus.que[i]);
+#				for(var i = 0; i < masterConfig.googleplus.queue.length; i++) {
+#					VMM.ExternalAPI.googleplus.create(masterConfig.googleplus.queue[i]);
 #				}
-#				masterConfig.googleplus.que = [];
+#				masterConfig.googleplus.queue = [];
 #				
 
 #flickr_thumb_id = "flickr_" + uid + "_thumb";
@@ -196,44 +196,25 @@ define [
 	"VMM.Library"
 	"VMM.Util"
 	"VMM.masterConfig"
-], (global,trace, LoadLib, browser, vDate, library, util, masterConfig)->
+	"VMM.FileExtension"
+], (global,trace, LoadLib, browser, vDate, library, util, masterConfig, fileExtension)->
 	global.onYouTubePlayerAPIReady = ->
 		trace "GLOBAL YOUTUBE API CALLED"
 		ExternalAPI.youtube.onAPIReady()
 		return
 
-	ExternalAPI = (
-		keys:
-			google: ""
-			flickr: ""
-			twitter: ""
-
-		keys_master:
-			vp: "Pellentesque nibh felis, eleifend id, commodo in, interdum vitae, leo"
-			flickr: "RAIvxHY4hE/Elm5cieh4X5ptMyDpj7MYIxziGxi0WGCcy1s+yr7rKQ=="
-			google: "jwNGnYw4hE9lmAez4ll0QD+jo6SKBJFknkopLS4FrSAuGfIwyj57AusuR0s8dAo="
-			twitter: ""
-
-		init: ->
-			this
-
-		setKeys: (d) ->
-			ExternalAPI.keys = d
-			return
-
-		pushQues: ->
-			ExternalAPI.googlemaps.pushQue()    if masterConfig.googlemaps.active
-			ExternalAPI.youtube.pushQue()    if masterConfig.youtube.active
-			ExternalAPI.soundcloud.pushQue()    if masterConfig.soundcloud.active
-			ExternalAPI.googledocs.pushQue()    if masterConfig.googledocs.active
-			ExternalAPI.googleplus.pushQue()    if masterConfig.googleplus.active
-			ExternalAPI.wikipedia.pushQue()    if masterConfig.wikipedia.active
-			ExternalAPI.vimeo.pushQue()    if masterConfig.vimeo.active
-			ExternalAPI.vine.pushQue()    if masterConfig.vine.active
-			ExternalAPI.twitter.pushQue()    if masterConfig.twitter.active
-			ExternalAPI.flickr.pushQue()    if masterConfig.flickr.active
-			ExternalAPI.webthumb.pushQue()    if masterConfig.webthumb.active
-			return
+	ExternalAPI = 
+		
+		"twitter-ready":
+			assetTest:(asset,media, d)->
+				if d and d.match("div class='twitter'")
+					id: d
+					mediaType:ExternalAPI["twitter-ready"]
+			thumbnail:(media, uid)->
+				"<div class='thumbnail thumb-twitter'></div>"
+			createElement:(media,loading_message)->
+				media.id
+			isTextMedia:true
 
 		twitter:
 			tweetArray: []
@@ -242,8 +223,8 @@ define [
 					mid: m.id
 					id: m.uid
 
-				masterConfig.twitter.que.push tweet
-				masterConfig.twitter.active = true
+				ExternalAPI.twitter.flags.queue.push tweet
+				ExternalAPI.twitter.flags.active = true
 				return
 
 			create: (tweet, callback) ->
@@ -275,10 +256,10 @@ define [
 				library.attachElement "#" + tweet.id.toString(), library.loadingmessage("Still waiting on Twitter: " + tweet.mid)
 				return
 
-			pushQue: ->
-				if masterConfig.twitter.que.length > 0
-					ExternalAPI.twitter.create masterConfig.twitter.que[0], ExternalAPI.twitter.pushQue
-					util.removeRange masterConfig.twitter.que, 0
+			pushQueue: ->
+				if ExternalAPI.twitter.flags.queue.length > 0
+					ExternalAPI.twitter.create ExternalAPI.twitter.flags.queue[0], ExternalAPI.twitter.pushQueue
+					util.removeRange ExternalAPI.twitter.flags.queue, 0
 				return
 
 			getOEmbed: (tweet, callback) ->
@@ -432,8 +413,41 @@ define [
 				library.attachElement "#twitter_" + id.toString(), twit
 				library.attachElement "#text_thumb_" + id.toString(), d.text
 				return
-
+			assetTest:(asset,media, d)->
+				if d
+					if d.match("(www.)?twitter.com") and d.match("status")
+						if d.match("status/")
+							media.id = d.split("status/")[1]
+						else if d.match("statuses/")
+							media.id = d.split("statuses/")[1]
+						else
+							media.id = ""
+						media.type="twitter"
+						media.mediaType=ExternalAPI.twitter
+						media
+			thumbnail:(media, uid)->
+				"<div class='thumbnail thumb-twitter'></div>"
+			createElement:(media,loading_message)->
+				ExternalAPI.twitter.get media
+				mediaElem = "<div class='twitter' id='" + media.uid + "'>" + loading_message + "</div>"
+			isTextMedia:true
 		googlemaps:
+			assetTest:(asset,media, d)->
+				if d
+					if d.match("maps.google") and not d.match("staticmap")
+						$.extend media,
+							type:"google-map"
+							id:d.split(/src=['|"][^'|"]*?['|"]/g)
+							mediaType:ExternalAPI.googlemaps
+			thumbnail:(media, uid)->
+				"<div class='thumbnail thumb-map'></div>"
+			createElement:(media,loading_message)->
+				
+				ExternalAPI.googlemaps.get media
+				mediaElem = "<div class='media-frame media-shadow map' id='" + media.uid + "'>" + loading_message + "</div>"
+			configure:(config)->
+				ExternalAPI.googlemaps.setMapType config.maptype
+
 			maptype: "TERRAIN"
 			setMapType: (d) ->
 				ExternalAPI.googlemaps.maptype = d    unless d is ""
@@ -449,11 +463,11 @@ define [
 				else
 					api_key = Aes.Ctr.decrypt(ExternalAPI.keys_master.google, ExternalAPI.keys_master.vp, 256)
 				map_url = "//maps.googleapis.com/maps/api/js?key=" + api_key + "&v=3.9&libraries=places&sensor=false&callback=ExternalAPI.googlemaps.onMapAPIReady"
-				if masterConfig.googlemaps.active
-					masterConfig.googlemaps.que.push m
+				if ExternalAPI.googlemaps.flags.active
+					ExternalAPI.googlemaps.flags.queue.push m
 				else
-					masterConfig.googlemaps.que.push m
-					if masterConfig.googlemaps.api_loaded
+					ExternalAPI.googlemaps.flags.queue.push m
+					if ExternalAPI.googlemaps.flags.api_loaded
 						dontcrashjs2coffee = 0
 					else
 						LoadLib.js map_url, ->
@@ -753,31 +767,31 @@ define [
 					geocodePlace()    if type.of(util.getUrlVars(m.id)["q"]) is "string"
 				return
 
-			pushQue: ->
+			pushQueue: ->
 				i = 0
 
-				while i < masterConfig.googlemaps.que.length
-					ExternalAPI.googlemaps.create masterConfig.googlemaps.que[i]
+				while i < ExternalAPI.googlemaps.flags.queue.length
+					ExternalAPI.googlemaps.create ExternalAPI.googlemaps.flags.queue[i]
 					i++
-				masterConfig.googlemaps.que = []
+				ExternalAPI.googlemaps.flags.queue = []
 				return
 
 			onMapAPIReady: ->
-				masterConfig.googlemaps.map_active = true
-				masterConfig.googlemaps.places_active = true
+				ExternalAPI.googlemaps.flags.map_active = true
+				ExternalAPI.googlemaps.flags.places_active = true
 				ExternalAPI.googlemaps.onAPIReady()
 				return
 
 			onPlacesAPIReady: ->
-				masterConfig.googlemaps.places_active = true
+				ExternalAPI.googlemaps.flags.places_active = true
 				ExternalAPI.googlemaps.onAPIReady()
 				return
 
 			onAPIReady: ->
-				unless masterConfig.googlemaps.active
-					if masterConfig.googlemaps.map_active and masterConfig.googlemaps.places_active
-						masterConfig.googlemaps.active = true
-						ExternalAPI.googlemaps.pushQue()
+				unless ExternalAPI.googlemaps.flags.active
+					if ExternalAPI.googlemaps.flags.map_active and ExternalAPI.googlemaps.flags.places_active
+						ExternalAPI.googlemaps.flags.active = true
+						ExternalAPI.googlemaps.pushQueue()
 				return
 
 			defaultType: (name) ->
@@ -835,6 +849,26 @@ define [
 					attribution: "stamen"
 
 		googleplus:
+			assetTest:(asset,media, d)->
+				if d
+					if d.match("plus.google")
+						media.type = "googleplus"
+						media.id = d.split("/posts/")[1]
+						media.mediaType=ExternalAPI.googleplus
+			
+						#https://plus.google.com/u/0/112374836634096795698/posts/bRJSvCb5mUU
+						#https://plus.google.com/107096716333816995401/posts/J5iMpEDHWNL
+						if d.split("/posts/")[0].match("u/0/")
+							media.user = d.split("u/0/")[1].split("/posts")[0]
+						else
+							media.user = d.split("google.com/")[1].split("/posts/")[0]
+			thumbnail:(media, uid)->
+				"<div class='thumbnail thumb-googleplus'></div>"
+			createElement:(media,loading_message)->
+				ExternalAPI.googleplus.get media
+				mediaElem = "<div class='googleplus' id='googleplus_" + media.id + "'>" + loading_message + "</div>"
+			isTextMedia:true
+
 			get: (m) ->
 				api_key = undefined
 				gplus =
@@ -842,8 +876,8 @@ define [
 					activity: m.id
 					id: m.uid
 
-				masterConfig.googleplus.que.push gplus
-				masterConfig.googleplus.active = true
+				ExternalAPI.googleplus.flags.queue.push gplus
+				ExternalAPI.googleplus.flags.active = true
 				return
 
 			create: (gplus, callback) ->
@@ -927,10 +961,10 @@ define [
 
 				return
 
-			pushQue: ->
-				if masterConfig.googleplus.que.length > 0
-					ExternalAPI.googleplus.create masterConfig.googleplus.que[0], ExternalAPI.googleplus.pushQue
-					util.removeRange masterConfig.googleplus.que, 0
+			pushQueue: ->
+				if ExternalAPI.googleplus.flags.queue.length > 0
+					ExternalAPI.googleplus.create ExternalAPI.googleplus.flags.queue[0], ExternalAPI.googleplus.pushQueue
+					util.removeRange ExternalAPI.googleplus.flags.queue, 0
 				return
 
 			errorTimeOut: (gplus) ->
@@ -939,9 +973,21 @@ define [
 				return
 
 		googledocs:
+			assetTest:(asset,media, d)->
+				if d
+					if fileExtension.googleDocType(d)
+						$.extend media,
+							type: "googledoc"
+							id: d
+							mediaType:ExternalAPI.googledocs
+			thumbnail:(media, uid)->
+				"<div class='thumbnail thumb-document'></div>"
+			createElement:(media,loading_message)->
+				ExternalAPI.googledocs.get media
+				mediaElem = "<div class='media-frame media-shadow doc' id='" + media.uid + "'>" + loading_message + "</div>"
 			get: (m) ->
-				masterConfig.googledocs.que.push m
-				masterConfig.googledocs.active = true
+				ExternalAPI.googledocs.flags.queue.push m
+				ExternalAPI.googledocs.flags.active = true
 				return
 
 			create: (m) ->
@@ -953,19 +999,35 @@ define [
 				library.attachElement "#" + m.uid, mediaElem
 				return
 
-			pushQue: ->
+			pushQueue: ->
 				i = 0
 
-				while i < masterConfig.googledocs.que.length
-					ExternalAPI.googledocs.create masterConfig.googledocs.que[i]
+				while i < ExternalAPI.googledocs.flags.queue.length
+					ExternalAPI.googledocs.create ExternalAPI.googledocs.flags.queue[i]
 					i++
-				masterConfig.googledocs.que = []
+				ExternalAPI.googledocs.flags.queue = []
 				return
 
 		flickr:
+			assetTest:(asset,media, d)->
+				if d
+					if d.match("flickr.com/photos/")
+						media.type = "flickr"
+						media.id = ExternalAPI.flickr.getFlickrIdFromUrl(d)
+						media.link = d
+						media.mediaType=ExternalAPI.flickr
+						if Boolean(media.id)
+							media
+						else
+							false
+			thumbnail:(media, uid)->
+				"<div class='thumbnail thumb-photo' id='" + uid + "_thumb'></div>"
+			createElement:(media,loading_message)->
+				ExternalAPI.flickr.get media
+				mediaElem = "<div class='media-image media-shadow'><a href='" + media.link + "' target='_blank'><img id='" + media.uid + "'></a></div>"
 			get: (m) ->
-				masterConfig.flickr.que.push m
-				masterConfig.flickr.active = true
+				ExternalAPI.flickr.flags.queue.push m
+				ExternalAPI.flickr.flags.active = true
 				return
 
 			create: (m, callback) ->
@@ -1008,10 +1070,10 @@ define [
 
 				return
 
-			pushQue: ->
-				if masterConfig.flickr.que.length > 0
-					ExternalAPI.flickr.create masterConfig.flickr.que[0], ExternalAPI.flickr.pushQue
-					util.removeRange masterConfig.flickr.que, 0
+			pushQueue: ->
+				if ExternalAPI.flickr.flags.queue.length > 0
+					ExternalAPI.flickr.create ExternalAPI.flickr.flags.queue[0], ExternalAPI.flickr.pushQueue
+					util.removeRange ExternalAPI.flickr.flags.queue, 0
 				return
 
 			sizes: (s) ->
@@ -1042,6 +1104,21 @@ define [
 				photo_info.split("/")[1]
 
 		instagram:
+			assetTest:(asset,media, d)->
+				if d
+					if ExternalAPI.instagram.isInstagramUrl(d)
+						media.type = "instagram"
+						media.link = d
+						media.id = ExternalAPI.instagram.getInstagramIdFromUrl(d)
+						media.mediaType=ExternalAPI.instagram
+						if Boolean(media.id)
+							media
+						else 
+							false
+			thumbnail:(media, uid)->
+				"<div class='thumbnail thumb-instagram' id='" + uid + "_thumb'><img src='" + ExternalAPI.instagram.get(media, true) + "'></div>"
+			createElement:(media,loading_message)->
+				"<div class='media-image media-shadow'><a href='" + media.link + "' target='_blank'><img src='" + ExternalAPI.instagram.get(media) + "'></a></div>"
 			get: (m, thumb) ->
 				if thumb
 					"//instagr.am/p/" + m.id + "/media/?size=t"
@@ -1071,8 +1148,8 @@ define [
 
 		soundcloud:
 			get: (m) ->
-				masterConfig.soundcloud.que.push m
-				masterConfig.soundcloud.active = true
+				ExternalAPI.soundcloud.flags.queue.push m
+				ExternalAPI.soundcloud.flags.active = true
 				return
 
 			create: (m, callback) ->
@@ -1084,16 +1161,45 @@ define [
 
 				return
 
-			pushQue: ->
-				if masterConfig.soundcloud.que.length > 0
-					ExternalAPI.soundcloud.create masterConfig.soundcloud.que[0], ExternalAPI.soundcloud.pushQue
-					util.removeRange masterConfig.soundcloud.que, 0
+			pushQueue: ->
+				if ExternalAPI.soundcloud.flags.queue.length > 0
+					ExternalAPI.soundcloud.create ExternalAPI.soundcloud.flags.queue[0], ExternalAPI.soundcloud.pushQueue
+					util.removeRange ExternalAPI.soundcloud.flags.queue, 0
 				return
+			assetTest:(asset,media, d)->
+				if d
+					if d.match("(player.)?soundcloud.com")
+						id:d
+						type:"soundcloud"
+						mediaType:ExternalAPI.soundcloud
+			thumbnail:(media, uid)->
+				"<div class='thumbnail thumb-audio'></div>"
+			createElement:(media,loading_message)->
+				ExternalAPI.soundcloud.get media
+				mediaElem = "<div class='media-frame media-shadow soundcloud' id='" + media.uid + "'>" + loading_message + "</div>"
 
 		wikipedia:
+			assetTest:(asset,media, d)->
+				if d
+					if d.match("(www.)?wikipedia.org")
+						media.type = "wikipedia"
+			
+						#media.id = d.split("wiki\/")[1];
+						wiki_id = d.split("wiki/")[1].split("#")[0].replace("_", " ")
+						media.id = wiki_id.replace(" ", "%20")
+						media.lang = d.split("//")[1].split(".wikipedia")[0]
+						media.mediaType = ExternalAPI.wikipedia
+						media
+			thumbnail:(media, uid)->
+				"<div class='thumbnail thumb-wikipedia'></div>"
+			createElement:(media,loading_message)->	
+				ExternalAPI.wikipedia.get media
+				mediaElem = "<div class='wikipedia' id='" + media.uid + "'>" + loading_message + "</div>"
+			isTextMedia:true
+
 			get: (m) ->
-				masterConfig.wikipedia.que.push m
-				masterConfig.wikipedia.active = true
+				ExternalAPI.wikipedia.flags.queue.push m
+				ExternalAPI.wikipedia.flags.active = true
 				return
 
 			create: (m, callback) ->
@@ -1138,35 +1244,36 @@ define [
 					trace errorThrown
 					library.attachElement "#" + m.uid, library.loadingmessage("<p>Wikipedia is not responding</p>")
 					clearTimeout callback_timeout
-					if masterConfig.wikipedia.tries < 4
-						trace "WIKIPEDIA ATTEMPT " + masterConfig.wikipedia.tries
+					ExternalAPI.wikipedia.flags.tries or=0
+					if ExternalAPI.wikipedia.flags.tries < 4
+						trace "WIKIPEDIA ATTEMPT " + ExternalAPI.wikipedia.flags.tries
 						trace m
-						masterConfig.wikipedia.tries++
+						ExternalAPI.wikipedia.flags.tries++
 						ExternalAPI.wikipedia.create m, callback
 					else
 						callback()
 					return
 				).success (d) ->
-					masterConfig.wikipedia.tries = 0
+					ExternalAPI.wikipedia.flags.tries = 0
 					clearTimeout callback_timeout
 					callback()
 					return
 
 				return
 
-			pushQue: ->
-				if masterConfig.wikipedia.que.length > 0
-					trace "WIKIPEDIA PUSH QUE " + masterConfig.wikipedia.que.length
-					ExternalAPI.wikipedia.create masterConfig.wikipedia.que[0], ExternalAPI.wikipedia.pushQue
-					util.removeRange masterConfig.wikipedia.que, 0
+			pushQueue: ->
+				if ExternalAPI.wikipedia.flags.queue.length > 0
+					trace "WIKIPEDIA PUSH QUE " + ExternalAPI.wikipedia.flags.queue.length
+					ExternalAPI.wikipedia.create ExternalAPI.wikipedia.flags.queue[0], ExternalAPI.wikipedia.pushQueue
+					util.removeRange ExternalAPI.wikipedia.flags.queue, 0
 				return
 
 		youtube:
 			get: (m) ->
 				the_url = "//gdata.youtube.com/feeds/api/videos/" + m.id + "?v=2&alt=jsonc&callback=?"
-				masterConfig.youtube.que.push m
-				unless masterConfig.youtube.active
-					unless masterConfig.youtube.api_loaded
+				ExternalAPI.youtube.flags.queue.push m
+				unless ExternalAPI.youtube.flags.active
+					unless ExternalAPI.youtube.flags.api_loaded
 						LoadLib.js "//www.youtube.com/player_api", ->
 							trace "YouTube API Library Loaded"
 							return
@@ -1214,7 +1321,7 @@ define [
 						onReady: ExternalAPI.youtube.onPlayerReady
 						onStateChange: ExternalAPI.youtube.onStateChange
 				)
-				masterConfig.youtube.array.push p
+				ExternalAPI.youtube.flags.array.push p
 				return
 
 			createThumb: (d, m) ->
@@ -1226,49 +1333,68 @@ define [
 					library.attachElement thumb_id, "<img src='" + d.data.thumbnail.sqDefault + "'>"
 				return
 
-			pushQue: ->
+			pushQueue: ->
 				i = 0
 
-				while i < masterConfig.youtube.que.length
-					ExternalAPI.youtube.create masterConfig.youtube.que[i]
+				while i < ExternalAPI.youtube.flags.queue.length
+					ExternalAPI.youtube.create ExternalAPI.youtube.flags.queue[i]
 					i++
-				masterConfig.youtube.que = []
+				ExternalAPI.youtube.flags.queue = []
 				return
 
 			onAPIReady: ->
-				masterConfig.youtube.active = true
-				ExternalAPI.youtube.pushQue()
+				ExternalAPI.youtube.flags.active = true
+				ExternalAPI.youtube.pushQueue()
 				return
 
 			stopPlayers: ->
 				i = 0
 
-				while i < masterConfig.youtube.array.length
-					if masterConfig.youtube.array[i].playing
-						#the_name = masterConfig.youtube.array[i].name
-						masterConfig.youtube.array[i].player[Object.keys(masterConfig.youtube.array[i].player)[0]].stopVideo()
+				while i < ExternalAPI.youtube.flags.array.length
+					if ExternalAPI.youtube.flags.array[i].playing
+						ExternalAPI.youtube.flags.array[i].player[Object.keys(ExternalAPI.youtube.flags.array[i].player)[0]].stopVideo()
 					i++
 				return
 
 			onStateChange: (e) ->
 				i = 0
 
-				while i < masterConfig.youtube.array.length
-					#the_name = masterConfig.youtube.array[i].name
-					if masterConfig.youtube.array[i].player[Object.keys(masterConfig.youtube.array[i].player)[0]] is e.target
+				while i < ExternalAPI.youtube.flags.array.length
+					if ExternalAPI.youtube.flags.array[i].player[Object.keys(ExternalAPI.youtube.flags.array[i].player)[0]] is e.target
 						if e.data is YT.PlayerState.PLAYING
-							masterConfig.youtube.array[i].playing = true
-							trace masterConfig.youtube.array[i].hd
-							dontcrashjs2coffee = 0    if masterConfig.youtube.array[i].hd
+							ExternalAPI.youtube.flags.array[i].playing = true
+							trace ExternalAPI.youtube.flags.array[i].hd
+							dontcrashjs2coffee = 0    if ExternalAPI.youtube.flags.array[i].hd
 					i++
 				return
 
 			onPlayerReady: (e) ->
+			assetTest:(asset,media, d)->
+				if d
+					if d.match("(www.)?youtube|youtu.be")
+						if d.match("v=")
+							media.id = util.getUrlVars(d)["v"]
+						else if d.match("/embed/")
+							media.id = d.split("embed/")[1].split(/[?&]/)[0]
+						else if d.match(/v\/|v=|youtu\.be\//)
+							media.id = d.split(/v\/|v=|youtu\.be\//)[1].split(/[?&]/)[0]
+						else
+							trace "YOUTUBE IN URL BUT NOT A VALID VIDEO"
+						$.extend media,
+							start:util.getUrlVars(d)["t"]
+							hd:util.getUrlVars(d)["hd"]
+							mediaType:ExternalAPI.youtube
+							type:"youtube"
+			thumbnail:(media, uid)->
+				"<div class='thumbnail thumb-youtube' id='" + uid + "_thumb'></div>"
+			createElement:(media,loading_message)->
+				ExternalAPI.youtube.get media
+				mediaElem = "<div class='media-shadow'><div class='media-frame video youtube' id='" + media.uid + "'>" + loading_message + "</div></div>"
 
 		vimeo:
 			get: (m) ->
-				masterConfig.vimeo.que.push m
-				masterConfig.vimeo.active = true
+				ExternalAPI.vimeo.flags.queue.push m
+				ExternalAPI.vimeo.flags.active = true
 				return
 
 			create: (m, callback) ->
@@ -1289,16 +1415,27 @@ define [
 				library.attachElement thumb_id, "<img src='" + d[0].thumbnail_small + "'>"
 				return
 
-			pushQue: ->
-				if masterConfig.vimeo.que.length > 0
-					ExternalAPI.vimeo.create masterConfig.vimeo.que[0], ExternalAPI.vimeo.pushQue
-					util.removeRange masterConfig.vimeo.que, 0
+			pushQueue: ->
+				if ExternalAPI.vimeo.flags.queue.length > 0
+					ExternalAPI.vimeo.create ExternalAPI.vimeo.flags.queue[0], ExternalAPI.vimeo.pushQueue
+					util.removeRange ExternalAPI.vimeo.flags.queue, 0
 				return
+			assetTest:(asset,media, d)->
+				if d
+					if d.match("(player.)?vimeo.com")
+						id:d.split(/video\/|\/\/vimeo\.com\//)[1].split(/[?&]/)[0]
+						mediaType:ExternalAPI.vimeo
+						type:"vimeo"
+			thumbnail:(media, uid)->
+				"<div class='thumbnail thumb-vimeo' id='" + uid + "_thumb'></div>"
+			createElement:(media,loading_message)->
+				ExternalAPI.vimeo.get media
+				mediaElem = "<div class='media-shadow media-frame video vimeo' id='" + media.uid + "'>" + loading_message + "</div>"
 
 		vine:
 			get: (m) ->
-				masterConfig.vine.que.push m
-				masterConfig.vine.active = true
+				ExternalAPI.vine.flags.queue.push m
+				ExternalAPI.vine.flags.active = true
 				return
 
 			create: (m, callback) ->
@@ -1307,16 +1444,70 @@ define [
 				library.attachElement "#" + m.uid, "<iframe frameborder='0' width='100%' height='100%' src='" + video_url + "'></iframe><script async src='http://platform.vine.co/static/scripts/embed.js' charset='utf-8'></script>"
 				return
 
-			pushQue: ->
-				if masterConfig.vine.que.length > 0
-					ExternalAPI.vine.create masterConfig.vine.que[0], ExternalAPI.vine.pushQue
-					util.removeRange masterConfig.vine.que, 0
+			pushQueue: ->
+				if ExternalAPI.vine.flags.queue.length > 0
+					ExternalAPI.vine.create ExternalAPI.vine.flags.queue[0], ExternalAPI.vine.pushQueue
+					util.removeRange ExternalAPI.vine.flags.queue, 0
 				return
+			assetTest:(asset,media, d)->
+				if d
+					if d.match("(www.)?vine.co")
+						trace "VINE"
+						#https://vine.co/v/b55LOA1dgJU
+						if d.match("vine.co/v/")
+							trace d.split("vine.co/v/")[1]
+							id:d.split("vine.co/v/")[1]
+							type:"vine"
+							mediaType:ExternalAPI.vine
+						else
+							type:"vine"
+							mediaType:ExternalAPI.vine
+			thumbnail:(media, uid)->
+				"<div class='thumbnail thumb-vine'></div>"
+			createElement:(media,loading_message)->
+				ExternalAPI.vine.get media
+				mediaElem = "<div class='media-shadow media-frame video vine' id='" + media.uid + "'>" + loading_message + "</div>"
+		dailymotion:
+			assetTest:(asset,media, d)->
+				if d
+					if d.match("(www.)?dailymotion.com")
+						id:d.split(/video\/|\/\/dailymotion\.com\//)[1]
+						mediaType:ExternalAPI.dailymotion
+						type:"dailymotion"
+			thumbnail:(media, uid)->
+				"<div class='thumbnail thumb-video'></div>"
+			createElement:(media,loading_message)->
+				"<div class='media-shadow'><iframe class='media-frame video dailymotion' autostart='false' frameborder='0' width='100%' height='100%' src='http://www.dailymotion.com/embed/video/" + media.id + "'></iframe></div>"
+		image:
+			assetTest:(asset,media, d)->
+				if d
+					if d.match(/jpg|jpeg|png|gif/i) or d.match("staticmap") or d.match("yfrog.com") or d.match("twitpic.com")
+						$.extend media,
+							type: "image"
+							id: d
+							mediaType:ExternalAPI.image
+			thumbnail:(media, uid)->
+				"<div class='thumbnail thumb-photo'></div>"
+			createElement:(media,loading_message)->
+				media.id = media.id.replace("https://", "http://")    if media.id.match("https://")
+				"<div class='media-image media-shadow'><img src='" + media.id + "' class='media-image'></div>"
 
-		webthumb:
+		website:
+			assetTest:(asset,media, d)->
+				if d
+					if d.indexOf("http://") is 0
+						media.type = "website"
+						media.id = d
+						media.mediaType = ExternalAPI.website
+						media
+			thumbnail:(media, uid)->
+				"<div class='thumbnail thumb-website' id='" + uid + "_thumb'></div>"
+			createElement:(media,loading_message)->
+				ExternalAPI.website.get media
+				mediaElem = "<div class='media-shadow website' id='" + media.uid + "'>" + loading_message + "</div>"
 			get: (m, thumb) ->
-				masterConfig.webthumb.que.push m
-				masterConfig.webthumb.active = true
+				ExternalAPI.website.flags.queue.push m
+				ExternalAPI.website.flags.active = true
 				return
 
 			sizes: (s) ->
@@ -1337,12 +1528,11 @@ define [
 				library.attachElement "#" + m.uid + "_thumb", "<img src='" + thumb_url + "size=t&url=" + url + "'>"
 				return
 
-			pushQue: ->
+			pushQueue: ->
 				i = 0
 
-				while i < masterConfig.webthumb.que.length
-					ExternalAPI.webthumb.create masterConfig.webthumb.que[i]
+				while i < ExternalAPI.website.flags.queue.length
+					ExternalAPI.website.create ExternalAPI.website.flags.queue[i]
 					i++
-				masterConfig.webthumb.que = []
+				ExternalAPI.website.flags.queue = []
 				return
-	).init()

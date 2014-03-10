@@ -542,7 +542,8 @@ define [
 			vDate.setLanguage config.language
 			masterConfig.language = config.language
 			ExternalAPI.setKeys config.api_keys
-			ExternalAPI.googlemaps.setMapType config.maptype
+			ExternalAPI.configure config
+			
 			library.bindEvent global, onDataReady, config.events.data_ready
 			library.bindEvent global, showMessege, config.events.messege
 			library.fireEvent global, config.events.messege, config.language.messages.loading_timeline

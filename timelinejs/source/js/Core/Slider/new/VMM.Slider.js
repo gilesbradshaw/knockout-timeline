@@ -388,7 +388,7 @@
         is_first = false;
         _title = "";
         _pos = void 0;
-        ExternalAPI.youtube.stopPlayers();
+        ExternalAPI.stopPlayers();
         current_slide = n;
         _pos = slides[current_slide].leftpos();
         if (current_slide === 0) {

@@ -1,5 +1,5 @@
 (function() {
-  define(["global", "trace", "VMM.LoadLib", "VMM.Browser", "VMM.Date", "VMM.Library", "VMM.Util", "VMM.masterConfig"], function(global, trace, LoadLib, browser, vDate, library, util, masterConfig) {
+  define(["global", "trace", "VMM.LoadLib", "VMM.Browser", "VMM.Date", "VMM.Library", "VMM.Util", "VMM.masterConfig", "VMM.FileExtension"], function(global, trace, LoadLib, browser, vDate, library, util, masterConfig, fileExtension) {
     var ExternalAPI;
 
     global.onYouTubePlayerAPIReady = function() {
@@ -7,57 +7,22 @@
       ExternalAPI.youtube.onAPIReady();
     };
     return ExternalAPI = {
-      keys: {
-        google: "",
-        flickr: "",
-        twitter: ""
-      },
-      keys_master: {
-        vp: "Pellentesque nibh felis, eleifend id, commodo in, interdum vitae, leo",
-        flickr: "RAIvxHY4hE/Elm5cieh4X5ptMyDpj7MYIxziGxi0WGCcy1s+yr7rKQ==",
-        google: "jwNGnYw4hE9lmAez4ll0QD+jo6SKBJFknkopLS4FrSAuGfIwyj57AusuR0s8dAo=",
-        twitter: ""
-      },
-      init: function() {
-        return this;
-      },
-      setKeys: function(d) {
-        ExternalAPI.keys = d;
-      },
-      pushQues: function() {
-        if (masterConfig.googlemaps.active) {
-          ExternalAPI.googlemaps.pushQue();
-        }
-        if (masterConfig.youtube.active) {
-          ExternalAPI.youtube.pushQue();
-        }
-        if (masterConfig.soundcloud.active) {
-          ExternalAPI.soundcloud.pushQue();
-        }
-        if (masterConfig.googledocs.active) {
-          ExternalAPI.googledocs.pushQue();
-        }
-        if (masterConfig.googleplus.active) {
-          ExternalAPI.googleplus.pushQue();
-        }
-        if (masterConfig.wikipedia.active) {
-          ExternalAPI.wikipedia.pushQue();
-        }
-        if (masterConfig.vimeo.active) {
-          ExternalAPI.vimeo.pushQue();
-        }
-        if (masterConfig.vine.active) {
-          ExternalAPI.vine.pushQue();
-        }
-        if (masterConfig.twitter.active) {
-          ExternalAPI.twitter.pushQue();
-        }
-        if (masterConfig.flickr.active) {
-          ExternalAPI.flickr.pushQue();
-        }
-        if (masterConfig.webthumb.active) {
-          ExternalAPI.webthumb.pushQue();
-        }
+      "twitter-ready": {
+        assetTest: function(asset, media, d) {
+          if (d && d.match("div class='twitter'")) {
+            return {
+              id: d,
+              mediaType: ExternalAPI["twitter-ready"]
+            };
+          }
+        },
+        thumbnail: function(media, uid) {
+          return "<div class='thumbnail thumb-twitter'></div>";
+        },
+        createElement: function(media, loading_message) {
+          return media.id;
+        },
+        isTextMedia: true
       },
       twitter: {
         tweetArray: [],
@@ -68,8 +33,8 @@
             mid: m.id,
             id: m.uid
           };
-          masterConfig.twitter.que.push(tweet);
-          masterConfig.twitter.active = true;
+          ExternalAPI.twitter.flags.queue.push(tweet);
+          ExternalAPI.twitter.flags.active = true;
         },
         create: function(tweet, callback) {
           var error_obj, id, the_url;
@@ -103,10 +68,10 @@
           trace("TWITTER JSON ERROR TIMEOUT " + tweet.mid);
           library.attachElement("#" + tweet.id.toString(), library.loadingmessage("Still waiting on Twitter: " + tweet.mid));
         },
-        pushQue: function() {
-          if (masterConfig.twitter.que.length > 0) {
-            ExternalAPI.twitter.create(masterConfig.twitter.que[0], ExternalAPI.twitter.pushQue);
-            util.removeRange(masterConfig.twitter.que, 0);
+        pushQueue: function() {
+          if (ExternalAPI.twitter.flags.queue.length > 0) {
+            ExternalAPI.twitter.create(ExternalAPI.twitter.flags.queue[0], ExternalAPI.twitter.pushQueue);
+            util.removeRange(ExternalAPI.twitter.flags.queue, 0);
           }
         },
         getOEmbed: function(tweet, callback) {
@@ -281,9 +246,58 @@
           }
           library.attachElement("#twitter_" + id.toString(), twit);
           library.attachElement("#text_thumb_" + id.toString(), d.text);
-        }
+        },
+        assetTest: function(asset, media, d) {
+          if (d) {
+            if (d.match("(www.)?twitter.com") && d.match("status")) {
+              if (d.match("status/")) {
+                media.id = d.split("status/")[1];
+              } else if (d.match("statuses/")) {
+                media.id = d.split("statuses/")[1];
+              } else {
+                media.id = "";
+              }
+              media.type = "twitter";
+              media.mediaType = ExternalAPI.twitter;
+              return media;
+            }
+          }
+        },
+        thumbnail: function(media, uid) {
+          return "<div class='thumbnail thumb-twitter'></div>";
+        },
+        createElement: function(media, loading_message) {
+          var mediaElem;
+
+          ExternalAPI.twitter.get(media);
+          return mediaElem = "<div class='twitter' id='" + media.uid + "'>" + loading_message + "</div>";
+        },
+        isTextMedia: true
       },
       googlemaps: {
+        assetTest: function(asset, media, d) {
+          if (d) {
+            if (d.match("maps.google") && !d.match("staticmap")) {
+              return $.extend(media, {
+                type: "google-map",
+                id: d.split(/src=['|"][^'|"]*?['|"]/g),
+                mediaType: ExternalAPI.googlemaps
+              });
+            }
+          }
+        },
+        thumbnail: function(media, uid) {
+          return "<div class='thumbnail thumb-map'></div>";
+        },
+        createElement: function(media, loading_message) {
+          var mediaElem;
+
+          ExternalAPI.googlemaps.get(media);
+          return mediaElem = "<div class='media-frame media-shadow map' id='" + media.uid + "'>" + loading_message + "</div>";
+        },
+        configure: function(config) {
+          return ExternalAPI.googlemaps.setMapType(config.maptype);
+        },
         maptype: "TERRAIN",
         setMapType: function(d) {
           if (d !== "") {
@@ -303,11 +317,11 @@
             api_key = Aes.Ctr.decrypt(ExternalAPI.keys_master.google, ExternalAPI.keys_master.vp, 256);
           }
           map_url = "//maps.googleapis.com/maps/api/js?key=" + api_key + "&v=3.9&libraries=places&sensor=false&callback=ExternalAPI.googlemaps.onMapAPIReady";
-          if (masterConfig.googlemaps.active) {
-            masterConfig.googlemaps.que.push(m);
+          if (ExternalAPI.googlemaps.flags.active) {
+            ExternalAPI.googlemaps.flags.queue.push(m);
           } else {
-            masterConfig.googlemaps.que.push(m);
-            if (masterConfig.googlemaps.api_loaded) {
+            ExternalAPI.googlemaps.flags.queue.push(m);
+            if (ExternalAPI.googlemaps.flags.api_loaded) {
               dontcrashjs2coffee = 0;
             } else {
               LoadLib.js(map_url, function() {
@@ -674,30 +688,30 @@
             }
           }
         },
-        pushQue: function() {
+        pushQueue: function() {
           var i;
 
           i = 0;
-          while (i < masterConfig.googlemaps.que.length) {
-            ExternalAPI.googlemaps.create(masterConfig.googlemaps.que[i]);
+          while (i < ExternalAPI.googlemaps.flags.queue.length) {
+            ExternalAPI.googlemaps.create(ExternalAPI.googlemaps.flags.queue[i]);
             i++;
           }
-          masterConfig.googlemaps.que = [];
+          ExternalAPI.googlemaps.flags.queue = [];
         },
         onMapAPIReady: function() {
-          masterConfig.googlemaps.map_active = true;
-          masterConfig.googlemaps.places_active = true;
+          ExternalAPI.googlemaps.flags.map_active = true;
+          ExternalAPI.googlemaps.flags.places_active = true;
           ExternalAPI.googlemaps.onAPIReady();
         },
         onPlacesAPIReady: function() {
-          masterConfig.googlemaps.places_active = true;
+          ExternalAPI.googlemaps.flags.places_active = true;
           ExternalAPI.googlemaps.onAPIReady();
         },
         onAPIReady: function() {
-          if (!masterConfig.googlemaps.active) {
-            if (masterConfig.googlemaps.map_active && masterConfig.googlemaps.places_active) {
-              masterConfig.googlemaps.active = true;
-              ExternalAPI.googlemaps.pushQue();
+          if (!ExternalAPI.googlemaps.flags.active) {
+            if (ExternalAPI.googlemaps.flags.map_active && ExternalAPI.googlemaps.flags.places_active) {
+              ExternalAPI.googlemaps.flags.active = true;
+              ExternalAPI.googlemaps.pushQueue();
             }
           }
         },
@@ -753,6 +767,30 @@
         }
       },
       googleplus: {
+        assetTest: function(asset, media, d) {
+          if (d) {
+            if (d.match("plus.google")) {
+              media.type = "googleplus";
+              media.id = d.split("/posts/")[1];
+              media.mediaType = ExternalAPI.googleplus;
+              if (d.split("/posts/")[0].match("u/0/")) {
+                return media.user = d.split("u/0/")[1].split("/posts")[0];
+              } else {
+                return media.user = d.split("google.com/")[1].split("/posts/")[0];
+              }
+            }
+          }
+        },
+        thumbnail: function(media, uid) {
+          return "<div class='thumbnail thumb-googleplus'></div>";
+        },
+        createElement: function(media, loading_message) {
+          var mediaElem;
+
+          ExternalAPI.googleplus.get(media);
+          return mediaElem = "<div class='googleplus' id='googleplus_" + media.id + "'>" + loading_message + "</div>";
+        },
+        isTextMedia: true,
         get: function(m) {
           var api_key, gplus;
 
@@ -762,8 +800,8 @@
             activity: m.id,
             id: m.uid
           };
-          masterConfig.googleplus.que.push(gplus);
-          masterConfig.googleplus.active = true;
+          ExternalAPI.googleplus.flags.queue.push(gplus);
+          ExternalAPI.googleplus.flags.active = true;
         },
         create: function(gplus, callback) {
           var api_key, callback_timeout, g_activity, g_attachments, g_content, gactivity_api_url, googleplus_timeout, gperson_api_url, mediaElem;
@@ -853,10 +891,10 @@
             callback();
           });
         },
-        pushQue: function() {
-          if (masterConfig.googleplus.que.length > 0) {
-            ExternalAPI.googleplus.create(masterConfig.googleplus.que[0], ExternalAPI.googleplus.pushQue);
-            util.removeRange(masterConfig.googleplus.que, 0);
+        pushQueue: function() {
+          if (ExternalAPI.googleplus.flags.queue.length > 0) {
+            ExternalAPI.googleplus.create(ExternalAPI.googleplus.flags.queue[0], ExternalAPI.googleplus.pushQueue);
+            util.removeRange(ExternalAPI.googleplus.flags.queue, 0);
           }
         },
         errorTimeOut: function(gplus) {
@@ -865,9 +903,29 @@
         }
       },
       googledocs: {
+        assetTest: function(asset, media, d) {
+          if (d) {
+            if (fileExtension.googleDocType(d)) {
+              return $.extend(media, {
+                type: "googledoc",
+                id: d,
+                mediaType: ExternalAPI.googledocs
+              });
+            }
+          }
+        },
+        thumbnail: function(media, uid) {
+          return "<div class='thumbnail thumb-document'></div>";
+        },
+        createElement: function(media, loading_message) {
+          var mediaElem;
+
+          ExternalAPI.googledocs.get(media);
+          return mediaElem = "<div class='media-frame media-shadow doc' id='" + media.uid + "'>" + loading_message + "</div>";
+        },
         get: function(m) {
-          masterConfig.googledocs.que.push(m);
-          masterConfig.googledocs.active = true;
+          ExternalAPI.googledocs.flags.queue.push(m);
+          ExternalAPI.googledocs.flags.active = true;
         },
         create: function(m) {
           var mediaElem;
@@ -880,21 +938,45 @@
           }
           library.attachElement("#" + m.uid, mediaElem);
         },
-        pushQue: function() {
+        pushQueue: function() {
           var i;
 
           i = 0;
-          while (i < masterConfig.googledocs.que.length) {
-            ExternalAPI.googledocs.create(masterConfig.googledocs.que[i]);
+          while (i < ExternalAPI.googledocs.flags.queue.length) {
+            ExternalAPI.googledocs.create(ExternalAPI.googledocs.flags.queue[i]);
             i++;
           }
-          masterConfig.googledocs.que = [];
+          ExternalAPI.googledocs.flags.queue = [];
         }
       },
       flickr: {
+        assetTest: function(asset, media, d) {
+          if (d) {
+            if (d.match("flickr.com/photos/")) {
+              media.type = "flickr";
+              media.id = ExternalAPI.flickr.getFlickrIdFromUrl(d);
+              media.link = d;
+              media.mediaType = ExternalAPI.flickr;
+              if (Boolean(media.id)) {
+                return media;
+              } else {
+                return false;
+              }
+            }
+          }
+        },
+        thumbnail: function(media, uid) {
+          return "<div class='thumbnail thumb-photo' id='" + uid + "_thumb'></div>";
+        },
+        createElement: function(media, loading_message) {
+          var mediaElem;
+
+          ExternalAPI.flickr.get(media);
+          return mediaElem = "<div class='media-image media-shadow'><a href='" + media.link + "' target='_blank'><img id='" + media.uid + "'></a></div>";
+        },
         get: function(m) {
-          masterConfig.flickr.que.push(m);
-          masterConfig.flickr.active = true;
+          ExternalAPI.flickr.flags.queue.push(m);
+          ExternalAPI.flickr.flags.active = true;
         },
         create: function(m, callback) {
           var api_key, callback_timeout, the_url;
@@ -940,10 +1022,10 @@
             callback();
           });
         },
-        pushQue: function() {
-          if (masterConfig.flickr.que.length > 0) {
-            ExternalAPI.flickr.create(masterConfig.flickr.que[0], ExternalAPI.flickr.pushQue);
-            util.removeRange(masterConfig.flickr.que, 0);
+        pushQueue: function() {
+          if (ExternalAPI.flickr.flags.queue.length > 0) {
+            ExternalAPI.flickr.create(ExternalAPI.flickr.flags.queue[0], ExternalAPI.flickr.pushQueue);
+            util.removeRange(ExternalAPI.flickr.flags.queue, 0);
           }
         },
         sizes: function(s) {
@@ -986,6 +1068,27 @@
         }
       },
       instagram: {
+        assetTest: function(asset, media, d) {
+          if (d) {
+            if (ExternalAPI.instagram.isInstagramUrl(d)) {
+              media.type = "instagram";
+              media.link = d;
+              media.id = ExternalAPI.instagram.getInstagramIdFromUrl(d);
+              media.mediaType = ExternalAPI.instagram;
+              if (Boolean(media.id)) {
+                return media;
+              } else {
+                return false;
+              }
+            }
+          }
+        },
+        thumbnail: function(media, uid) {
+          return "<div class='thumbnail thumb-instagram' id='" + uid + "_thumb'><img src='" + ExternalAPI.instagram.get(media, true) + "'></div>";
+        },
+        createElement: function(media, loading_message) {
+          return "<div class='media-image media-shadow'><a href='" + media.link + "' target='_blank'><img src='" + ExternalAPI.instagram.get(media) + "'></a></div>";
+        },
         get: function(m, thumb) {
           if (thumb) {
             return "//instagr.am/p/" + m.id + "/media/?size=t";
@@ -1023,8 +1126,8 @@
       },
       soundcloud: {
         get: function(m) {
-          masterConfig.soundcloud.que.push(m);
-          masterConfig.soundcloud.active = true;
+          ExternalAPI.soundcloud.flags.queue.push(m);
+          ExternalAPI.soundcloud.flags.active = true;
         },
         create: function(m, callback) {
           var the_url;
@@ -1035,17 +1138,61 @@
             callback();
           });
         },
-        pushQue: function() {
-          if (masterConfig.soundcloud.que.length > 0) {
-            ExternalAPI.soundcloud.create(masterConfig.soundcloud.que[0], ExternalAPI.soundcloud.pushQue);
-            util.removeRange(masterConfig.soundcloud.que, 0);
+        pushQueue: function() {
+          if (ExternalAPI.soundcloud.flags.queue.length > 0) {
+            ExternalAPI.soundcloud.create(ExternalAPI.soundcloud.flags.queue[0], ExternalAPI.soundcloud.pushQueue);
+            util.removeRange(ExternalAPI.soundcloud.flags.queue, 0);
           }
+        },
+        assetTest: function(asset, media, d) {
+          if (d) {
+            if (d.match("(player.)?soundcloud.com")) {
+              return {
+                id: d,
+                type: "soundcloud",
+                mediaType: ExternalAPI.soundcloud
+              };
+            }
+          }
+        },
+        thumbnail: function(media, uid) {
+          return "<div class='thumbnail thumb-audio'></div>";
+        },
+        createElement: function(media, loading_message) {
+          var mediaElem;
+
+          ExternalAPI.soundcloud.get(media);
+          return mediaElem = "<div class='media-frame media-shadow soundcloud' id='" + media.uid + "'>" + loading_message + "</div>";
         }
       },
       wikipedia: {
+        assetTest: function(asset, media, d) {
+          var wiki_id;
+
+          if (d) {
+            if (d.match("(www.)?wikipedia.org")) {
+              media.type = "wikipedia";
+              wiki_id = d.split("wiki/")[1].split("#")[0].replace("_", " ");
+              media.id = wiki_id.replace(" ", "%20");
+              media.lang = d.split("//")[1].split(".wikipedia")[0];
+              media.mediaType = ExternalAPI.wikipedia;
+              return media;
+            }
+          }
+        },
+        thumbnail: function(media, uid) {
+          return "<div class='thumbnail thumb-wikipedia'></div>";
+        },
+        createElement: function(media, loading_message) {
+          var mediaElem;
+
+          ExternalAPI.wikipedia.get(media);
+          return mediaElem = "<div class='wikipedia' id='" + media.uid + "'>" + loading_message + "</div>";
+        },
+        isTextMedia: true,
         get: function(m) {
-          masterConfig.wikipedia.que.push(m);
-          masterConfig.wikipedia.active = true;
+          ExternalAPI.wikipedia.flags.queue.push(m);
+          ExternalAPI.wikipedia.flags.active = true;
         },
         create: function(m, callback) {
           var callback_timeout, temp_text, the_url;
@@ -1093,30 +1240,33 @@
               }
             }
           }).error(function(jqXHR, textStatus, errorThrown) {
+            var _base;
+
             trace("WIKIPEDIA error");
             trace("WIKIPEDIA ERROR: " + textStatus + " " + jqXHR.responseText);
             trace(errorThrown);
             library.attachElement("#" + m.uid, library.loadingmessage("<p>Wikipedia is not responding</p>"));
             clearTimeout(callback_timeout);
-            if (masterConfig.wikipedia.tries < 4) {
-              trace("WIKIPEDIA ATTEMPT " + masterConfig.wikipedia.tries);
+            (_base = ExternalAPI.wikipedia.flags).tries || (_base.tries = 0);
+            if (ExternalAPI.wikipedia.flags.tries < 4) {
+              trace("WIKIPEDIA ATTEMPT " + ExternalAPI.wikipedia.flags.tries);
               trace(m);
-              masterConfig.wikipedia.tries++;
+              ExternalAPI.wikipedia.flags.tries++;
               ExternalAPI.wikipedia.create(m, callback);
             } else {
               callback();
             }
           }).success(function(d) {
-            masterConfig.wikipedia.tries = 0;
+            ExternalAPI.wikipedia.flags.tries = 0;
             clearTimeout(callback_timeout);
             callback();
           });
         },
-        pushQue: function() {
-          if (masterConfig.wikipedia.que.length > 0) {
-            trace("WIKIPEDIA PUSH QUE " + masterConfig.wikipedia.que.length);
-            ExternalAPI.wikipedia.create(masterConfig.wikipedia.que[0], ExternalAPI.wikipedia.pushQue);
-            util.removeRange(masterConfig.wikipedia.que, 0);
+        pushQueue: function() {
+          if (ExternalAPI.wikipedia.flags.queue.length > 0) {
+            trace("WIKIPEDIA PUSH QUE " + ExternalAPI.wikipedia.flags.queue.length);
+            ExternalAPI.wikipedia.create(ExternalAPI.wikipedia.flags.queue[0], ExternalAPI.wikipedia.pushQueue);
+            util.removeRange(ExternalAPI.wikipedia.flags.queue, 0);
           }
         }
       },
@@ -1125,9 +1275,9 @@
           var the_url;
 
           the_url = "//gdata.youtube.com/feeds/api/videos/" + m.id + "?v=2&alt=jsonc&callback=?";
-          masterConfig.youtube.que.push(m);
-          if (!masterConfig.youtube.active) {
-            if (!masterConfig.youtube.api_loaded) {
+          ExternalAPI.youtube.flags.queue.push(m);
+          if (!ExternalAPI.youtube.flags.active) {
+            if (!ExternalAPI.youtube.flags.api_loaded) {
               LoadLib.js("//www.youtube.com/player_api", function() {
                 trace("YouTube API Library Loaded");
               });
@@ -1181,7 +1331,7 @@
               onStateChange: ExternalAPI.youtube.onStateChange
             }
           });
-          masterConfig.youtube.array.push(p);
+          ExternalAPI.youtube.flags.array.push(p);
         },
         createThumb: function(d, m) {
           var thumb_id;
@@ -1194,27 +1344,27 @@
             library.attachElement(thumb_id, "<img src='" + d.data.thumbnail.sqDefault + "'>");
           }
         },
-        pushQue: function() {
+        pushQueue: function() {
           var i;
 
           i = 0;
-          while (i < masterConfig.youtube.que.length) {
-            ExternalAPI.youtube.create(masterConfig.youtube.que[i]);
+          while (i < ExternalAPI.youtube.flags.queue.length) {
+            ExternalAPI.youtube.create(ExternalAPI.youtube.flags.queue[i]);
             i++;
           }
-          masterConfig.youtube.que = [];
+          ExternalAPI.youtube.flags.queue = [];
         },
         onAPIReady: function() {
-          masterConfig.youtube.active = true;
-          ExternalAPI.youtube.pushQue();
+          ExternalAPI.youtube.flags.active = true;
+          ExternalAPI.youtube.pushQueue();
         },
         stopPlayers: function() {
           var i;
 
           i = 0;
-          while (i < masterConfig.youtube.array.length) {
-            if (masterConfig.youtube.array[i].playing) {
-              masterConfig.youtube.array[i].player[Object.keys(masterConfig.youtube.array[i].player)[0]].stopVideo();
+          while (i < ExternalAPI.youtube.flags.array.length) {
+            if (ExternalAPI.youtube.flags.array[i].playing) {
+              ExternalAPI.youtube.flags.array[i].player[Object.keys(ExternalAPI.youtube.flags.array[i].player)[0]].stopVideo();
             }
             i++;
           }
@@ -1223,12 +1373,12 @@
           var dontcrashjs2coffee, i;
 
           i = 0;
-          while (i < masterConfig.youtube.array.length) {
-            if (masterConfig.youtube.array[i].player[Object.keys(masterConfig.youtube.array[i].player)[0]] === e.target) {
+          while (i < ExternalAPI.youtube.flags.array.length) {
+            if (ExternalAPI.youtube.flags.array[i].player[Object.keys(ExternalAPI.youtube.flags.array[i].player)[0]] === e.target) {
               if (e.data === YT.PlayerState.PLAYING) {
-                masterConfig.youtube.array[i].playing = true;
-                trace(masterConfig.youtube.array[i].hd);
-                if (masterConfig.youtube.array[i].hd) {
+                ExternalAPI.youtube.flags.array[i].playing = true;
+                trace(ExternalAPI.youtube.flags.array[i].hd);
+                if (ExternalAPI.youtube.flags.array[i].hd) {
                   dontcrashjs2coffee = 0;
                 }
               }
@@ -1236,12 +1386,42 @@
             i++;
           }
         },
-        onPlayerReady: function(e) {}
+        onPlayerReady: function(e) {},
+        assetTest: function(asset, media, d) {
+          if (d) {
+            if (d.match("(www.)?youtube|youtu.be")) {
+              if (d.match("v=")) {
+                media.id = util.getUrlVars(d)["v"];
+              } else if (d.match("/embed/")) {
+                media.id = d.split("embed/")[1].split(/[?&]/)[0];
+              } else if (d.match(/v\/|v=|youtu\.be\//)) {
+                media.id = d.split(/v\/|v=|youtu\.be\//)[1].split(/[?&]/)[0];
+              } else {
+                trace("YOUTUBE IN URL BUT NOT A VALID VIDEO");
+              }
+              return $.extend(media, {
+                start: util.getUrlVars(d)["t"],
+                hd: util.getUrlVars(d)["hd"],
+                mediaType: ExternalAPI.youtube,
+                type: "youtube"
+              });
+            }
+          }
+        },
+        thumbnail: function(media, uid) {
+          return "<div class='thumbnail thumb-youtube' id='" + uid + "_thumb'></div>";
+        },
+        createElement: function(media, loading_message) {
+          var mediaElem;
+
+          ExternalAPI.youtube.get(media);
+          return mediaElem = "<div class='media-shadow'><div class='media-frame video youtube' id='" + media.uid + "'>" + loading_message + "</div></div>";
+        }
       },
       vimeo: {
         get: function(m) {
-          masterConfig.vimeo.que.push(m);
-          masterConfig.vimeo.active = true;
+          ExternalAPI.vimeo.flags.queue.push(m);
+          ExternalAPI.vimeo.flags.active = true;
         },
         create: function(m, callback) {
           var thumb_url, video_url;
@@ -1262,17 +1442,37 @@
           thumb_id = "#" + m.uid + "_thumb";
           library.attachElement(thumb_id, "<img src='" + d[0].thumbnail_small + "'>");
         },
-        pushQue: function() {
-          if (masterConfig.vimeo.que.length > 0) {
-            ExternalAPI.vimeo.create(masterConfig.vimeo.que[0], ExternalAPI.vimeo.pushQue);
-            util.removeRange(masterConfig.vimeo.que, 0);
+        pushQueue: function() {
+          if (ExternalAPI.vimeo.flags.queue.length > 0) {
+            ExternalAPI.vimeo.create(ExternalAPI.vimeo.flags.queue[0], ExternalAPI.vimeo.pushQueue);
+            util.removeRange(ExternalAPI.vimeo.flags.queue, 0);
           }
+        },
+        assetTest: function(asset, media, d) {
+          if (d) {
+            if (d.match("(player.)?vimeo.com")) {
+              return {
+                id: d.split(/video\/|\/\/vimeo\.com\//)[1].split(/[?&]/)[0],
+                mediaType: ExternalAPI.vimeo,
+                type: "vimeo"
+              };
+            }
+          }
+        },
+        thumbnail: function(media, uid) {
+          return "<div class='thumbnail thumb-vimeo' id='" + uid + "_thumb'></div>";
+        },
+        createElement: function(media, loading_message) {
+          var mediaElem;
+
+          ExternalAPI.vimeo.get(media);
+          return mediaElem = "<div class='media-shadow media-frame video vimeo' id='" + media.uid + "'>" + loading_message + "</div>";
         }
       },
       vine: {
         get: function(m) {
-          masterConfig.vine.que.push(m);
-          masterConfig.vine.active = true;
+          ExternalAPI.vine.flags.queue.push(m);
+          ExternalAPI.vine.flags.active = true;
         },
         create: function(m, callback) {
           var video_url;
@@ -1281,17 +1481,106 @@
           video_url = "https://vine.co/v/" + m.id + "/embed/simple";
           library.attachElement("#" + m.uid, "<iframe frameborder='0' width='100%' height='100%' src='" + video_url + "'></iframe><script async src='http://platform.vine.co/static/scripts/embed.js' charset='utf-8'></script>");
         },
-        pushQue: function() {
-          if (masterConfig.vine.que.length > 0) {
-            ExternalAPI.vine.create(masterConfig.vine.que[0], ExternalAPI.vine.pushQue);
-            util.removeRange(masterConfig.vine.que, 0);
+        pushQueue: function() {
+          if (ExternalAPI.vine.flags.queue.length > 0) {
+            ExternalAPI.vine.create(ExternalAPI.vine.flags.queue[0], ExternalAPI.vine.pushQueue);
+            util.removeRange(ExternalAPI.vine.flags.queue, 0);
           }
+        },
+        assetTest: function(asset, media, d) {
+          if (d) {
+            if (d.match("(www.)?vine.co")) {
+              trace("VINE");
+              if (d.match("vine.co/v/")) {
+                trace(d.split("vine.co/v/")[1]);
+                return {
+                  id: d.split("vine.co/v/")[1],
+                  type: "vine",
+                  mediaType: ExternalAPI.vine
+                };
+              } else {
+                return {
+                  type: "vine",
+                  mediaType: ExternalAPI.vine
+                };
+              }
+            }
+          }
+        },
+        thumbnail: function(media, uid) {
+          return "<div class='thumbnail thumb-vine'></div>";
+        },
+        createElement: function(media, loading_message) {
+          var mediaElem;
+
+          ExternalAPI.vine.get(media);
+          return mediaElem = "<div class='media-shadow media-frame video vine' id='" + media.uid + "'>" + loading_message + "</div>";
         }
       },
-      webthumb: {
+      dailymotion: {
+        assetTest: function(asset, media, d) {
+          if (d) {
+            if (d.match("(www.)?dailymotion.com")) {
+              return {
+                id: d.split(/video\/|\/\/dailymotion\.com\//)[1],
+                mediaType: ExternalAPI.dailymotion,
+                type: "dailymotion"
+              };
+            }
+          }
+        },
+        thumbnail: function(media, uid) {
+          return "<div class='thumbnail thumb-video'></div>";
+        },
+        createElement: function(media, loading_message) {
+          return "<div class='media-shadow'><iframe class='media-frame video dailymotion' autostart='false' frameborder='0' width='100%' height='100%' src='http://www.dailymotion.com/embed/video/" + media.id + "'></iframe></div>";
+        }
+      },
+      image: {
+        assetTest: function(asset, media, d) {
+          if (d) {
+            if (d.match(/jpg|jpeg|png|gif/i) || d.match("staticmap") || d.match("yfrog.com") || d.match("twitpic.com")) {
+              return $.extend(media, {
+                type: "image",
+                id: d,
+                mediaType: ExternalAPI.image
+              });
+            }
+          }
+        },
+        thumbnail: function(media, uid) {
+          return "<div class='thumbnail thumb-photo'></div>";
+        },
+        createElement: function(media, loading_message) {
+          if (media.id.match("https://")) {
+            media.id = media.id.replace("https://", "http://");
+          }
+          return "<div class='media-image media-shadow'><img src='" + media.id + "' class='media-image'></div>";
+        }
+      },
+      website: {
+        assetTest: function(asset, media, d) {
+          if (d) {
+            if (d.indexOf("http://") === 0) {
+              media.type = "website";
+              media.id = d;
+              media.mediaType = ExternalAPI.website;
+              return media;
+            }
+          }
+        },
+        thumbnail: function(media, uid) {
+          return "<div class='thumbnail thumb-website' id='" + uid + "_thumb'></div>";
+        },
+        createElement: function(media, loading_message) {
+          var mediaElem;
+
+          ExternalAPI.website.get(media);
+          return mediaElem = "<div class='media-shadow website' id='" + media.uid + "'>" + loading_message + "</div>";
+        },
         get: function(m, thumb) {
-          masterConfig.webthumb.que.push(m);
-          masterConfig.webthumb.active = true;
+          ExternalAPI.website.flags.queue.push(m);
+          ExternalAPI.website.flags.active = true;
         },
         sizes: function(s) {
           var _size;
@@ -1315,18 +1604,18 @@
           library.attachElement("#" + m.uid, "<a href='" + m.id + "' target='_blank'><img src='" + thumb_url + "size=x&url=" + url + "'></a>");
           library.attachElement("#" + m.uid + "_thumb", "<img src='" + thumb_url + "size=t&url=" + url + "'>");
         },
-        pushQue: function() {
+        pushQueue: function() {
           var i;
 
           i = 0;
-          while (i < masterConfig.webthumb.que.length) {
-            ExternalAPI.webthumb.create(masterConfig.webthumb.que[i]);
+          while (i < ExternalAPI.website.flags.queue.length) {
+            ExternalAPI.website.create(ExternalAPI.website.flags.queue[i]);
             i++;
           }
-          masterConfig.webthumb.que = [];
+          ExternalAPI.website.flags.queue = [];
         }
       }
-    }.init();
+    };
   });
 
 }).call(this);

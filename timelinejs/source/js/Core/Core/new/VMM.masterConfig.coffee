@@ -18,74 +18,9 @@
 			api: 7000
 
 		api:
-			pushques: []
+			pushqueues: []
 
-		twitter:
-			active: false
-			array: []
-			api_loaded: false
-			que: []
 
-		flickr:
-			active: false
-			array: []
-			api_loaded: false
-			que: []
 
-		youtube:
-			active: false
-			array: []
-			api_loaded: false
-			que: []
 
-		vimeo:
-			active: false
-			array: []
-			api_loaded: false
-			que: []
-
-		vine:
-			active: false
-			array: []
-			api_loaded: false
-			que: []
-
-		webthumb:
-			active: false
-			array: []
-			api_loaded: false
-			que: []
-
-		googlemaps:
-			active: false
-			map_active: false
-			places_active: false
-			array: []
-			api_loaded: false
-			que: []
-
-		googledocs:
-			active: false
-			array: []
-			api_loaded: false
-			que: []
-
-		googleplus:
-			active: false
-			array: []
-			api_loaded: false
-			que: []
-
-		wikipedia:
-			active: false
-			array: []
-			api_loaded: false
-			que: []
-			tries: 0
-
-		soundcloud:
-			active: false
-			array: []
-			api_loaded: false
-			que: []
 	).init()

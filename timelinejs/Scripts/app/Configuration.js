@@ -41,7 +41,7 @@
   require(["VMM.Timeline"], function(Timeline) {
     var timeline;
 
-    timeline = new Timeline('timeline', 1200, 500);
+    timeline = new Timeline('timeline', 1800, 800);
     return timeline.init({
       type: 'timeline',
       source: {
@@ -67,7 +67,7 @@
               "headline": "Sh*t Politicians Say",
               "text": "<p>In true political fashion, his character rattles off common jargon heard from people running for office.</p>",
               "asset": {
-                "media": "http://youtu.be/u4XpeU9erbg",
+                "media": "http://www.dailymotion.com/video/x1fudyl_2015-jeep-renegade_tech",
                 "credit": "",
                 "caption": ""
               }
@@ -76,18 +76,18 @@
               "headline": "Sh*t Nobody Says",
               "text": "<p>Have you ever heard someone say “can I burn a copy of your Nickelback CD?” or “my Bazooka gum still has flavor!” Nobody says that.</p>",
               "asset": {
-                "media": "http://youtu.be/f-x8t0JOnVw",
+                "media": "http://en.wikipedia.org/wiki/John_Bradshaw_(judge)",
                 "credit": "",
                 "caption": ""
               }
             }, {
               "startDate": "2012,1,26",
               "headline": "Sh*t Chicagoans Say",
-              "text": "",
+              "text": "<p>Have you ever heard someone say “can I burn a copy of your Nickelback CD?” or “my Bazooka gum still has flavor!” Nobody says that.</p>",
               "asset": {
-                "media": "http://youtu.be/Ofy5gNkKGOo",
-                "credit": "",
-                "caption": ""
+                "media": "http://www.bbc.co.uk/news/uk-england-hampshire-26504109",
+                "credit": "all credit to the bbc",
+                "caption": "a captioon gopes here"
               }
             }, {
               "startDate": "2011,12,12",

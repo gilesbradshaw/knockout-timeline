@@ -25,18 +25,18 @@ define [
 		preloaded = false
 		is_skinny = false
 		_enqueue = true
-		_removeque = false
+		_removequeue = false
 		_id = "slide_"
 		_class = 0
 		timer =
-			pushque: ""
+			pushqueue: ""
 			render: ""
 			relayout: ""
 			remove: ""
 			skinny: false
 
 		times =
-			pushque: 500
+			pushqueue: 500
 			render: 100
 			relayout: 100
 			remove: 30000
@@ -68,7 +68,7 @@ define [
 		@show = (skinny) ->
 			_enqueue = false
 			timer.skinny = skinny
-			_removeque = false
+			_removequeue = false
 			clearTimeout timer.remove
 			unless loaded
 				if preloaded
@@ -79,8 +79,8 @@ define [
 			return
 
 		@hide = ->
-			if loaded and not _removeque
-				_removeque = true
+			if loaded and not _removequeue
+				_removequeue = true
 				clearTimeout timer.remove
 				timer.remove = setTimeout(removeSlide, times.remove)
 			return
@@ -89,7 +89,7 @@ define [
 			
 			#clearTimeout(timer.remove);
 			clearTimeout timer.relayout
-			clearTimeout timer.pushque
+			clearTimeout timer.pushqueue
 			clearTimeout timer.render
 			return
 
@@ -144,9 +144,9 @@ define [
 			preloaded = true
 			timer.skinny = skinny
 			buildSlide()
-			clearTimeout timer.pushque
+			clearTimeout timer.pushqueue
 			clearTimeout timer.render
-			timer.pushque = setTimeout(ExternalAPI.pushQues, times.pushque)
+			timer.pushqueue = setTimeout(ExternalAPI.pushQueues, times.pushqueue)
 			return
 
 		removeSlide = ->

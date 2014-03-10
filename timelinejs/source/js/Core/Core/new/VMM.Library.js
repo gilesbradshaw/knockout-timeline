@@ -236,11 +236,11 @@
           }
         }
       },
-      animate: function(element, duration, ease, att, que, callback_function) {
-        var x, __duration, _att, _duration, _ease, _que, _tdd;
+      animate: function(element, duration, ease, att, queue, callback_function) {
+        var x, __duration, _att, _duration, _ease, _queue, _tdd;
 
         _ease = "easein";
-        _que = false;
+        _queue = false;
         _duration = 1000;
         _att = {};
         if (duration != null) {
@@ -253,8 +253,8 @@
         if ((ease != null) && ease !== "") {
           _ease = ease;
         }
-        if ((que != null) && que !== "") {
-          _que = que;
+        if ((queue != null) && queue !== "") {
+          _queue = queue;
         }
         if (att != null) {
           _att = att;
@@ -282,14 +282,14 @@
           if (typeof jQuery !== "undefined") {
             if ((callback_function != null) && callback_function !== "") {
               return jQuery(element).animate(_att, {
-                queue: _que,
+                queue: _queue,
                 duration: _duration,
                 easing: _ease,
                 complete: callback_function
               });
             } else {
               return jQuery(element).animate(_att, {
-                queue: _que,
+                queue: _queue,
                 duration: _duration,
                 easing: _ease
               });
@@ -439,7 +439,7 @@
         if ((cName != null) && cName !== "") {
           _class = cName;
         }
-        if ((content != null) && content !== "") {
+        if (content) {
           _content = content;
         }
         if (typeof jQuery !== "undefined") {
