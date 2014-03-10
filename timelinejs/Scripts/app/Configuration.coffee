@@ -2,11 +2,13 @@ requirejs.config
 	baseUrl:'/'
 	shim:
 		easing:["jquery"]
+		linq:["jquery"]
 		"bootstrap-tooltip":["jquery"]
 		
 	paths:
-
+		knockout: "Scripts/knockout-3.1.0.debug"
 		jquery: "Scripts/jquery-2.1.0"
+		linq: "Scripts/jquery.linq"
 		"trace":"/source/js/core/core/new/trace"
 		"global":"/source/js/core/core/new/global"
 		"Date.extensions":"/source/js/core/core/new/Date.extensions"
@@ -18,6 +20,8 @@ requirejs.config
 		"bootstrap-tooltip":"/source/js/core/Library/bootstrap-tooltip"
 		"leaflet":"/source/js/core/Library/leaflet"
 
+		"ko.easing":"/source/js/core/core/new/custombindings/easing"
+		"ko.importDates":"/source/js/core/core/new/custombindings/importDate"
 
 		"VMM.Browser":"/source/js/core/core/new/VMM.Browser"
 		"VMM.Date":"/source/js/core/core/new/VMM.Date"
@@ -50,15 +54,105 @@ requirejs.config
 
 require [
 	"VMM.Timeline"
-], (Timeline)->
+	"knockout"
+	"jquery"
+	"linq"
+	"ko.easing"
+	"ko.importDates"
+], (Timeline, ko, $)->
+	
+	tConfig= 
+		config: ko.observable
+			type:ko.observable 'timeline'
+			preload: ko.observable 4
+			current_slide:(()->
+				initial=ko.observable 0
+				ko.computed(
+					deferEvaluation:true
+					read:()->
+						if initial()> tConfig.timeline().dates().length
+							initial tConfig.timeline().dates().length
+						initial()
+					write: (x)->
+						initial x
+				)
+			)()
+			forward:()->
+				tConfig.config().current_slide tConfig.config().current_slide()+1
+			backward:()->
+				tConfig.config().current_slide tConfig.config().current_slide()-1
+
+			interval: ko.observable 10
+			something: ko.observable 0
+			width: ko.observable 1200
+			ease: ko.observable "easeInOutExpo"
+			duration: ko.observable 1000
+			timeline: ko.observable false
+			spacing: ko.observable 15
+			nav: ko.observable
+				height:ko.observable 200
+			
+			slider: ko.observable
+				height: ko.observable 600
+				
+				content:ko.observable
+					width: ko.observable 720
+					height: ko.observable 400
+					padding: ko.observable 120
+					padding_default: ko.observable 120
+
+				nav:ko.observable
+					width: ko.observable 100
+					height: ko.observable 200
+
+			touch:ko.observable()
+			language: ko.observable
+				right_to_left:ko.observable()
+		timeline:ko.observable
+			headline:ko.observable "Sh*t People Say"
+			type:ko.observable "default"
+			text:ko.observable "People say stuff"
+			startDate:ko.observable "2012,1,26"
+
+			dates:ko.observableArray [
+					startDate:ko.observable "2011,12,12"
+					endDate:ko.observable "2012,1,27"
+					headline:ko.observable "Vine"
+					text:ko.observable "<p>Vine Test</p>"
+					asset:ko.observable
+						media:ko.observable "https://vine.co/v/b55LOA1dgJU"
+						credit:ko.observable ""
+						caption:ko.observable ""
+				,
+					startDate:ko.observable "2011,12,13"
+					endDate:ko.observable "2012,1,28"
+					headline:ko.observable "Vine#2"
+					text:ko.observable "<p>Vine Test</p>"
+					asset:ko.observable
+						media:ko.observable "https://vine.co/v/b55LOA1dgJU"
+						credit:ko.observable ""
+						caption:ko.observable ""
+				]
+		
+
+	$(document).ready -> 
+		ko.applyBindings tConfig
+		tConfig.timeline().dates.push
+			startDate:ko.observable "2011,12,12"
+			endDate:ko.observable "2012,1,27"
+			headline:ko.observable "Vine#3"
+			text:ko.observable "<p>Vine Test</p>"
+			asset:ko.observable
+				media:ko.observable "https://vine.co/v/b55LOA1dgJU"
+				credit:ko.observable ""
+				caption:ko.observable ""
+	#return
 	timeline = new Timeline 'timeline', 1800,800
 
 	timeline.init
 		type:'timeline'
 		source:
-
-
-
+	
 			"timeline":
 				"headline":"Sh*t People Say",
 				"type":"default",

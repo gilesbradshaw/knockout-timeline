@@ -106,64 +106,12 @@
 	ExternalAPI.addMediaType "wikipedia",ExternalAPI.wikipedia
 	ExternalAPI.addMediaType "website",ExternalAPI.website
 		
-	ExternalAPI.addMediaType "storify",
-		assetTest:(asset,media, d)->
-			if d
-				if d.match("storify")
-					media.type = "storify"
-					media.id = d
-					media.mediaType = ExternalAPI.storify
-					media
-		thumbnail:(media, uid)->
-			"<div class='thumbnail thumb-storify'></div>"
-		createElement:(media,loading_message)->
-			"<div class='plain-text-quote'>" + media.id + "</div>"
-		isTextMedia:true
-	ExternalAPI.addMediaType "blockquote",
-		assetTest:(asset,media, d)->
-			if d
-				if d.match("blockquote")
-					media.type = "quote"
-					media.id = d
-					media.mediaType = ExternalAPI.blockquote
-					media
-		thumbnail:(media, uid)->
-			"<div class='thumbnail thumb-quote'></div>"
-		createElement:(media,loading_message)->
-			"<div class='plain-text-quote'>" + media.id + "</div>"
-		isTextMedia:true
-	ExternalAPI.addMediaType "iframe",
-		assetTest:(asset,media, d)->
-			if d
-				if d.match("iframe")
-					media.type = "iframe"
-					trace "IFRAME"
-					regex = /src=['"](\S+?)['"]\s/
-					group = d.match(regex)
-					media.id = group[1]    if group
-					media.mediaType = ExternalAPI.iframe
-					trace "iframe url: " + media.id
-					if Boolean(media.id)
-						media
-					else
-						false
-		thumbnail:(media, uid)->
-			"<div class='thumbnail thumb-video'></div>"
-		createElement:(media,loading_message)->
-			"<div class='media-shadow'><iframe class='media-frame video' autostart='false' frameborder='0' width='100%' height='100%' src='" + media.id + "'></iframe></div>"
-		isTextMedia:true
-	ExternalAPI.setUnknownMediaType "unknown",
-		assetTest:(asset,media, d)->
-			if d
-				trace "unknown media"
-				$.extend media,
-					type:"unknown"
-					id:d
-					mediaType:unknownMediaType
-		thumbnail:(media, uid)->
-			"<div class='thumbnail thumb-plaintext'></div>"
-		createElement:(media,loading_message)->
-			trace "NO KNOWN MEDIA TYPE FOUND TRYING TO JUST PLACE THE HTML"
-			"<div class='plain-text'><div class='container'>" + util.properQuotes(media.id) + "</div></div>"
-		isTextMedia:true
+	ExternalAPI.addMediaType "storify",ExternalAPI.storify
+		
+	ExternalAPI.addMediaType "blockquote",ExternalAPI.blockquote
+		
+	ExternalAPI.addMediaType "iframe",ExternalAPI.iframe
+
+	ExternalAPI.setUnknownMediaType "unknown",ExternalAPI.unknown
+		
 

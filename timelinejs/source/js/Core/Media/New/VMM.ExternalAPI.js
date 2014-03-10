@@ -1558,6 +1558,95 @@
           return "<div class='media-image media-shadow'><img src='" + media.id + "' class='media-image'></div>";
         }
       },
+      storify: {
+        assetTest: function(asset, media, d) {
+          if (d) {
+            if (d.match("storify")) {
+              media.type = "storify";
+              media.id = d;
+              media.mediaType = ExternalAPI.storify;
+              return media;
+            }
+          }
+        },
+        thumbnail: function(media, uid) {
+          return "<div class='thumbnail thumb-storify'></div>";
+        },
+        createElement: function(media, loading_message) {
+          return "<div class='plain-text-quote'>" + media.id + "</div>";
+        },
+        isTextMedia: true
+      },
+      blockquote: {
+        assetTest: function(asset, media, d) {
+          if (d) {
+            if (d.match("blockquote")) {
+              media.type = "quote";
+              media.id = d;
+              media.mediaType = ExternalAPI.blockquote;
+              return media;
+            }
+          }
+        },
+        thumbnail: function(media, uid) {
+          return "<div class='thumbnail thumb-quote'></div>";
+        },
+        createElement: function(media, loading_message) {
+          return "<div class='plain-text-quote'>" + media.id + "</div>";
+        },
+        isTextMedia: true
+      },
+      iframe: {
+        assetTest: function(asset, media, d) {
+          var group, regex;
+
+          if (d) {
+            if (d.match("iframe")) {
+              media.type = "iframe";
+              trace("IFRAME");
+              regex = /src=['"](\S+?)['"]\s/;
+              group = d.match(regex);
+              if (group) {
+                media.id = group[1];
+              }
+              media.mediaType = ExternalAPI.iframe;
+              trace("iframe url: " + media.id);
+              if (Boolean(media.id)) {
+                return media;
+              } else {
+                return false;
+              }
+            }
+          }
+        },
+        thumbnail: function(media, uid) {
+          return "<div class='thumbnail thumb-video'></div>";
+        },
+        createElement: function(media, loading_message) {
+          return "<div class='media-shadow'><iframe class='media-frame video' autostart='false' frameborder='0' width='100%' height='100%' src='" + media.id + "'></iframe></div>";
+        },
+        isTextMedia: true
+      },
+      unknown: {
+        assetTest: function(asset, media, d) {
+          if (d) {
+            trace("unknown media");
+            return $.extend(media, {
+              type: "unknown",
+              id: d,
+              mediaType: unknownMediaType
+            });
+          }
+        },
+        thumbnail: function(media, uid) {
+          return "<div class='thumbnail thumb-plaintext'></div>";
+        },
+        createElement: function(media, loading_message) {
+          trace("NO KNOWN MEDIA TYPE FOUND TRYING TO JUST PLACE THE HTML");
+          return "<div class='plain-text'><div class='container'>" + util.properQuotes(media.id) + "</div></div>";
+        },
+        isTextMedia: true
+      },
       website: {
         assetTest: function(asset, media, d) {
           if (d) {
