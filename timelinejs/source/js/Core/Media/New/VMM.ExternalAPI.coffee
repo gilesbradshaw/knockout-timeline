@@ -190,6 +190,8 @@
 define [
 	"global"
 	"trace"
+	"type"
+	"knockout"
 	"VMM.LoadLib"
 	"VMM.Browser"
 	"VMM.Date"
@@ -197,10 +199,11 @@ define [
 	"VMM.Util"
 	"VMM.masterConfig"
 	"VMM.FileExtension"
-], (global,trace, LoadLib, browser, vDate, library, util, masterConfig, fileExtension)->
+	"VMM.Language"
+], (global,trace, type, ko, LoadLib, browser, vDate, library, util, masterConfig, fileExtension, language)->
 	global.onYouTubePlayerAPIReady = ->
 		trace "GLOBAL YOUTUBE API CALLED"
-		ExternalAPI.youtube.onAPIReady()
+		#ExternalAPI.youtube.onAPIReady()
 		return
 
 	ExternalAPI = 
@@ -215,17 +218,18 @@ define [
 			createElement:(media,loading_message)->
 				media.id
 			isTextMedia:true
+			linkify:(text)->
+				util.linkify_with_twitter text, "_blank"
 
 		twitter:
+			linkify:(text)->
+				util.linkify_with_twitter text, "_blank"
 			tweetArray: []
 			get: (m) ->
 				tweet =
 					mid: m.id
 					id: m.uid
 
-				ExternalAPI.twitter.flags.queue.push tweet
-				ExternalAPI.twitter.flags.active = true
-				return
 
 			create: (tweet, callback) ->
 				id = tweet.mid.toString()
@@ -256,11 +260,6 @@ define [
 				library.attachElement "#" + tweet.id.toString(), library.loadingmessage("Still waiting on Twitter: " + tweet.mid)
 				return
 
-			pushQueue: ->
-				if ExternalAPI.twitter.flags.queue.length > 0
-					ExternalAPI.twitter.create ExternalAPI.twitter.flags.queue[0], ExternalAPI.twitter.pushQueue
-					util.removeRange ExternalAPI.twitter.flags.queue, 0
-				return
 
 			getOEmbed: (tweet, callback) ->
 				the_url = "//api.twitter.com/1/statuses/oembed.json?id=" + tweet.mid + "&omit_script=true&include_entities=true&callback=?"
@@ -432,6 +431,8 @@ define [
 				mediaElem = "<div class='twitter' id='" + media.uid + "'>" + loading_message + "</div>"
 			isTextMedia:true
 		googlemaps:
+			linkify:(text)->
+				util.linkify_with_twitter text, "_blank"
 			assetTest:(asset,media, d)->
 				if d
 					if d.match("maps.google") and not d.match("staticmap")
@@ -464,15 +465,10 @@ define [
 					api_key = Aes.Ctr.decrypt(ExternalAPI.keys_master.google, ExternalAPI.keys_master.vp, 256)
 				map_url = "//maps.googleapis.com/maps/api/js?key=" + api_key + "&v=3.9&libraries=places&sensor=false&callback=ExternalAPI.googlemaps.onMapAPIReady"
 				if ExternalAPI.googlemaps.flags.active
-					ExternalAPI.googlemaps.flags.queue.push m
 				else
-					ExternalAPI.googlemaps.flags.queue.push m
-					if ExternalAPI.googlemaps.flags.api_loaded
-						dontcrashjs2coffee = 0
-					else
-						LoadLib.js map_url, ->
-							trace "Google Maps API Library Loaded"
-							return
+					LoadLib.js map_url, ->
+						trace "Google Maps API Library Loaded"
+						return
 
 				return
 
@@ -767,14 +763,7 @@ define [
 					geocodePlace()    if type.of(util.getUrlVars(m.id)["q"]) is "string"
 				return
 
-			pushQueue: ->
-				i = 0
-
-				while i < ExternalAPI.googlemaps.flags.queue.length
-					ExternalAPI.googlemaps.create ExternalAPI.googlemaps.flags.queue[i]
-					i++
-				ExternalAPI.googlemaps.flags.queue = []
-				return
+			
 
 			onMapAPIReady: ->
 				ExternalAPI.googlemaps.flags.map_active = true
@@ -791,7 +780,7 @@ define [
 				unless ExternalAPI.googlemaps.flags.active
 					if ExternalAPI.googlemaps.flags.map_active and ExternalAPI.googlemaps.flags.places_active
 						ExternalAPI.googlemaps.flags.active = true
-						ExternalAPI.googlemaps.pushQueue()
+						
 				return
 
 			defaultType: (name) ->
@@ -849,6 +838,8 @@ define [
 					attribution: "stamen"
 
 		googleplus:
+			linkify:(text)->
+				util.linkify_with_twitter text, "_blank"
 			assetTest:(asset,media, d)->
 				if d
 					if d.match("plus.google")
@@ -862,6 +853,7 @@ define [
 							media.user = d.split("u/0/")[1].split("/posts")[0]
 						else
 							media.user = d.split("google.com/")[1].split("/posts/")[0]
+						media
 			thumbnail:(media, uid)->
 				"<div class='thumbnail thumb-googleplus'></div>"
 			createElement:(media,loading_message)->
@@ -870,17 +862,8 @@ define [
 			isTextMedia:true
 
 			get: (m) ->
-				api_key = undefined
-				gplus =
-					user: m.user
-					activity: m.id
-					id: m.uid
 
-				ExternalAPI.googleplus.flags.queue.push gplus
-				ExternalAPI.googleplus.flags.active = true
-				return
-
-			create: (gplus, callback) ->
+			create: (gplus) ->
 				mediaElem = ""
 				api_key = ""
 				g_activity = ""
@@ -889,12 +872,11 @@ define [
 				gperson_api_url = undefined
 				gactivity_api_url = undefined
 				googleplus_timeout = setTimeout(ExternalAPI.googleplus.errorTimeOut, masterConfig.timers.api, gplus)
-				callback_timeout = setTimeout(callback, masterConfig.timers.api, gplus)
-
-				unless masterConfig.Timeline.api_keys.google is ""
-					api_key = masterConfig.Timeline.api_keys.google
-				else
-					api_key = Aes.Ctr.decrypt(masterConfig.api_keys_master.google, masterConfig.vp, 256)
+				
+				#unless masterConfig.Timeline.api_keys.google is ""
+				#	api_key = masterConfig.Timeline.api_keys.google
+				#else
+				api_key = Aes.Ctr.decrypt(masterConfig.api_keys_master.google, masterConfig.vp, 256)
 				gperson_api_url = "https://www.googleapis.com/plus/v1/people/" + gplus.user + "/activities/public?alt=json&maxResults=100&fields=items(id,url)&key=" + api_key
 				mediaElem = "GOOGLE PLUS API CALL"
 				library.getJSON(gperson_api_url, (p_data) ->
@@ -902,7 +884,7 @@ define [
 
 					while i < p_data.items.length
 						trace "loop"
-						if p_data.items[i].url.split("posts/")[1] is gplus.activity
+						if p_data.items[i].url.split("posts/")[1] is gplus.id
 							trace "FOUND IT!!"
 							g_activity = p_data.items[i].id
 							gactivity_api_url = "https://www.googleapis.com/plus/v1/activities/" + g_activity + "?alt=json&key=" + api_key
@@ -930,7 +912,8 @@ define [
 											g_attachments += "<div>"
 											g_attachments += "<a href='" + a_data.object.attachments[k].url + "' target='_blank'>"
 											g_attachments += "<h5>" + a_data.object.attachments[k].displayName + "</h5>"
-											g_attachments += "<p>" + a_data.object.attachments[k].content + "</p>"
+											if a_data.object.attachments[k].content
+												g_attachments += "<p>" + a_data.object.attachments[k].content + "</p>"
 											g_attachments += "</a>"
 											g_attachments += "</div>"
 										trace a_data.object.attachments[k]
@@ -942,7 +925,7 @@ define [
 								mediaElem += "<span class='fn'>" + a_data.actor.displayName + "</span>"
 								mediaElem += "<span class='nickname'><span class='thumbnail-inline'></span></span>"
 								mediaElem += "</a></div>"
-								library.attachElement "#googleplus_" + gplus.activity, mediaElem
+								library.attachElement "#googleplus_" + gplus.id, mediaElem
 								return
 
 							break
@@ -951,28 +934,23 @@ define [
 				).error((jqXHR, textStatus, errorThrown) ->
 					error_obj = library.parseJSON(jqXHR.responseText)
 					trace error_obj.error.message
-					library.attachElement "#googleplus_" + gplus.activity, library.loadingmessage("<p>ERROR LOADING GOOGLE+ </p><p>" + error_obj.error.message + "</p>")
+					library.attachElement "#googleplus_" + gplus.id, library.loadingmessage("<p>ERROR LOADING GOOGLE+ </p><p>" + error_obj.error.message + "</p>")
 					return
 				).success (d) ->
 					clearTimeout googleplus_timeout
-					clearTimeout callback_timeout
-					callback()
 					return
 
 				return
 
-			pushQueue: ->
-				if ExternalAPI.googleplus.flags.queue.length > 0
-					ExternalAPI.googleplus.create ExternalAPI.googleplus.flags.queue[0], ExternalAPI.googleplus.pushQueue
-					util.removeRange ExternalAPI.googleplus.flags.queue, 0
-				return
 
 			errorTimeOut: (gplus) ->
-				trace "GOOGLE+ JSON ERROR TIMEOUT " + gplus.activity
-				library.attachElement "#googleplus_" + gplus.activity, library.loadingmessage("<p>Still waiting on GOOGLE+ </p><p>" + gplus.activity + "</p>")
+				trace "GOOGLE+ JSON ERROR TIMEOUT " + gplus.id
+				library.attachElement "#googleplus_" + gplus.id, library.loadingmessage("<p>Still waiting on GOOGLE+ </p><p>" + gplus.activity + "</p>")
 				return
 
 		googledocs:
+			linkify:(text)->
+				util.linkify_with_twitter text, "_blank"
 			assetTest:(asset,media, d)->
 				if d
 					if fileExtension.googleDocType(d)
@@ -986,9 +964,6 @@ define [
 				ExternalAPI.googledocs.get media
 				mediaElem = "<div class='media-frame media-shadow doc' id='" + media.uid + "'>" + loading_message + "</div>"
 			get: (m) ->
-				ExternalAPI.googledocs.flags.queue.push m
-				ExternalAPI.googledocs.flags.active = true
-				return
 
 			create: (m) ->
 				mediaElem = ""
@@ -999,16 +974,10 @@ define [
 				library.attachElement "#" + m.uid, mediaElem
 				return
 
-			pushQueue: ->
-				i = 0
-
-				while i < ExternalAPI.googledocs.flags.queue.length
-					ExternalAPI.googledocs.create ExternalAPI.googledocs.flags.queue[i]
-					i++
-				ExternalAPI.googledocs.flags.queue = []
-				return
 
 		flickr:
+			linkify:(text)->
+				util.linkify_with_twitter text, "_blank"
 			assetTest:(asset,media, d)->
 				if d
 					if d.match("flickr.com/photos/")
@@ -1022,17 +991,19 @@ define [
 							false
 			thumbnail:(media, uid)->
 				"<div class='thumbnail thumb-photo' id='" + uid + "_thumb'></div>"
-			createElement:(media,loading_message)->
+			createElement:(media,loading_message, configuration)->
+				
 				ExternalAPI.flickr.get media
 				mediaElem = "<div class='media-image media-shadow'><a href='" + media.link + "' target='_blank'><img id='" + media.uid + "'></a></div>"
 			get: (m) ->
-				ExternalAPI.flickr.flags.queue.push m
-				ExternalAPI.flickr.flags.active = true
-				return
-
-			create: (m, callback) ->
+			
+			create: (m, configuration) ->
+				size=1000
+				if c= ko.unwrap(configuration)
+					if c= ko.unwrap c.slider
+						if c=ko.unwrap c.content
+							size =  ko.unwrap(c.height) or 1000
 				api_key = undefined
-				callback_timeout = setTimeout(callback, masterConfig.timers.api, m)
 				if typeof masterConfig.Timeline isnt "undefined" and masterConfig.Timeline.api_keys.flickr isnt ""
 					api_key = masterConfig.Timeline.api_keys.flickr
 				else
@@ -1046,7 +1017,7 @@ define [
 					flickr_img_thumb = undefined
 					flickr_size_found = false
 					flickr_best_size = "Large"
-					flickr_best_size = ExternalAPI.flickr.sizes(masterConfig.sizes.api.height)
+					flickr_best_size = ExternalAPI.flickr.sizes(size)
 					i = 0
 
 					while i < d.sizes.size.length
@@ -1064,18 +1035,9 @@ define [
 					trace "FLICKR ERROR: " + textStatus + " " + jqXHR.responseText
 					return
 				).success (d) ->
-					clearTimeout callback_timeout
-					callback()
 					return
 
 				return
-
-			pushQueue: ->
-				if ExternalAPI.flickr.flags.queue.length > 0
-					ExternalAPI.flickr.create ExternalAPI.flickr.flags.queue[0], ExternalAPI.flickr.pushQueue
-					util.removeRange ExternalAPI.flickr.flags.queue, 0
-				return
-
 			sizes: (s) ->
 				_size = ""
 				if s <= 75
@@ -1104,6 +1066,8 @@ define [
 				photo_info.split("/")[1]
 
 		instagram:
+			linkify:(text)->
+				util.linkify_with_twitter text, "_blank"
 			assetTest:(asset,media, d)->
 				if d
 					if ExternalAPI.instagram.isInstagramUrl(d)
@@ -1117,13 +1081,18 @@ define [
 							false
 			thumbnail:(media, uid)->
 				"<div class='thumbnail thumb-instagram' id='" + uid + "_thumb'><img src='" + ExternalAPI.instagram.get(media, true) + "'></div>"
-			createElement:(media,loading_message)->
-				"<div class='media-image media-shadow'><a href='" + media.link + "' target='_blank'><img src='" + ExternalAPI.instagram.get(media) + "'></a></div>"
-			get: (m, thumb) ->
+			createElement:(media,loading_message, configuration)->
+				size = 1000
+				if c= ko.unwrap(configuration)
+					if c= ko.unwrap c.slider
+						if c=ko.unwrap c.content
+							size =  ko.unwrap(c.height) or 1000
+				"<div class='media-image media-shadow'><a href='" + media.link + "' target='_blank'><img src='" + ExternalAPI.instagram.get(media, false, size) + "'></a></div>"
+			get: (m, thumb, size) ->
 				if thumb
 					"//instagr.am/p/" + m.id + "/media/?size=t"
 				else
-					"//instagr.am/p/" + m.id + "/media/?size=" + ExternalAPI.instagram.sizes(masterConfig.sizes.api.height)
+					"//instagr.am/p/" + m.id + "/media/?size=" + ExternalAPI.instagram.sizes(size)
 
 			sizes: (s) ->
 				_size = ""
@@ -1147,25 +1116,19 @@ define [
 				return
 
 		soundcloud:
+			linkify:(text)->
+				util.linkify_with_twitter text, "_blank"
 			get: (m) ->
-				ExternalAPI.soundcloud.flags.queue.push m
-				ExternalAPI.soundcloud.flags.active = true
 				return
 
-			create: (m, callback) ->
+			create: (m) ->
 				the_url = "//soundcloud.com/oembed?url=" + m.id + "&format=js&callback=?"
 				library.getJSON the_url, (d) ->
 					library.attachElement "#" + m.uid, d.html
-					callback()
 					return
 
 				return
 
-			pushQueue: ->
-				if ExternalAPI.soundcloud.flags.queue.length > 0
-					ExternalAPI.soundcloud.create ExternalAPI.soundcloud.flags.queue[0], ExternalAPI.soundcloud.pushQueue
-					util.removeRange ExternalAPI.soundcloud.flags.queue, 0
-				return
 			assetTest:(asset,media, d)->
 				if d
 					if d.match("(player.)?soundcloud.com")
@@ -1179,6 +1142,8 @@ define [
 				mediaElem = "<div class='media-frame media-shadow soundcloud' id='" + media.uid + "'>" + loading_message + "</div>"
 
 		wikipedia:
+			linkify:(text)->
+				util.linkify_with_twitter text, "_blank"
 			assetTest:(asset,media, d)->
 				if d
 					if d.match("(www.)?wikipedia.org")
@@ -1198,16 +1163,13 @@ define [
 			isTextMedia:true
 
 			get: (m) ->
-				ExternalAPI.wikipedia.flags.queue.push m
-				ExternalAPI.wikipedia.flags.active = true
-				return
 
-			create: (m, callback) ->
+			create: (m) ->
 				the_url = "//" + m.lang + ".wikipedia.org/w/api.php?action=query&prop=extracts&redirects=&titles=" + m.id + "&exintro=1&format=json&callback=?"
-				callback_timeout = setTimeout(callback, masterConfig.timers.api, m)
+				#callback_timeout = setTimeout(callback, masterConfig.timers.api, m)
 				if browser.browser is "Explorer" and parseInt(browser.version, 10) >= 7 and window.XDomainRequest
-					temp_text = "<h4><a href='http://" + masterConfig.language.api.wikipedia + ".wikipedia.org/wiki/" + m.id + "' target='_blank'>" + m.url + "</a></h4>"
-					temp_text += "<span class='wiki-source'>" + masterConfig.language.messages.wikipedia + "</span>"
+					temp_text = "<h4><a href='http://" + language.api.wikipedia + ".wikipedia.org/wiki/" + m.id + "' target='_blank'>" + m.url + "</a></h4>"
+					temp_text += "<span class='wiki-source'>" + language.messages.wikipedia + "</span>"
 					temp_text += "<p>Wikipedia entry unable to load using Internet Explorer 8 or below.</p>"
 					library.attachElement "#" + m.uid, temp_text
 				library.getJSON(the_url, (d) ->
@@ -1229,8 +1191,8 @@ define [
 						while i < wiki_text_array.length
 							wiki_text += "<p>" + wiki_text_array[i + 1]    if i + 1 <= wiki_number_of_paragraphs and i + 1 < wiki_text_array.length
 							i++
-						_wiki = "<h4><a href='http://" + masterConfig.language.api.wikipedia + ".wikipedia.org/wiki/" + wiki_title + "' target='_blank'>" + wiki_title + "</a></h4>"
-						_wiki += "<span class='wiki-source'>" + masterConfig.language.messages.wikipedia + "</span>"
+						_wiki = "<h4><a href='http://" + language.api.wikipedia + ".wikipedia.org/wiki/" + wiki_title + "' target='_blank'>" + wiki_title + "</a></h4>"
+						_wiki += "<span class='wiki-source'>" + language.messages.wikipedia + "</span>"
 						_wiki += util.linkify_wikipedia(wiki_text)
 						if wiki_extract.match("REDIRECT")
 							don = undefined
@@ -1243,40 +1205,35 @@ define [
 					trace "WIKIPEDIA ERROR: " + textStatus + " " + jqXHR.responseText
 					trace errorThrown
 					library.attachElement "#" + m.uid, library.loadingmessage("<p>Wikipedia is not responding</p>")
-					clearTimeout callback_timeout
+					#clearTimeout callback_timeout
 					ExternalAPI.wikipedia.flags.tries or=0
 					if ExternalAPI.wikipedia.flags.tries < 4
 						trace "WIKIPEDIA ATTEMPT " + ExternalAPI.wikipedia.flags.tries
 						trace m
 						ExternalAPI.wikipedia.flags.tries++
-						ExternalAPI.wikipedia.create m, callback
-					else
-						callback()
+						ExternalAPI.wikipedia.create m
 					return
 				).success (d) ->
 					ExternalAPI.wikipedia.flags.tries = 0
-					clearTimeout callback_timeout
-					callback()
 					return
 
 				return
 
-			pushQueue: ->
-				if ExternalAPI.wikipedia.flags.queue.length > 0
-					trace "WIKIPEDIA PUSH QUE " + ExternalAPI.wikipedia.flags.queue.length
-					ExternalAPI.wikipedia.create ExternalAPI.wikipedia.flags.queue[0], ExternalAPI.wikipedia.pushQueue
-					util.removeRange ExternalAPI.wikipedia.flags.queue, 0
-				return
 
 		youtube:
+			linkify:(text)->
+				util.linkify_with_twitter text, "_blank"
 			get: (m) ->
 				the_url = "//gdata.youtube.com/feeds/api/videos/" + m.id + "?v=2&alt=jsonc&callback=?"
-				ExternalAPI.youtube.flags.queue.push m
-				unless ExternalAPI.youtube.flags.active
-					unless ExternalAPI.youtube.flags.api_loaded
-						LoadLib.js "//www.youtube.com/player_api", ->
-							trace "YouTube API Library Loaded"
-							return
+				unless ExternalAPI.youtube.flags.api_loading
+					ExternalAPI.youtube.flags.api_loading=true
+					deferred = $.Deferred()
+					ExternalAPI.youtube.flags.apiPromise= deferred.promise()
+					LoadLib.js "//www.youtube.com/player_api", ->
+						trace "YouTube API Library Loaded"
+						YT.ready ()->
+							deferred.resolve()
+						
 
 				library.getJSON the_url, (d) ->
 					ExternalAPI.youtube.createThumb d, m
@@ -1285,44 +1242,50 @@ define [
 				return
 
 			create: (m) ->
-				unless typeof (m.start) is "undefined"
-					vidstart = m.start.toString()
-					vid_start_minutes = 0
-					vid_start_seconds = 0
-					if vidstart.match("m")
-						vid_start_minutes = parseInt(vidstart.split("m")[0], 10)
-						vid_start_seconds = parseInt(vidstart.split("m")[1].split("s")[0], 10)
-						m.start = (vid_start_minutes * 60) + vid_start_seconds
-					else
-						m.start = 0
-				else
-					m.start = 0
-				p =
-					active: false
-					player: {}
-					name: m.uid
-					playing: false
-					hd: false
+				ExternalAPI.youtube.flags.apiPromise.done ()->
+					if !m.player
+						unless typeof (m.start) is "undefined"
+							vidstart = m.start.toString()
+							vid_start_minutes = 0
+							vid_start_seconds = 0
+							if vidstart.match("m")
+								vid_start_minutes = parseInt(vidstart.split("m")[0], 10)
+								vid_start_seconds = parseInt(vidstart.split("m")[1].split("s")[0], 10)
+								m.start = (vid_start_minutes * 60) + vid_start_seconds
+							else
+								m.start = 0
+						else
+							m.start = 0
+						m.player = p =
+							active: false
+							player: {}
+							name: m.uid
+							playing: false
+							hd: false
 
-				p.hd = true    unless typeof (m.hd) is "undefined"
-				p.player[m.id] = new YT.Player(m.uid,
-					height: "390"
-					width: "640"
-					playerVars:
-						enablejsapi: 1
-						color: "white"
-						showinfo: 0
-						theme: "light"
-						start: m.start
-						rel: 0
+						p.hd = true    unless typeof (m.hd) is "undefined"
+						p.player[m.id] = new YT.Player(m.uid,
+							height: "100%"
+							width: "100%"
+							playerVars:
+								enablejsapi: 1
+								color: "white"
+								showinfo: 0
+								theme: "light"
+								start: m.start
+								rel: 0
 
-					videoId: m.id
-					events:
-						onReady: ExternalAPI.youtube.onPlayerReady
-						onStateChange: ExternalAPI.youtube.onStateChange
-				)
-				ExternalAPI.youtube.flags.array.push p
-				return
+							videoId: m.id
+							events:
+								onReady:->
+								onStateChange:(e)->
+									m.player.playing = e.data is YT.PlayerState.PLAYING
+						)
+					return
+			stop:(m)->
+				if m.player
+					if m.player.player[m.id].stopVideo
+						m.player.player[m.id].stopVideo()
 
 			createThumb: (d, m) ->
 				trace "CREATE THUMB"
@@ -1332,43 +1295,6 @@ define [
 					thumb_id = "#" + m.uid + "_thumb"
 					library.attachElement thumb_id, "<img src='" + d.data.thumbnail.sqDefault + "'>"
 				return
-
-			pushQueue: ->
-				i = 0
-
-				while i < ExternalAPI.youtube.flags.queue.length
-					ExternalAPI.youtube.create ExternalAPI.youtube.flags.queue[i]
-					i++
-				ExternalAPI.youtube.flags.queue = []
-				return
-
-			onAPIReady: ->
-				ExternalAPI.youtube.flags.active = true
-				ExternalAPI.youtube.pushQueue()
-				return
-
-			stopPlayers: ->
-				i = 0
-
-				while i < ExternalAPI.youtube.flags.array.length
-					if ExternalAPI.youtube.flags.array[i].playing
-						ExternalAPI.youtube.flags.array[i].player[Object.keys(ExternalAPI.youtube.flags.array[i].player)[0]].stopVideo()
-					i++
-				return
-
-			onStateChange: (e) ->
-				i = 0
-
-				while i < ExternalAPI.youtube.flags.array.length
-					if ExternalAPI.youtube.flags.array[i].player[Object.keys(ExternalAPI.youtube.flags.array[i].player)[0]] is e.target
-						if e.data is YT.PlayerState.PLAYING
-							ExternalAPI.youtube.flags.array[i].playing = true
-							trace ExternalAPI.youtube.flags.array[i].hd
-							dontcrashjs2coffee = 0    if ExternalAPI.youtube.flags.array[i].hd
-					i++
-				return
-
-			onPlayerReady: (e) ->
 			assetTest:(asset,media, d)->
 				if d
 					if d.match("(www.)?youtube|youtu.be")
@@ -1392,18 +1318,18 @@ define [
 				mediaElem = "<div class='media-shadow'><div class='media-frame video youtube' id='" + media.uid + "'>" + loading_message + "</div></div>"
 
 		vimeo:
+			linkify:(text)->
+				util.linkify_with_twitter text, "_blank"
 			get: (m) ->
-				ExternalAPI.vimeo.flags.queue.push m
-				ExternalAPI.vimeo.flags.active = true
 				return
 
-			create: (m, callback) ->
+			create: (m) ->
 				trace "VIMEO CREATE"
 				thumb_url = "//vimeo.com/api/v2/video/" + m.id + ".json"
 				video_url = "//player.vimeo.com/video/" + m.id + "?title=0&amp;byline=0&amp;portrait=0&amp;color=ffffff"
 				library.getJSON thumb_url, (d) ->
 					ExternalAPI.vimeo.createThumb d, m
-					callback()
+					
 					return
 
 				library.attachElement "#" + m.uid, "<iframe autostart='false' frameborder='0' width='100%' height='100%' src='" + video_url + "'></iframe>"
@@ -1415,11 +1341,6 @@ define [
 				library.attachElement thumb_id, "<img src='" + d[0].thumbnail_small + "'>"
 				return
 
-			pushQueue: ->
-				if ExternalAPI.vimeo.flags.queue.length > 0
-					ExternalAPI.vimeo.create ExternalAPI.vimeo.flags.queue[0], ExternalAPI.vimeo.pushQueue
-					util.removeRange ExternalAPI.vimeo.flags.queue, 0
-				return
 			assetTest:(asset,media, d)->
 				if d
 					if d.match("(player.)?vimeo.com")
@@ -1430,12 +1351,12 @@ define [
 				"<div class='thumbnail thumb-vimeo' id='" + uid + "_thumb'></div>"
 			createElement:(media,loading_message)->
 				ExternalAPI.vimeo.get media
-				mediaElem = "<div class='media-shadow media-frame video vimeo' id='" + media.uid + "'>" + loading_message + "</div>"
+				mediaElem = "<div class='media-shadow media-frame video vimeo'  id='" + media.uid + "'>" + loading_message + "</div>"
 
 		vine:
+			linkify:(text)->
+				util.linkify_with_twitter text, "_blank"
 			get: (m) ->
-				ExternalAPI.vine.flags.queue.push m
-				ExternalAPI.vine.flags.active = true
 				return
 
 			create: (m, callback) ->
@@ -1444,11 +1365,6 @@ define [
 				library.attachElement "#" + m.uid, "<iframe frameborder='0' width='100%' height='100%' src='" + video_url + "'></iframe><script async src='http://platform.vine.co/static/scripts/embed.js' charset='utf-8'></script>"
 				return
 
-			pushQueue: ->
-				if ExternalAPI.vine.flags.queue.length > 0
-					ExternalAPI.vine.create ExternalAPI.vine.flags.queue[0], ExternalAPI.vine.pushQueue
-					util.removeRange ExternalAPI.vine.flags.queue, 0
-				return
 			assetTest:(asset,media, d)->
 				if d
 					if d.match("(www.)?vine.co")
@@ -1468,6 +1384,8 @@ define [
 				ExternalAPI.vine.get media
 				mediaElem = "<div class='media-shadow media-frame video vine' id='" + media.uid + "'>" + loading_message + "</div>"
 		dailymotion:
+			linkify:(text)->
+				util.linkify_with_twitter text, "_blank"
 			assetTest:(asset,media, d)->
 				if d
 					if d.match("(www.)?dailymotion.com")
@@ -1479,6 +1397,8 @@ define [
 			createElement:(media,loading_message)->
 				"<div class='media-shadow'><iframe class='media-frame video dailymotion' autostart='false' frameborder='0' width='100%' height='100%' src='http://www.dailymotion.com/embed/video/" + media.id + "'></iframe></div>"
 		image:
+			linkify:(text)->
+				util.linkify_with_twitter text, "_blank"
 			assetTest:(asset,media, d)->
 				if d
 					if d.match(/jpg|jpeg|png|gif/i) or d.match("staticmap") or d.match("yfrog.com") or d.match("twitpic.com")
@@ -1490,8 +1410,10 @@ define [
 				"<div class='thumbnail thumb-photo'></div>"
 			createElement:(media,loading_message)->
 				media.id = media.id.replace("https://", "http://")    if media.id.match("https://")
-				"<div class='media-image media-shadow'><img src='" + media.id + "' class='media-image'></div>"
+				"<div class='media-image'><img src='" + media.id + "' class='media-image'></div>"
 		storify:
+			linkify:(text)->
+				util.linkify_with_twitter text, "_blank"
 			assetTest:(asset,media, d)->
 				if d
 					if d.match("storify")
@@ -1505,6 +1427,8 @@ define [
 				"<div class='plain-text-quote'>" + media.id + "</div>"
 			isTextMedia:true
 		blockquote:
+			linkify:(text)->
+				util.linkify_with_twitter text, "_blank"
 			assetTest:(asset,media, d)->
 				if d
 					if d.match("blockquote")
@@ -1518,12 +1442,14 @@ define [
 				"<div class='plain-text-quote'>" + media.id + "</div>"
 			isTextMedia:true
 		iframe:
+			linkify:(text)->
+				util.linkify_with_twitter text, "_blank"
 			assetTest:(asset,media, d)->
 				if d
 					if d.match("iframe")
 						media.type = "iframe"
 						trace "IFRAME"
-						regex = /src=['"](\S+?)['"]\s/
+						regex = /src=['"](\S+?)['"]/
 						group = d.match(regex)
 						media.id = group[1]    if group
 						media.mediaType = ExternalAPI.iframe
@@ -1531,20 +1457,22 @@ define [
 						if Boolean(media.id)
 							media
 						else
-							false
+							undefined
 			thumbnail:(media, uid)->
 				"<div class='thumbnail thumb-video'></div>"
 			createElement:(media,loading_message)->
 				"<div class='media-shadow'><iframe class='media-frame video' autostart='false' frameborder='0' width='100%' height='100%' src='" + media.id + "'></iframe></div>"
 			isTextMedia:true
 		unknown:
+			linkify:(text)->
+				util.linkify_with_twitter text, "_blank"
 			assetTest:(asset,media, d)->
 				if d
 					trace "unknown media"
 					$.extend media,
 						type:"unknown"
 						id:d
-						mediaType:unknownMediaType
+						mediaType:ExternalAPI.unknown
 			thumbnail:(media, uid)->
 				"<div class='thumbnail thumb-plaintext'></div>"
 			createElement:(media,loading_message)->
@@ -1552,6 +1480,8 @@ define [
 				"<div class='plain-text'><div class='container'>" + util.properQuotes(media.id) + "</div></div>"
 			isTextMedia:true
 		website:
+			linkify:(text)->
+				util.linkify_with_twitter text, "_blank"
 			assetTest:(asset,media, d)->
 				if d
 					if d.indexOf("http://") is 0
@@ -1565,8 +1495,6 @@ define [
 				ExternalAPI.website.get media
 				mediaElem = "<div class='media-shadow website' id='" + media.uid + "'>" + loading_message + "</div>"
 			get: (m, thumb) ->
-				ExternalAPI.website.flags.queue.push m
-				ExternalAPI.website.flags.active = true
 				return
 
 			sizes: (s) ->
@@ -1587,11 +1515,5 @@ define [
 				library.attachElement "#" + m.uid + "_thumb", "<img src='" + thumb_url + "size=t&url=" + url + "'>"
 				return
 
-			pushQueue: ->
-				i = 0
-
-				while i < ExternalAPI.website.flags.queue.length
-					ExternalAPI.website.create ExternalAPI.website.flags.queue[i]
-					i++
-				ExternalAPI.website.flags.queue = []
-				return
+			
+	window.ExternalAPI = ExternalAPI

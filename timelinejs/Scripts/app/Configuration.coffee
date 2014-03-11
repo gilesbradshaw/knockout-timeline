@@ -115,38 +115,178 @@ require [
 			startDate:ko.observable "2012,1,26"
 
 			dates:ko.observableArray [
+
 					startDate:ko.observable "2011,12,12"
 					endDate:ko.observable "2012,1,27"
-					headline:ko.observable "Vine"
-					text:ko.observable "<p>Vine Test</p>"
+					headline:ko.observable "vimeo"
+					text:ko.observable "<p>Vimeo vid</p>"
 					asset:ko.observable
-						media:ko.observable "https://vine.co/v/b55LOA1dgJU"
+						media:ko.observable "http://vimeo.com/88646767"
+						credit:ko.observable ""
+						caption:ko.observable ""
+			
+				,
+					startDate:ko.observable "2011,12,12"
+					endDate:ko.observable "2012,1,27"
+					headline:ko.observable "you tube"
+					text:ko.observable "<p>You tube Test</p>"
+					asset:ko.observable
+						media:ko.observable "http://youtu.be/u-yLGIH7W9Y"
 						credit:ko.observable ""
 						caption:ko.observable ""
 				,
-					startDate:ko.observable "2011,12,13"
-					endDate:ko.observable "2012,1,28"
-					headline:ko.observable "Vine#2"
-					text:ko.observable "<p>Vine Test</p>"
+					startDate:ko.observable "2011,12,12"
+					endDate:ko.observable "2012,1,27"
+					headline:ko.observable "you tube"
+					text:ko.observable "<p>You tube Test another</p>"
 					asset:ko.observable
-						media:ko.observable "https://vine.co/v/b55LOA1dgJU"
-						credit:ko.observable ""
-						caption:ko.observable ""
+						media:ko.observable "http://youtu.be/zyyalkHjSjo"
+						credit:ko.observable "credit to @therealmrbenn"
+						caption:ko.observable "captioned by @Wildlife_Focus"
+
+				,
+					startDate:ko.observable "2011,12,12"
+					endDate:ko.observable "2012,1,27"
+					headline:ko.observable "wiki"
+					text:ko.observable "<p>wiki test</p>"
+					asset:ko.observable
+						media:ko.observable "http://en.wikipedia.org/wiki/Green_Grass_of_Wyoming"
+						credit:ko.observable "credit to @therealmrbenn"
+						caption:ko.observable "captioned by @Wildlife_Focus"
+				,
+					startDate:ko.observable "2011,12,12"
+					endDate:ko.observable "2012,1,27"
+					headline:ko.observable "daily motion"
+					text:ko.observable "<p>daily motion</p>"
+					asset:ko.observable
+						media:ko.observable "http://www.dailymotion.com/video/x1g89p9_boris-johnson-has-paid-tribute-to-rmt-leader-bob-crow_news"
+						credit:ko.observable "credit to @therealmrbenn"
+						caption:ko.observable "captioned by @Wildlife_Focus"
+				,
+					startDate:ko.observable "2011,12,12"
+					endDate:ko.observable "2012,1,27"
+					headline:ko.observable "pcture"
+					text:ko.observable "<p>daily motion</p>"
+					asset:ko.observable
+						media:ko.observable "http://news.bbcimg.co.uk/media/images/73507000/jpg/_73507180_021490652-2.jpg"
+						credit:ko.observable "credit to @therealmrbenn"
+						caption:ko.observable "captioned by @Wildlife_Focus"
+				,
+					startDate:ko.observable "2011,12,12"
+					endDate:ko.observable "2012,1,27"
+					headline:ko.observable "sound clound"
+					text:ko.observable "<p>daily motion</p>"
+					asset:ko.observable
+						media:ko.observable "https://soundcloud.com/noisestorm/noisestorm-breakdown-1"
+						credit:ko.observable "credit to @therealmrbenn"
+						caption:ko.observable "captioned by @Wildlife_Focus"
+				,
+					startDate:ko.observable "2011,12,12"
+					endDate:ko.observable "2012,1,27"
+					headline:ko.observable "google map"
+					text:ko.observable "<p>daily motion</p>"
+					asset:ko.observable
+						media:ko.observable "https://maps.google.co.uk/maps?q=ex364pp&hl=en&sll=52.8382,-2.327815&sspn=7.48912,19.753418&hnear=Bishops+Nympton+EX36+4PP,+United+Kingdom&t=m&z=14"
+						credit:ko.observable "credit to @therealmrbenn"
+						caption:ko.observable "captioned by @Wildlife_Focus"
+				,
+					startDate:ko.observable "2011,12,12"
+					endDate:ko.observable "2012,1,27"
+					headline:ko.observable "google plus"
+					text:ko.observable "<p>daily motion</p>"
+					asset:ko.observable
+						media:ko.observable "https://plus.google.com/u/0/+KendoUI/posts/PcpJZ3Dsijm"
+						credit:ko.observable "credit to @therealmrbenn"
+						caption:ko.observable "captioned by @Wildlife_Focus"
+				,
+					startDate:ko.observable "2011,12,12"
+					endDate:ko.observable "2012,1,27"
+					headline:ko.observable "flickr"
+					text:ko.observable "<p>daily motion</p>"
+					asset:ko.observable
+						media:ko.observable "https://www.flickr.com/photos/mark_lj/13065843314/in/explore-2014-03-10"
+						credit:ko.observable "credit to @therealmrbenn"
+						caption:ko.observable "captioned by @Wildlife_Focus"
+				,
+					startDate:ko.observable "2011,12,12"
+					endDate:ko.observable "2012,1,27"
+					headline:ko.observable "flickr"
+					text:ko.observable "<p>daily motion</p>"
+					asset:ko.observable
+						media:ko.observable "http://instagram.com/p/k16EEFsJ5s/"
+						credit:ko.observable "credit to @therealmrbenn"
+						caption:ko.observable "captioned by @Wildlife_Focus"
+				,
+					startDate:ko.observable "2011,12,12"
+					endDate:ko.observable "2012,1,27"
+					headline:ko.observable "google doc"
+					text:ko.observable "<p>daily motion</p>"
+					asset:ko.observable
+						media:ko.observable "http://docs.google.com/document/pub?id\u003d1BhlYxLl8NNWDEre5exmR9cuUQQmMFnZGDl9-uJtMTIk"
+						credit:ko.observable "credit to @therealmrbenn"
+						caption:ko.observable "captioned by @Wildlife_Focus"
+				,
+					startDate:ko.observable "2011,12,12"
+					endDate:ko.observable "2012,1,27"
+					headline:ko.observable "web siter"
+					text:ko.observable "<p>daily motion</p>"
+					asset:ko.observable
+						media:ko.observable "http://news.bbc.co.uk"
+						credit:ko.observable "credit to @therealmrbenn"
+						caption:ko.observable "captioned by @Wildlife_Focus"
+				,
+					startDate:ko.observable "2011,12,12"
+					endDate:ko.observable "2012,1,27"
+					headline:ko.observable "web siter"
+					text:ko.observable "<p>daily motion</p>"
+					asset:ko.observable
+						media:ko.observable "<blockquote>He who passively accepts evil is as much involved in it as he who helps to perpetrate it. He who accepts evil without protesting against it is really cooperating with it. </blockquote>"
+						credit:ko.observable "credit to @therealmrbenn"
+						caption:ko.observable "captioned by @Wildlife_Focus"
+				,
+					startDate:ko.observable "2011,12,12"
+					endDate:ko.observable "2012,1,27"
+					headline:ko.observable "iframe"
+					text:ko.observable "<p>daily motion</p>"
+					asset:ko.observable
+						media:ko.observable "<iframe src='http://www.w3schools.com'></iframe>"
+						credit:ko.observable "credit to @therealmrbenn"
+						caption:ko.observable "captioned by @Wildlife_Focus"
+				,
+					startDate:ko.observable "2011,12,12"
+					endDate:ko.observable "2012,1,27"
+					headline:ko.observable "unknown"
+					text:ko.observable "<p>daily motion</p>"
+					asset:ko.observable
+						media:ko.observable "<h1>hello</h1>"
+						credit:ko.observable "credit to @therealmrbenn"
+						caption:ko.observable "captioned by @Wildlife_Focus"
+					
+				#,
+				#	startDate:ko.observable "2011,12,13"
+				#	endDate:ko.observable "2012,1,28"
+				#	headline:ko.observable "Vine#2"
+				#	text:ko.observable "<p>Vine Test</p>"
+				#	asset:ko.observable
+				#		media:ko.observable "https://vine.co/v/b55LOA1dgJU"
+				#		credit:ko.observable ""
+				#		caption:ko.observable ""
 				]
 		
 
 	$(document).ready -> 
 		ko.applyBindings tConfig
-		tConfig.timeline().dates.push
-			startDate:ko.observable "2011,12,12"
-			endDate:ko.observable "2012,1,27"
-			headline:ko.observable "Vine#3"
-			text:ko.observable "<p>Vine Test</p>"
-			asset:ko.observable
-				media:ko.observable "https://vine.co/v/b55LOA1dgJU"
-				credit:ko.observable ""
-				caption:ko.observable ""
-	#return
+		if false 
+			tConfig.timeline().dates.push
+				startDate:ko.observable "2011,12,12"
+				endDate:ko.observable "2012,1,27"
+				headline:ko.observable "Vine#3"
+				text:ko.observable "<p>Vine Test</p>"
+				asset:ko.observable
+					media:ko.observable "https://vine.co/v/b55LOA1dgJU"
+					credit:ko.observable "all credit @GilesBradshaw"
+					caption:ko.observable "caption @GilesBradshaw"
+	return
 	timeline = new Timeline 'timeline', 1800,800
 
 	timeline.init
@@ -165,8 +305,8 @@ require [
 						"text":"<p>Vine Test</p>",
 						"asset":
 							"media":"https://vine.co/v/b55LOA1dgJU",
-							"credit":"",
-							"caption":""
+							"credit":"all credit @GilesBradshaw",
+							"caption":"caption @GilesBradshaw"
 					,
 						"startDate":"2012,1,26",
 						"endDate":"2012,1,27",

@@ -2794,7 +2794,7 @@ ko.exportSymbol('bindingProvider', ko.bindingProvider);
                     validateThatBindingIsAllowedForVirtualElements(bindingKey);
                 }
 
-                try {
+                //try {
                     // Run init, ignoring any dependencies
                     if (typeof handlerInitFn == "function") {
                         ko.dependencyDetection.ignore(function() {
@@ -2819,10 +2819,10 @@ ko.exportSymbol('bindingProvider', ko.bindingProvider);
                             { disposeWhenNodeIsRemoved: node }
                         );
                     }
-                } catch (ex) {
-                    ex.message = "Unable to process binding \"" + bindingKey + ": " + bindings[bindingKey] + "\"\nMessage: " + ex.message;
-                    throw ex;
-                }
+                //} catch (ex) {
+                //    ex.message = "Unable to process binding \"" + bindingKey + ": " + bindings[bindingKey] + "\"\nMessage: " + ex.message;
+                //    throw ex;
+                //}
             });
         }
 

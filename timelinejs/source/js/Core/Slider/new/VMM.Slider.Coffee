@@ -427,7 +427,7 @@ define [
 			
 			# STOP ANY VIDEO PLAYERS ACTIVE
 			#			================================================== 
-			ExternalAPI.stopPlayers()
+			
 			
 			# Set current slide
 			current_slide = n

@@ -10,7 +10,7 @@
         read: k
       });
     };
-    parseDate = function(date) {
+    parseDate = function(date, configuration) {
       var result;
 
       return result = {
@@ -31,11 +31,28 @@
             return result.startDate();
           }
         }),
+        fullDate: computed(function() {
+          return result.startDate().getTime();
+        }),
+        period: computed(function() {
+          var text;
+
+          text = vDate.prettyDate(result.startDate(), false, result.precisionDate());
+          if (result.startDate() !== result.endDate()) {
+            return text += ' - ' + vDate.prettyDate(result.endDate(), false, result.precisionDate());
+          }
+        }),
+        date: computed(function() {
+          return vDate.prettyDate(result.startDate(), false, result.precisionDate());
+        }),
         needs_slug: computed(function() {
           return (date.slug != null) && date.slug() !== "" && (!date.headline || !date.headline());
         }),
         title: computed(function() {
           return ko.unwrap(date.headline);
+        }),
+        unlinkedTitle: computed(function() {
+          return util.unlinkify(result.title());
         }),
         headline: computed(function() {
           return ko.unwrap(date.headline);
@@ -43,14 +60,17 @@
         type: computed(function() {
           return ko.unwrap(date.type);
         }),
-        date: computed(function() {
-          return vDate.prettyDate(result.startdate(), false, result.precisiondate());
-        }),
         asset: computed(function() {
-          return ko.unwrap(date.asset);
-        }),
-        fullDate: computed(function() {
-          return result.startDate().getTime();
+          return $.extend({}, ko.unwrap(date.asset), (function(asset) {
+            return {
+              credit: computed(function() {
+                return ko.unwrap(asset.credit) || "";
+              }),
+              caption: computed(function() {
+                return ko.unwrap(asset.caption) || "";
+              })
+            };
+          })(ko.unwrap(date.asset)));
         }),
         text: computed(function() {
           return ko.unwrap(date.text);
@@ -65,6 +85,19 @@
         uniqueId: util.unique_ID(7),
         className: computed(function() {
           return ko.unwrap(date.className);
+        }),
+        mediaType: computed(function() {
+          var m;
+
+          m = externalAPI.mediaTypeFromAsset(ko.unwrap(date.asset));
+          m.uid = result.uniqueId;
+          return m;
+        }),
+        create: computed(function() {
+          return result.mediaType().mediaType.createElement(result.mediaType(), "comooneeee!");
+        }),
+        configuration: computed(function() {
+          return configuration;
         })
       };
     };
@@ -87,16 +120,20 @@
     };
     return ko.bindingHandlers.importDates = {
       init: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
-        return bindingContext.$importedDates($.Enumerable.From(ko.unwrap(valueAccessor())).Where(function(d) {
+        var configuration;
+
+        configuration = ko.unwrap(valueAccessor().configuration);
+        return bindingContext.$importedDates($.Enumerable.From(ko.unwrap(valueAccessor().dates)).Where(function(d) {
           return ko.unwrap(d.startDate) && !isNaN(vDate.parse(ko.unwrap(d.startDate), true).date);
         }).Select(function(d) {
-          return parseDate(d);
+          return parseDate(d, configuration);
         }).ToArray());
       },
       update: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
-        var dates;
+        var configuration, dates;
 
-        dates = ko.unwrap(valueAccessor());
+        configuration = ko.unwrap(valueAccessor().configuration);
+        dates = ko.unwrap(valueAccessor().dates);
         bindingContext.$importedDates.remove(function(d) {
           return dates.indexOf(d._date) < 0;
         });
@@ -105,7 +142,7 @@
             return dd._date === d;
           });
         }).Select(function(d) {
-          return bindingContext.$importedDates.push(parseDate(d));
+          return bindingContext.$importedDates.push(parseDate(d, configuration));
         }).ToArray();
       }
     };

@@ -1,5 +1,5 @@
 (function() {
-  define(["jquery", "trace", "VMM.FileExtension", "VMM.Util", "VMM.ExternalAPI", "VMM.Language"], function($, trace, fileExtension, util, ExternalAPI, language) {
+  define(["jquery", "knockout", "trace", "VMM.FileExtension", "VMM.Util", "VMM.ExternalAPI", "VMM.Language"], function($, ko, trace, fileExtension, util, ExternalAPI, language) {
     var addFlags, mediaTypes, unknownMediaType;
 
     mediaTypes = [];
@@ -8,10 +8,10 @@
       return $.extend(mediaType, {
         flags: {
           active: false,
-          array: [],
-          api_loaded: false,
-          queue: []
-        }
+          api_loaded: false
+        },
+        create: mediaType.create || function() {},
+        stop: mediaType.stop || function() {}
       });
     };
     $.extend(ExternalAPI, {
@@ -32,19 +32,6 @@
       setKeys: function(d) {
         ExternalAPI.keys = d;
       },
-      pushQueues: function() {
-        var mediaType, _i, _len;
-
-        for (_i = 0, _len = mediaTypes.length; _i < _len; _i++) {
-          mediaType = mediaTypes[_i];
-          if (mediaType.pushQueue && mediaType.flags.active) {
-            mediaType.pushQueue();
-          }
-        }
-        if (unknownMediaType.pushQueue && unknownMediaType.flags.active) {
-          return unknownMediaType.pushQueue();
-        }
-      },
       configure: function(config) {
         var mediaType, _i, _len;
 
@@ -58,19 +45,6 @@
           return unknownMediaType.configure(config);
         }
       },
-      stopPlayers: function() {
-        var mediaType, _i, _len;
-
-        for (_i = 0, _len = mediaTypes.length; _i < _len; _i++) {
-          mediaType = mediaTypes[_i];
-          if (mediaType.stopPlayers) {
-            mediaType.stopPlayers();
-          }
-        }
-        if (unknownMediaType.stopPlayers) {
-          return unknownMediaType.stopPlayers();
-        }
-      },
       insertMediaType: function(name, mediaType) {
         mediaType.name = name;
         ExternalAPI[name] = addFlags(mediaType);
@@ -81,8 +55,9 @@
         ExternalAPI[name] = addFlags(mediaType);
         return mediaTypes.push(mediaType);
       },
-      setUnknownMediaType: function(mediaType) {
-        return unknownMediaType = addFlags(mediaType);
+      setUnknownMediaType: function(name, mediaType) {
+        ExternalAPI[name] = addFlags(mediaType);
+        return unknownMediaType = ExternalAPI[name];
       },
       mediaTypeFromAsset: function(asset) {
         var media, mediaId, mediaType, ret, _i, _len;
@@ -98,8 +73,8 @@
             uniqueid: util.unique_ID(6)
           };
         };
-        if (asset.media) {
-          mediaId = asset.media.replace(/^\s\s*/, "").replace(/\s\s*$/, "");
+        if (ko.unwrap(asset.media)) {
+          mediaId = ko.unwrap(asset.media).replace(/^\s\s*/, "").replace(/\s\s*$/, "");
         }
         for (_i = 0, _len = mediaTypes.length; _i < _len; _i++) {
           mediaType = mediaTypes[_i];
@@ -108,7 +83,7 @@
               return $.extend(media(), ret);
             } else {
               trace("No valid media id detected");
-              trace(d);
+              trace(mediaId);
               return ret;
             }
           }

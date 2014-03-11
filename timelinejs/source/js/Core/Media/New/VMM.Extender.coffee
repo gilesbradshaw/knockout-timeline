@@ -1,4 +1,4 @@
-﻿define ["jquery", "trace", "VMM.FileExtension", "VMM.Util", "VMM.ExternalAPI", "VMM.Language"], ($, trace, fileExtension,util, ExternalAPI, language)->
+﻿define ["jquery", "knockout", "trace", "VMM.FileExtension", "VMM.Util", "VMM.ExternalAPI", "VMM.Language"], ($, ko, trace, fileExtension,util, ExternalAPI, language)->
 	mediaTypes=[]
 	unknownMediaType=undefined
 	
@@ -7,9 +7,9 @@
 		$.extend mediaType,
 			flags:
 				active: false
-				array: []
 				api_loaded: false
-				queue: []
+			create:mediaType.create or ->
+			stop:mediaType.stop or ->
 	$.extend ExternalAPI,
 		keys:
 			google: ""
@@ -28,23 +28,14 @@
 		setKeys: (d) ->
 			ExternalAPI.keys = d
 			return
-		pushQueues: ->
-			for mediaType in mediaTypes
-				mediaType.pushQueue()    if mediaType.pushQueue && mediaType.flags.active
-			unknownMediaType.pushQueue()    if unknownMediaType.pushQueue && unknownMediaType.flags.active
-
+		
 		configure:(config)->
 			for mediaType in mediaTypes
 				if mediaType.configure
 					mediaType.configure config
 			if unknownMediaType.configure
 				unknownMediaType.configure config
-		stopPlayers:()->
-			for mediaType in mediaTypes
-				if mediaType.stopPlayers
-					mediaType.stopPlayers()
-			if unknownMediaType.stopPlayers
-				unknownMediaType.stopPlayers()
+		
 		insertMediaType:(name,mediaType)->
 			mediaType.name=name
 			ExternalAPI[name]= addFlags mediaType
@@ -53,8 +44,9 @@
 			mediaType.name=name
 			ExternalAPI[name]= addFlags mediaType
 			mediaTypes.push mediaType
-		setUnknownMediaType:(mediaType)->
-			unknownMediaType=addFlags mediaType
+		setUnknownMediaType:(name, mediaType)->
+			ExternalAPI[name]= addFlags mediaType
+			unknownMediaType=ExternalAPI[name]
 		mediaTypeFromAsset:(asset)->
 			media =()->
 				type: "unknown"
@@ -64,8 +56,8 @@
 				link: ""
 				lang: language.lang
 				uniqueid: util.unique_ID(6)
-			if asset.media
-				mediaId = asset.media.replace(/^\s\s*/, "").replace(/\s\s*$/, "")
+			if ko.unwrap(asset.media)
+				mediaId = ko.unwrap(asset.media).replace(/^\s\s*/, "").replace(/\s\s*$/, "")
 			for mediaType in mediaTypes
 				#we pass a copy of the asset too and the media type has the opportunity to adapt itself to the asset
 				if mediaType.assetTest and (ret= mediaType.assetTest $.extend({}, asset), media(), mediaId)!=undefined
@@ -73,7 +65,7 @@
 						return $.extend media(), ret
 					else
 						trace "No valid media id detected"
-						trace d
+						trace mediaId
 						return ret
 				
 			$.extend (unknownMediaType.assetTest $.extend({}, asset), media(), mediaId),

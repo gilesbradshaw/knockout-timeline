@@ -1,12 +1,11 @@
 (function() {
-  define(["global", "trace", "VMM.LoadLib", "VMM.Browser", "VMM.Date", "VMM.Library", "VMM.Util", "VMM.masterConfig", "VMM.FileExtension"], function(global, trace, LoadLib, browser, vDate, library, util, masterConfig, fileExtension) {
+  define(["global", "trace", "type", "knockout", "VMM.LoadLib", "VMM.Browser", "VMM.Date", "VMM.Library", "VMM.Util", "VMM.masterConfig", "VMM.FileExtension", "VMM.Language"], function(global, trace, type, ko, LoadLib, browser, vDate, library, util, masterConfig, fileExtension, language) {
     var ExternalAPI;
 
     global.onYouTubePlayerAPIReady = function() {
       trace("GLOBAL YOUTUBE API CALLED");
-      ExternalAPI.youtube.onAPIReady();
     };
-    return ExternalAPI = {
+    ExternalAPI = {
       "twitter-ready": {
         assetTest: function(asset, media, d) {
           if (d && d.match("div class='twitter'")) {
@@ -22,19 +21,23 @@
         createElement: function(media, loading_message) {
           return media.id;
         },
-        isTextMedia: true
+        isTextMedia: true,
+        linkify: function(text) {
+          return util.linkify_with_twitter(text, "_blank");
+        }
       },
       twitter: {
+        linkify: function(text) {
+          return util.linkify_with_twitter(text, "_blank");
+        },
         tweetArray: [],
         get: function(m) {
           var tweet;
 
-          tweet = {
+          return tweet = {
             mid: m.id,
             id: m.uid
           };
-          ExternalAPI.twitter.flags.queue.push(tweet);
-          ExternalAPI.twitter.flags.active = true;
         },
         create: function(tweet, callback) {
           var error_obj, id, the_url;
@@ -67,12 +70,6 @@
         errorTimeOutOembed: function(tweet) {
           trace("TWITTER JSON ERROR TIMEOUT " + tweet.mid);
           library.attachElement("#" + tweet.id.toString(), library.loadingmessage("Still waiting on Twitter: " + tweet.mid));
-        },
-        pushQueue: function() {
-          if (ExternalAPI.twitter.flags.queue.length > 0) {
-            ExternalAPI.twitter.create(ExternalAPI.twitter.flags.queue[0], ExternalAPI.twitter.pushQueue);
-            util.removeRange(ExternalAPI.twitter.flags.queue, 0);
-          }
         },
         getOEmbed: function(tweet, callback) {
           var the_url, twitter_timeout;
@@ -275,6 +272,9 @@
         isTextMedia: true
       },
       googlemaps: {
+        linkify: function(text) {
+          return util.linkify_with_twitter(text, "_blank");
+        },
         assetTest: function(asset, media, d) {
           if (d) {
             if (d.match("maps.google") && !d.match("staticmap")) {
@@ -305,7 +305,7 @@
           }
         },
         get: function(m) {
-          var api_key, dontcrashjs2coffee, map_url, timer;
+          var api_key, map_url, timer;
 
           timer = void 0;
           api_key = void 0;
@@ -318,16 +318,11 @@
           }
           map_url = "//maps.googleapis.com/maps/api/js?key=" + api_key + "&v=3.9&libraries=places&sensor=false&callback=ExternalAPI.googlemaps.onMapAPIReady";
           if (ExternalAPI.googlemaps.flags.active) {
-            ExternalAPI.googlemaps.flags.queue.push(m);
+
           } else {
-            ExternalAPI.googlemaps.flags.queue.push(m);
-            if (ExternalAPI.googlemaps.flags.api_loaded) {
-              dontcrashjs2coffee = 0;
-            } else {
-              LoadLib.js(map_url, function() {
-                trace("Google Maps API Library Loaded");
-              });
-            }
+            LoadLib.js(map_url, function() {
+              trace("Google Maps API Library Loaded");
+            });
           }
         },
         create: function(m) {
@@ -688,16 +683,6 @@
             }
           }
         },
-        pushQueue: function() {
-          var i;
-
-          i = 0;
-          while (i < ExternalAPI.googlemaps.flags.queue.length) {
-            ExternalAPI.googlemaps.create(ExternalAPI.googlemaps.flags.queue[i]);
-            i++;
-          }
-          ExternalAPI.googlemaps.flags.queue = [];
-        },
         onMapAPIReady: function() {
           ExternalAPI.googlemaps.flags.map_active = true;
           ExternalAPI.googlemaps.flags.places_active = true;
@@ -711,7 +696,6 @@
           if (!ExternalAPI.googlemaps.flags.active) {
             if (ExternalAPI.googlemaps.flags.map_active && ExternalAPI.googlemaps.flags.places_active) {
               ExternalAPI.googlemaps.flags.active = true;
-              ExternalAPI.googlemaps.pushQueue();
             }
           }
         },
@@ -767,6 +751,9 @@
         }
       },
       googleplus: {
+        linkify: function(text) {
+          return util.linkify_with_twitter(text, "_blank");
+        },
         assetTest: function(asset, media, d) {
           if (d) {
             if (d.match("plus.google")) {
@@ -774,10 +761,11 @@
               media.id = d.split("/posts/")[1];
               media.mediaType = ExternalAPI.googleplus;
               if (d.split("/posts/")[0].match("u/0/")) {
-                return media.user = d.split("u/0/")[1].split("/posts")[0];
+                media.user = d.split("u/0/")[1].split("/posts")[0];
               } else {
-                return media.user = d.split("google.com/")[1].split("/posts/")[0];
+                media.user = d.split("google.com/")[1].split("/posts/")[0];
               }
+              return media;
             }
           }
         },
@@ -791,20 +779,9 @@
           return mediaElem = "<div class='googleplus' id='googleplus_" + media.id + "'>" + loading_message + "</div>";
         },
         isTextMedia: true,
-        get: function(m) {
-          var api_key, gplus;
-
-          api_key = void 0;
-          gplus = {
-            user: m.user,
-            activity: m.id,
-            id: m.uid
-          };
-          ExternalAPI.googleplus.flags.queue.push(gplus);
-          ExternalAPI.googleplus.flags.active = true;
-        },
-        create: function(gplus, callback) {
-          var api_key, callback_timeout, g_activity, g_attachments, g_content, gactivity_api_url, googleplus_timeout, gperson_api_url, mediaElem;
+        get: function(m) {},
+        create: function(gplus) {
+          var api_key, g_activity, g_attachments, g_content, gactivity_api_url, googleplus_timeout, gperson_api_url, mediaElem;
 
           mediaElem = "";
           api_key = "";
@@ -814,12 +791,7 @@
           gperson_api_url = void 0;
           gactivity_api_url = void 0;
           googleplus_timeout = setTimeout(ExternalAPI.googleplus.errorTimeOut, masterConfig.timers.api, gplus);
-          callback_timeout = setTimeout(callback, masterConfig.timers.api, gplus);
-          if (masterConfig.Timeline.api_keys.google !== "") {
-            api_key = masterConfig.Timeline.api_keys.google;
-          } else {
-            api_key = Aes.Ctr.decrypt(masterConfig.api_keys_master.google, masterConfig.vp, 256);
-          }
+          api_key = Aes.Ctr.decrypt(masterConfig.api_keys_master.google, masterConfig.vp, 256);
           gperson_api_url = "https://www.googleapis.com/plus/v1/people/" + gplus.user + "/activities/public?alt=json&maxResults=100&fields=items(id,url)&key=" + api_key;
           mediaElem = "GOOGLE PLUS API CALL";
           library.getJSON(gperson_api_url, function(p_data) {
@@ -828,7 +800,7 @@
             i = 0;
             while (i < p_data.items.length) {
               trace("loop");
-              if (p_data.items[i].url.split("posts/")[1] === gplus.activity) {
+              if (p_data.items[i].url.split("posts/")[1] === gplus.id) {
                 trace("FOUND IT!!");
                 g_activity = p_data.items[i].id;
                 gactivity_api_url = "https://www.googleapis.com/plus/v1/activities/" + g_activity + "?alt=json&key=" + api_key;
@@ -858,7 +830,9 @@
                         g_attachments += "<div>";
                         g_attachments += "<a href='" + a_data.object.attachments[k].url + "' target='_blank'>";
                         g_attachments += "<h5>" + a_data.object.attachments[k].displayName + "</h5>";
-                        g_attachments += "<p>" + a_data.object.attachments[k].content + "</p>";
+                        if (a_data.object.attachments[k].content) {
+                          g_attachments += "<p>" + a_data.object.attachments[k].content + "</p>";
+                        }
                         g_attachments += "</a>";
                         g_attachments += "</div>";
                       }
@@ -873,7 +847,7 @@
                   mediaElem += "<span class='fn'>" + a_data.actor.displayName + "</span>";
                   mediaElem += "<span class='nickname'><span class='thumbnail-inline'></span></span>";
                   mediaElem += "</a></div>";
-                  library.attachElement("#googleplus_" + gplus.activity, mediaElem);
+                  library.attachElement("#googleplus_" + gplus.id, mediaElem);
                 });
                 break;
               }
@@ -884,25 +858,20 @@
 
             error_obj = library.parseJSON(jqXHR.responseText);
             trace(error_obj.error.message);
-            library.attachElement("#googleplus_" + gplus.activity, library.loadingmessage("<p>ERROR LOADING GOOGLE+ </p><p>" + error_obj.error.message + "</p>"));
+            library.attachElement("#googleplus_" + gplus.id, library.loadingmessage("<p>ERROR LOADING GOOGLE+ </p><p>" + error_obj.error.message + "</p>"));
           }).success(function(d) {
             clearTimeout(googleplus_timeout);
-            clearTimeout(callback_timeout);
-            callback();
           });
         },
-        pushQueue: function() {
-          if (ExternalAPI.googleplus.flags.queue.length > 0) {
-            ExternalAPI.googleplus.create(ExternalAPI.googleplus.flags.queue[0], ExternalAPI.googleplus.pushQueue);
-            util.removeRange(ExternalAPI.googleplus.flags.queue, 0);
-          }
-        },
         errorTimeOut: function(gplus) {
-          trace("GOOGLE+ JSON ERROR TIMEOUT " + gplus.activity);
-          library.attachElement("#googleplus_" + gplus.activity, library.loadingmessage("<p>Still waiting on GOOGLE+ </p><p>" + gplus.activity + "</p>"));
+          trace("GOOGLE+ JSON ERROR TIMEOUT " + gplus.id);
+          library.attachElement("#googleplus_" + gplus.id, library.loadingmessage("<p>Still waiting on GOOGLE+ </p><p>" + gplus.activity + "</p>"));
         }
       },
       googledocs: {
+        linkify: function(text) {
+          return util.linkify_with_twitter(text, "_blank");
+        },
         assetTest: function(asset, media, d) {
           if (d) {
             if (fileExtension.googleDocType(d)) {
@@ -923,10 +892,7 @@
           ExternalAPI.googledocs.get(media);
           return mediaElem = "<div class='media-frame media-shadow doc' id='" + media.uid + "'>" + loading_message + "</div>";
         },
-        get: function(m) {
-          ExternalAPI.googledocs.flags.queue.push(m);
-          ExternalAPI.googledocs.flags.active = true;
-        },
+        get: function(m) {},
         create: function(m) {
           var mediaElem;
 
@@ -937,19 +903,12 @@
             mediaElem = "<iframe class='doc' frameborder='0' width='100%' height='100%' src='" + "//docs.google.com/viewer?url=" + m.id + "&amp;embedded=true'></iframe>";
           }
           library.attachElement("#" + m.uid, mediaElem);
-        },
-        pushQueue: function() {
-          var i;
-
-          i = 0;
-          while (i < ExternalAPI.googledocs.flags.queue.length) {
-            ExternalAPI.googledocs.create(ExternalAPI.googledocs.flags.queue[i]);
-            i++;
-          }
-          ExternalAPI.googledocs.flags.queue = [];
         }
       },
       flickr: {
+        linkify: function(text) {
+          return util.linkify_with_twitter(text, "_blank");
+        },
         assetTest: function(asset, media, d) {
           if (d) {
             if (d.match("flickr.com/photos/")) {
@@ -968,21 +927,25 @@
         thumbnail: function(media, uid) {
           return "<div class='thumbnail thumb-photo' id='" + uid + "_thumb'></div>";
         },
-        createElement: function(media, loading_message) {
+        createElement: function(media, loading_message, configuration) {
           var mediaElem;
 
           ExternalAPI.flickr.get(media);
           return mediaElem = "<div class='media-image media-shadow'><a href='" + media.link + "' target='_blank'><img id='" + media.uid + "'></a></div>";
         },
-        get: function(m) {
-          ExternalAPI.flickr.flags.queue.push(m);
-          ExternalAPI.flickr.flags.active = true;
-        },
-        create: function(m, callback) {
-          var api_key, callback_timeout, the_url;
+        get: function(m) {},
+        create: function(m, configuration) {
+          var api_key, c, size, the_url;
 
+          size = 1000;
+          if (c = ko.unwrap(configuration)) {
+            if (c = ko.unwrap(c.slider)) {
+              if (c = ko.unwrap(c.content)) {
+                size = ko.unwrap(c.height) || 1000;
+              }
+            }
+          }
           api_key = void 0;
-          callback_timeout = setTimeout(callback, masterConfig.timers.api, m);
           if (typeof masterConfig.Timeline !== "undefined" && masterConfig.Timeline.api_keys.flickr !== "") {
             api_key = masterConfig.Timeline.api_keys.flickr;
           } else {
@@ -999,7 +962,7 @@
             flickr_img_thumb = void 0;
             flickr_size_found = false;
             flickr_best_size = "Large";
-            flickr_best_size = ExternalAPI.flickr.sizes(masterConfig.sizes.api.height);
+            flickr_best_size = ExternalAPI.flickr.sizes(size);
             i = 0;
             while (i < d.sizes.size.length) {
               if (d.sizes.size[i].label === flickr_best_size) {
@@ -1017,16 +980,7 @@
           }).error(function(jqXHR, textStatus, errorThrown) {
             trace("FLICKR error");
             trace("FLICKR ERROR: " + textStatus + " " + jqXHR.responseText);
-          }).success(function(d) {
-            clearTimeout(callback_timeout);
-            callback();
-          });
-        },
-        pushQueue: function() {
-          if (ExternalAPI.flickr.flags.queue.length > 0) {
-            ExternalAPI.flickr.create(ExternalAPI.flickr.flags.queue[0], ExternalAPI.flickr.pushQueue);
-            util.removeRange(ExternalAPI.flickr.flags.queue, 0);
-          }
+          }).success(function(d) {});
         },
         sizes: function(s) {
           var _size;
@@ -1068,6 +1022,9 @@
         }
       },
       instagram: {
+        linkify: function(text) {
+          return util.linkify_with_twitter(text, "_blank");
+        },
         assetTest: function(asset, media, d) {
           if (d) {
             if (ExternalAPI.instagram.isInstagramUrl(d)) {
@@ -1086,14 +1043,24 @@
         thumbnail: function(media, uid) {
           return "<div class='thumbnail thumb-instagram' id='" + uid + "_thumb'><img src='" + ExternalAPI.instagram.get(media, true) + "'></div>";
         },
-        createElement: function(media, loading_message) {
-          return "<div class='media-image media-shadow'><a href='" + media.link + "' target='_blank'><img src='" + ExternalAPI.instagram.get(media) + "'></a></div>";
+        createElement: function(media, loading_message, configuration) {
+          var c, size;
+
+          size = 1000;
+          if (c = ko.unwrap(configuration)) {
+            if (c = ko.unwrap(c.slider)) {
+              if (c = ko.unwrap(c.content)) {
+                size = ko.unwrap(c.height) || 1000;
+              }
+            }
+          }
+          return "<div class='media-image media-shadow'><a href='" + media.link + "' target='_blank'><img src='" + ExternalAPI.instagram.get(media, false, size) + "'></a></div>";
         },
-        get: function(m, thumb) {
+        get: function(m, thumb, size) {
           if (thumb) {
             return "//instagr.am/p/" + m.id + "/media/?size=t";
           } else {
-            return "//instagr.am/p/" + m.id + "/media/?size=" + ExternalAPI.instagram.sizes(masterConfig.sizes.api.height);
+            return "//instagr.am/p/" + m.id + "/media/?size=" + ExternalAPI.instagram.sizes(size);
           }
         },
         sizes: function(s) {
@@ -1125,24 +1092,17 @@
         }
       },
       soundcloud: {
-        get: function(m) {
-          ExternalAPI.soundcloud.flags.queue.push(m);
-          ExternalAPI.soundcloud.flags.active = true;
+        linkify: function(text) {
+          return util.linkify_with_twitter(text, "_blank");
         },
-        create: function(m, callback) {
+        get: function(m) {},
+        create: function(m) {
           var the_url;
 
           the_url = "//soundcloud.com/oembed?url=" + m.id + "&format=js&callback=?";
           library.getJSON(the_url, function(d) {
             library.attachElement("#" + m.uid, d.html);
-            callback();
           });
-        },
-        pushQueue: function() {
-          if (ExternalAPI.soundcloud.flags.queue.length > 0) {
-            ExternalAPI.soundcloud.create(ExternalAPI.soundcloud.flags.queue[0], ExternalAPI.soundcloud.pushQueue);
-            util.removeRange(ExternalAPI.soundcloud.flags.queue, 0);
-          }
         },
         assetTest: function(asset, media, d) {
           if (d) {
@@ -1166,6 +1126,9 @@
         }
       },
       wikipedia: {
+        linkify: function(text) {
+          return util.linkify_with_twitter(text, "_blank");
+        },
         assetTest: function(asset, media, d) {
           var wiki_id;
 
@@ -1190,18 +1153,14 @@
           return mediaElem = "<div class='wikipedia' id='" + media.uid + "'>" + loading_message + "</div>";
         },
         isTextMedia: true,
-        get: function(m) {
-          ExternalAPI.wikipedia.flags.queue.push(m);
-          ExternalAPI.wikipedia.flags.active = true;
-        },
-        create: function(m, callback) {
-          var callback_timeout, temp_text, the_url;
+        get: function(m) {},
+        create: function(m) {
+          var temp_text, the_url;
 
           the_url = "//" + m.lang + ".wikipedia.org/w/api.php?action=query&prop=extracts&redirects=&titles=" + m.id + "&exintro=1&format=json&callback=?";
-          callback_timeout = setTimeout(callback, masterConfig.timers.api, m);
           if (browser.browser === "Explorer" && parseInt(browser.version, 10) >= 7 && window.XDomainRequest) {
-            temp_text = "<h4><a href='http://" + masterConfig.language.api.wikipedia + ".wikipedia.org/wiki/" + m.id + "' target='_blank'>" + m.url + "</a></h4>";
-            temp_text += "<span class='wiki-source'>" + masterConfig.language.messages.wikipedia + "</span>";
+            temp_text = "<h4><a href='http://" + language.api.wikipedia + ".wikipedia.org/wiki/" + m.id + "' target='_blank'>" + m.url + "</a></h4>";
+            temp_text += "<span class='wiki-source'>" + language.messages.wikipedia + "</span>";
             temp_text += "<p>Wikipedia entry unable to load using Internet Explorer 8 or below.</p>";
             library.attachElement("#" + m.uid, temp_text);
           }
@@ -1229,8 +1188,8 @@
                 }
                 i++;
               }
-              _wiki = "<h4><a href='http://" + masterConfig.language.api.wikipedia + ".wikipedia.org/wiki/" + wiki_title + "' target='_blank'>" + wiki_title + "</a></h4>";
-              _wiki += "<span class='wiki-source'>" + masterConfig.language.messages.wikipedia + "</span>";
+              _wiki = "<h4><a href='http://" + language.api.wikipedia + ".wikipedia.org/wiki/" + wiki_title + "' target='_blank'>" + wiki_title + "</a></h4>";
+              _wiki += "<span class='wiki-source'>" + language.messages.wikipedia + "</span>";
               _wiki += util.linkify_wikipedia(wiki_text);
               if (wiki_extract.match("REDIRECT")) {
                 don = void 0;
@@ -1246,92 +1205,98 @@
             trace("WIKIPEDIA ERROR: " + textStatus + " " + jqXHR.responseText);
             trace(errorThrown);
             library.attachElement("#" + m.uid, library.loadingmessage("<p>Wikipedia is not responding</p>"));
-            clearTimeout(callback_timeout);
             (_base = ExternalAPI.wikipedia.flags).tries || (_base.tries = 0);
             if (ExternalAPI.wikipedia.flags.tries < 4) {
               trace("WIKIPEDIA ATTEMPT " + ExternalAPI.wikipedia.flags.tries);
               trace(m);
               ExternalAPI.wikipedia.flags.tries++;
-              ExternalAPI.wikipedia.create(m, callback);
-            } else {
-              callback();
+              ExternalAPI.wikipedia.create(m);
             }
           }).success(function(d) {
             ExternalAPI.wikipedia.flags.tries = 0;
-            clearTimeout(callback_timeout);
-            callback();
           });
-        },
-        pushQueue: function() {
-          if (ExternalAPI.wikipedia.flags.queue.length > 0) {
-            trace("WIKIPEDIA PUSH QUE " + ExternalAPI.wikipedia.flags.queue.length);
-            ExternalAPI.wikipedia.create(ExternalAPI.wikipedia.flags.queue[0], ExternalAPI.wikipedia.pushQueue);
-            util.removeRange(ExternalAPI.wikipedia.flags.queue, 0);
-          }
         }
       },
       youtube: {
+        linkify: function(text) {
+          return util.linkify_with_twitter(text, "_blank");
+        },
         get: function(m) {
-          var the_url;
+          var deferred, the_url;
 
           the_url = "//gdata.youtube.com/feeds/api/videos/" + m.id + "?v=2&alt=jsonc&callback=?";
-          ExternalAPI.youtube.flags.queue.push(m);
-          if (!ExternalAPI.youtube.flags.active) {
-            if (!ExternalAPI.youtube.flags.api_loaded) {
-              LoadLib.js("//www.youtube.com/player_api", function() {
-                trace("YouTube API Library Loaded");
+          if (!ExternalAPI.youtube.flags.api_loading) {
+            ExternalAPI.youtube.flags.api_loading = true;
+            deferred = $.Deferred();
+            ExternalAPI.youtube.flags.apiPromise = deferred.promise();
+            LoadLib.js("//www.youtube.com/player_api", function() {
+              trace("YouTube API Library Loaded");
+              return YT.ready(function() {
+                return deferred.resolve();
               });
-            }
+            });
           }
           library.getJSON(the_url, function(d) {
             ExternalAPI.youtube.createThumb(d, m);
           });
         },
         create: function(m) {
-          var p, vid_start_minutes, vid_start_seconds, vidstart;
+          return ExternalAPI.youtube.flags.apiPromise.done(function() {
+            var p, vid_start_minutes, vid_start_seconds, vidstart;
 
-          if (typeof m.start !== "undefined") {
-            vidstart = m.start.toString();
-            vid_start_minutes = 0;
-            vid_start_seconds = 0;
-            if (vidstart.match("m")) {
-              vid_start_minutes = parseInt(vidstart.split("m")[0], 10);
-              vid_start_seconds = parseInt(vidstart.split("m")[1].split("s")[0], 10);
-              m.start = (vid_start_minutes * 60) + vid_start_seconds;
-            } else {
-              m.start = 0;
-            }
-          } else {
-            m.start = 0;
-          }
-          p = {
-            active: false,
-            player: {},
-            name: m.uid,
-            playing: false,
-            hd: false
-          };
-          if (typeof m.hd !== "undefined") {
-            p.hd = true;
-          }
-          p.player[m.id] = new YT.Player(m.uid, {
-            height: "390",
-            width: "640",
-            playerVars: {
-              enablejsapi: 1,
-              color: "white",
-              showinfo: 0,
-              theme: "light",
-              start: m.start,
-              rel: 0
-            },
-            videoId: m.id,
-            events: {
-              onReady: ExternalAPI.youtube.onPlayerReady,
-              onStateChange: ExternalAPI.youtube.onStateChange
+            if (!m.player) {
+              if (typeof m.start !== "undefined") {
+                vidstart = m.start.toString();
+                vid_start_minutes = 0;
+                vid_start_seconds = 0;
+                if (vidstart.match("m")) {
+                  vid_start_minutes = parseInt(vidstart.split("m")[0], 10);
+                  vid_start_seconds = parseInt(vidstart.split("m")[1].split("s")[0], 10);
+                  m.start = (vid_start_minutes * 60) + vid_start_seconds;
+                } else {
+                  m.start = 0;
+                }
+              } else {
+                m.start = 0;
+              }
+              m.player = p = {
+                active: false,
+                player: {},
+                name: m.uid,
+                playing: false,
+                hd: false
+              };
+              if (typeof m.hd !== "undefined") {
+                p.hd = true;
+              }
+              p.player[m.id] = new YT.Player(m.uid, {
+                height: "100%",
+                width: "100%",
+                playerVars: {
+                  enablejsapi: 1,
+                  color: "white",
+                  showinfo: 0,
+                  theme: "light",
+                  start: m.start,
+                  rel: 0
+                },
+                videoId: m.id,
+                events: {
+                  onReady: function() {},
+                  onStateChange: function(e) {
+                    return m.player.playing = e.data === YT.PlayerState.PLAYING;
+                  }
+                }
+              });
             }
           });
-          ExternalAPI.youtube.flags.array.push(p);
+        },
+        stop: function(m) {
+          if (m.player) {
+            if (m.player.player[m.id].stopVideo) {
+              return m.player.player[m.id].stopVideo();
+            }
+          }
         },
         createThumb: function(d, m) {
           var thumb_id;
@@ -1344,49 +1309,6 @@
             library.attachElement(thumb_id, "<img src='" + d.data.thumbnail.sqDefault + "'>");
           }
         },
-        pushQueue: function() {
-          var i;
-
-          i = 0;
-          while (i < ExternalAPI.youtube.flags.queue.length) {
-            ExternalAPI.youtube.create(ExternalAPI.youtube.flags.queue[i]);
-            i++;
-          }
-          ExternalAPI.youtube.flags.queue = [];
-        },
-        onAPIReady: function() {
-          ExternalAPI.youtube.flags.active = true;
-          ExternalAPI.youtube.pushQueue();
-        },
-        stopPlayers: function() {
-          var i;
-
-          i = 0;
-          while (i < ExternalAPI.youtube.flags.array.length) {
-            if (ExternalAPI.youtube.flags.array[i].playing) {
-              ExternalAPI.youtube.flags.array[i].player[Object.keys(ExternalAPI.youtube.flags.array[i].player)[0]].stopVideo();
-            }
-            i++;
-          }
-        },
-        onStateChange: function(e) {
-          var dontcrashjs2coffee, i;
-
-          i = 0;
-          while (i < ExternalAPI.youtube.flags.array.length) {
-            if (ExternalAPI.youtube.flags.array[i].player[Object.keys(ExternalAPI.youtube.flags.array[i].player)[0]] === e.target) {
-              if (e.data === YT.PlayerState.PLAYING) {
-                ExternalAPI.youtube.flags.array[i].playing = true;
-                trace(ExternalAPI.youtube.flags.array[i].hd);
-                if (ExternalAPI.youtube.flags.array[i].hd) {
-                  dontcrashjs2coffee = 0;
-                }
-              }
-            }
-            i++;
-          }
-        },
-        onPlayerReady: function(e) {},
         assetTest: function(asset, media, d) {
           if (d) {
             if (d.match("(www.)?youtube|youtu.be")) {
@@ -1419,11 +1341,11 @@
         }
       },
       vimeo: {
-        get: function(m) {
-          ExternalAPI.vimeo.flags.queue.push(m);
-          ExternalAPI.vimeo.flags.active = true;
+        linkify: function(text) {
+          return util.linkify_with_twitter(text, "_blank");
         },
-        create: function(m, callback) {
+        get: function(m) {},
+        create: function(m) {
           var thumb_url, video_url;
 
           trace("VIMEO CREATE");
@@ -1431,7 +1353,6 @@
           video_url = "//player.vimeo.com/video/" + m.id + "?title=0&amp;byline=0&amp;portrait=0&amp;color=ffffff";
           library.getJSON(thumb_url, function(d) {
             ExternalAPI.vimeo.createThumb(d, m);
-            callback();
           });
           library.attachElement("#" + m.uid, "<iframe autostart='false' frameborder='0' width='100%' height='100%' src='" + video_url + "'></iframe>");
         },
@@ -1441,12 +1362,6 @@
           trace("VIMEO CREATE THUMB");
           thumb_id = "#" + m.uid + "_thumb";
           library.attachElement(thumb_id, "<img src='" + d[0].thumbnail_small + "'>");
-        },
-        pushQueue: function() {
-          if (ExternalAPI.vimeo.flags.queue.length > 0) {
-            ExternalAPI.vimeo.create(ExternalAPI.vimeo.flags.queue[0], ExternalAPI.vimeo.pushQueue);
-            util.removeRange(ExternalAPI.vimeo.flags.queue, 0);
-          }
         },
         assetTest: function(asset, media, d) {
           if (d) {
@@ -1466,26 +1381,20 @@
           var mediaElem;
 
           ExternalAPI.vimeo.get(media);
-          return mediaElem = "<div class='media-shadow media-frame video vimeo' id='" + media.uid + "'>" + loading_message + "</div>";
+          return mediaElem = "<div class='media-shadow media-frame video vimeo'  id='" + media.uid + "'>" + loading_message + "</div>";
         }
       },
       vine: {
-        get: function(m) {
-          ExternalAPI.vine.flags.queue.push(m);
-          ExternalAPI.vine.flags.active = true;
+        linkify: function(text) {
+          return util.linkify_with_twitter(text, "_blank");
         },
+        get: function(m) {},
         create: function(m, callback) {
           var video_url;
 
           trace("VINE CREATE");
           video_url = "https://vine.co/v/" + m.id + "/embed/simple";
           library.attachElement("#" + m.uid, "<iframe frameborder='0' width='100%' height='100%' src='" + video_url + "'></iframe><script async src='http://platform.vine.co/static/scripts/embed.js' charset='utf-8'></script>");
-        },
-        pushQueue: function() {
-          if (ExternalAPI.vine.flags.queue.length > 0) {
-            ExternalAPI.vine.create(ExternalAPI.vine.flags.queue[0], ExternalAPI.vine.pushQueue);
-            util.removeRange(ExternalAPI.vine.flags.queue, 0);
-          }
         },
         assetTest: function(asset, media, d) {
           if (d) {
@@ -1518,6 +1427,9 @@
         }
       },
       dailymotion: {
+        linkify: function(text) {
+          return util.linkify_with_twitter(text, "_blank");
+        },
         assetTest: function(asset, media, d) {
           if (d) {
             if (d.match("(www.)?dailymotion.com")) {
@@ -1537,6 +1449,9 @@
         }
       },
       image: {
+        linkify: function(text) {
+          return util.linkify_with_twitter(text, "_blank");
+        },
         assetTest: function(asset, media, d) {
           if (d) {
             if (d.match(/jpg|jpeg|png|gif/i) || d.match("staticmap") || d.match("yfrog.com") || d.match("twitpic.com")) {
@@ -1555,10 +1470,13 @@
           if (media.id.match("https://")) {
             media.id = media.id.replace("https://", "http://");
           }
-          return "<div class='media-image media-shadow'><img src='" + media.id + "' class='media-image'></div>";
+          return "<div class='media-image'><img src='" + media.id + "' class='media-image'></div>";
         }
       },
       storify: {
+        linkify: function(text) {
+          return util.linkify_with_twitter(text, "_blank");
+        },
         assetTest: function(asset, media, d) {
           if (d) {
             if (d.match("storify")) {
@@ -1578,6 +1496,9 @@
         isTextMedia: true
       },
       blockquote: {
+        linkify: function(text) {
+          return util.linkify_with_twitter(text, "_blank");
+        },
         assetTest: function(asset, media, d) {
           if (d) {
             if (d.match("blockquote")) {
@@ -1597,6 +1518,9 @@
         isTextMedia: true
       },
       iframe: {
+        linkify: function(text) {
+          return util.linkify_with_twitter(text, "_blank");
+        },
         assetTest: function(asset, media, d) {
           var group, regex;
 
@@ -1604,7 +1528,7 @@
             if (d.match("iframe")) {
               media.type = "iframe";
               trace("IFRAME");
-              regex = /src=['"](\S+?)['"]\s/;
+              regex = /src=['"](\S+?)['"]/;
               group = d.match(regex);
               if (group) {
                 media.id = group[1];
@@ -1614,7 +1538,7 @@
               if (Boolean(media.id)) {
                 return media;
               } else {
-                return false;
+                return void 0;
               }
             }
           }
@@ -1628,13 +1552,16 @@
         isTextMedia: true
       },
       unknown: {
+        linkify: function(text) {
+          return util.linkify_with_twitter(text, "_blank");
+        },
         assetTest: function(asset, media, d) {
           if (d) {
             trace("unknown media");
             return $.extend(media, {
               type: "unknown",
               id: d,
-              mediaType: unknownMediaType
+              mediaType: ExternalAPI.unknown
             });
           }
         },
@@ -1648,6 +1575,9 @@
         isTextMedia: true
       },
       website: {
+        linkify: function(text) {
+          return util.linkify_with_twitter(text, "_blank");
+        },
         assetTest: function(asset, media, d) {
           if (d) {
             if (d.indexOf("http://") === 0) {
@@ -1667,10 +1597,7 @@
           ExternalAPI.website.get(media);
           return mediaElem = "<div class='media-shadow website' id='" + media.uid + "'>" + loading_message + "</div>";
         },
-        get: function(m, thumb) {
-          ExternalAPI.website.flags.queue.push(m);
-          ExternalAPI.website.flags.active = true;
-        },
+        get: function(m, thumb) {},
         sizes: function(s) {
           var _size;
 
@@ -1692,19 +1619,10 @@
           url = m.id.replace("http://", "");
           library.attachElement("#" + m.uid, "<a href='" + m.id + "' target='_blank'><img src='" + thumb_url + "size=x&url=" + url + "'></a>");
           library.attachElement("#" + m.uid + "_thumb", "<img src='" + thumb_url + "size=t&url=" + url + "'>");
-        },
-        pushQueue: function() {
-          var i;
-
-          i = 0;
-          while (i < ExternalAPI.website.flags.queue.length) {
-            ExternalAPI.website.create(ExternalAPI.website.flags.queue[i]);
-            i++;
-          }
-          ExternalAPI.website.flags.queue = [];
         }
       }
     };
+    return window.ExternalAPI = ExternalAPI;
   });
 
 }).call(this);
