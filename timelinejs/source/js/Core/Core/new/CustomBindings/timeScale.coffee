@@ -58,7 +58,7 @@
 
 		if timespan.centuries > count / density
 			interval = intervalCalc.century
-			interval_major = intervalCalc.millenium
+			interval_major = intervalCalc.millennium
 			interval_macro = intervalCalc.decade
 		else if timespan.decades > count / density
 			interval = intervalCalc.decade
@@ -389,7 +389,7 @@
 		else if _interval.type is "age"
 			_first_date = Math.floor(minDate.getFullYear() / 1000000) * 1000000
 			_is_year = true
-		else if _interval.type is "millenium"
+		else if _interval.type is "millennium"
 			_first_date = Math.floor(minDate.getFullYear() / 1000) * 1000
 			_is_year = true
 		else if _interval.type is "century"
@@ -442,7 +442,7 @@
 				int_obj.date.setFullYear _first_date + (inc_time * 10000000)
 			else if _interval.type is "age"
 				int_obj.date.setFullYear _first_date + (inc_time * 1000000)
-			else if _interval.type is "millenium"
+			else if _interval.type is "millennium"
 				int_obj.date.setFullYear _first_date + (inc_time * 1000)
 			else if _interval.type is "century"
 				int_obj.date.setFullYear _first_date + (inc_time * 100)
@@ -545,8 +545,8 @@
 			timerelative.start = _first.epochs
 		else if _type is "age"
 			timerelative.start = _first.ages
-		else if _type is "millenium"
-			timerelative.start = first.milleniums
+		else if _type is "millennium"
+			timerelative.start = first.millenniums
 		else if _type is "century"
 			timerelative.start = _first.centuries
 		else if _type is "decade"
@@ -576,8 +576,8 @@
 				timerelative.end = _last.epochs
 			else if _type is "age"
 				timerelative.end = _last.ages
-			else if _type is "millenium"
-				timerelative.end = last.milleniums
+			else if _type is "millennium"
+				timerelative.end = last.millenniums
 			else if _type is "century"
 				timerelative.end = _last.centuries
 			else if _type is "decade"

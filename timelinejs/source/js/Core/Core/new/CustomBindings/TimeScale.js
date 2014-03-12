@@ -54,7 +54,7 @@
       density = ko.unwrap(navConfiguration.density);
       if (timespan.centuries > count / density) {
         interval = intervalCalc.century;
-        interval_major = intervalCalc.millenium;
+        interval_major = intervalCalc.millennium;
         interval_macro = intervalCalc.decade;
       } else if (timespan.decades > count / density) {
         interval = intervalCalc.decade;
@@ -396,7 +396,7 @@
       } else if (_interval.type === "age") {
         _first_date = Math.floor(minDate.getFullYear() / 1000000) * 1000000;
         _is_year = true;
-      } else if (_interval.type === "millenium") {
+      } else if (_interval.type === "millennium") {
         _first_date = Math.floor(minDate.getFullYear() / 1000) * 1000;
         _is_year = true;
       } else if (_interval.type === "century") {
@@ -446,7 +446,7 @@
           int_obj.date.setFullYear(_first_date + (inc_time * 10000000));
         } else if (_interval.type === "age") {
           int_obj.date.setFullYear(_first_date + (inc_time * 1000000));
-        } else if (_interval.type === "millenium") {
+        } else if (_interval.type === "millennium") {
           int_obj.date.setFullYear(_first_date + (inc_time * 1000));
         } else if (_interval.type === "century") {
           int_obj.date.setFullYear(_first_date + (inc_time * 100));
@@ -540,8 +540,8 @@
         timerelative.start = _first.epochs;
       } else if (_type === "age") {
         timerelative.start = _first.ages;
-      } else if (_type === "millenium") {
-        timerelative.start = first.milleniums;
+      } else if (_type === "millennium") {
+        timerelative.start = first.millenniums;
       } else if (_type === "century") {
         timerelative.start = _first.centuries;
       } else if (_type === "decade") {
@@ -572,8 +572,8 @@
           timerelative.end = _last.epochs;
         } else if (_type === "age") {
           timerelative.end = _last.ages;
-        } else if (_type === "millenium") {
-          timerelative.end = last.milleniums;
+        } else if (_type === "millennium") {
+          timerelative.end = last.millenniums;
         } else if (_type === "century") {
           timerelative.end = _last.centuries;
         } else if (_type === "decade") {
