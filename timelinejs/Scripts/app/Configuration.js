@@ -30,6 +30,7 @@
       "ko.easing": "/source/js/core/core/new/custombindings/easing",
       "ko.importDates": "/source/js/core/core/new/custombindings/importDate",
       "ko.timescale": "/source/js/core/core/new/custombindings/timescale",
+      "ko.getWidth": "/source/js/core/core/new/custombindings/getWidth",
       "VMM.Browser": "/source/js/core/core/new/VMM.Browser",
       "VMM.Date": "/source/js/core/core/new/VMM.Date",
       "VMM.FileExtension": "/source/js/core/core/new/VMM.FileExtension",
@@ -51,7 +52,7 @@
     }
   });
 
-  require(["VMM.Timeline", "knockout", "jquery", "linq", "ko.easing", "ko.importDates", "ko.timescale"], function(Timeline, ko, $) {
+  require(["VMM.Timeline", "knockout", "jquery", "linq", "ko.easing", "ko.importDates", "ko.timescale", "ko.getWidth"], function(Timeline, ko, $) {
     var tConfig, timeline;
 
     tConfig = {
@@ -91,8 +92,8 @@
         nav: ko.observable({
           height: ko.observable(200),
           density: ko.observable(4),
-          currentLeft: ko.observable(0),
-          zoom: ko.observable(1),
+          currentLeft: ko.observable(25),
+          zoom: ko.observable(.9),
           mousedown: function(data, e) {
             if (data.config().nav().moving && e.buttons) {
               data.config().nav().currentLeft(data.config().nav().currentLeft() - (data.config().nav().lastX - e.clientX));

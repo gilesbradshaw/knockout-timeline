@@ -85,6 +85,9 @@
     <Content Include="source\js\Core\Core\new\CustomBindings\easing.js">
       <DependentUpon>easing.coffee</DependentUpon>
     </Content>
+    <Content Include="source\js\Core\Core\new\CustomBindings\getWidth.js">
+      <DependentUpon>getWidth.coffee</DependentUpon>
+    </Content>
     <Content Include="source\js\Core\Core\new\CustomBindings\importDate.js">
       <DependentUpon>importDate.coffee</DependentUpon>
     </Content>
@@ -109,6 +112,7 @@
     <Content Include="source\js\Core\Core\new\CustomBindings\easing.coffee" />
     <Content Include="source\js\Core\Core\new\CustomBindings\importDate.coffee" />
     <Content Include="source\js\Core\Core\new\CustomBindings\timeScale.coffee" />
+    <Content Include="source\js\Core\Core\new\CustomBindings\getWidth.coffee" />
     <None Include="source\js\Core\Core\new\VMM.Browser.coffee" />
     <Content Include="source\js\Core\Core\new\trace.js">
       <DependentUpon>trace.coffee</DependentUpon>

@@ -149,26 +149,35 @@
 						</div>
 						<div class="time-interval-major">
 							<!-- ko foreach:$timescale.major -->
-							<div data-bind="
+							<!-- ko createWidth-->
+							<div data-bind="measureWidth:text">
+								<div data-bind="
 									text:text,
-									attr:{style:'color:blue;left:' + left() + 'px;text-indent:' + indent() + 'px;opacity:100;'}
+									attr:{style:'left:' + left() + 'px;text-indent:'  + ((0-$width())/2) + 'px;opacity:100;'}
 									">
 
+								</div>
 							</div>
 							<!-- /ko -->
+							<!-- /ko -->
 
-						</div>
+							</div>
 
 						<div class="time-interval">
+							<!-- this is a pain abolsuteely positioned elements don;lt have width-->
 							<!-- ko foreach:$timescale.interval -->
-							<div data-bind="
+							<!-- ko createWidth-->
+							<div data-bind="measureWidth:text">
+								<div data-bind="
 									text:text,
-									attr:{style:'color:red;left:' + left() + 'px;text-indent:' + indent() + 'px;opacity:100;'}
+									attr:{style:'left:' + left() + 'px;text-indent:' + ((0-$width())/2) + 'px;opacity:100;'}
 									">
 
+								</div>
 							</div>
-
 							<!-- /ko -->
+							<!-- /ko -->
+
 
 						</div>
 					</div>

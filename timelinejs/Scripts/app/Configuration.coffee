@@ -29,6 +29,7 @@ requirejs.config
 		"ko.easing":"/source/js/core/core/new/custombindings/easing"
 		"ko.importDates":"/source/js/core/core/new/custombindings/importDate"
 		"ko.timescale":"/source/js/core/core/new/custombindings/timescale"
+		"ko.getWidth":"/source/js/core/core/new/custombindings/getWidth"
 
 		"VMM.Browser":"/source/js/core/core/new/VMM.Browser"
 		"VMM.Date":"/source/js/core/core/new/VMM.Date"
@@ -67,6 +68,7 @@ require [
 	"ko.easing"
 	"ko.importDates"
 	"ko.timescale"
+	"ko.getWidth"
 
 ], (Timeline, ko, $)->
 	
@@ -101,8 +103,8 @@ require [
 			nav: ko.observable
 				height:ko.observable 200
 				density:ko.observable 4
-				currentLeft:ko.observable 0
-				zoom:ko.observable 1
+				currentLeft:ko.observable 25
+				zoom:ko.observable .9
 				mousedown:(data,e)->
 					if data.config().nav().moving and e.buttons
 						data.config().nav().currentLeft data.config().nav().currentLeft()- (data.config().nav().lastX - e.clientX)
