@@ -67,6 +67,7 @@
     <None Include="Scripts\jquery.linq-vsdoc.js" />
     <Content Include="Scripts\jquery.linq.js" />
     <Content Include="Scripts\jquery.linq.min.js" />
+    <Content Include="Scripts\knockouch-amd.js" />
     <Content Include="Scripts\knockout-3.1.0.debug.js" />
     <Content Include="Scripts\knockout-3.1.0.js" />
     <Content Include="Scripts\r.js" />
@@ -87,6 +88,9 @@
     <Content Include="source\js\Core\Core\new\CustomBindings\importDate.js">
       <DependentUpon>importDate.coffee</DependentUpon>
     </Content>
+    <Content Include="source\js\Core\Core\new\CustomBindings\TimeScale.js">
+      <DependentUpon>timeScale.coffee</DependentUpon>
+    </Content>
     <Content Include="source\js\Core\Core\new\Date.extensions.js">
       <DependentUpon>Date.extensions.coffee</DependentUpon>
     </Content>
@@ -104,6 +108,7 @@
     <Content Include="source\js\Core\Core\new\VMM.masterConfig.coffee" />
     <Content Include="source\js\Core\Core\new\CustomBindings\easing.coffee" />
     <Content Include="source\js\Core\Core\new\CustomBindings\importDate.coffee" />
+    <Content Include="source\js\Core\Core\new\CustomBindings\timeScale.coffee" />
     <None Include="source\js\Core\Core\new\VMM.Browser.coffee" />
     <Content Include="source\js\Core\Core\new\trace.js">
       <DependentUpon>trace.coffee</DependentUpon>

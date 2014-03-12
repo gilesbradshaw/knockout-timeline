@@ -3,10 +3,16 @@ requirejs.config
 	shim:
 		easing:["jquery"]
 		linq:["jquery"]
+		zepto:["jquery"]
 		"bootstrap-tooltip":["jquery"]
+		"knockouch":["knockout", "zepto"]
+	map:
+		'*':
+			'ko':'knockout'
 		
 	paths:
 		knockout: "Scripts/knockout-3.1.0.debug"
+		
 		jquery: "Scripts/jquery-2.1.0"
 		linq: "Scripts/jquery.linq"
 		"trace":"/source/js/core/core/new/trace"
@@ -22,6 +28,7 @@ requirejs.config
 
 		"ko.easing":"/source/js/core/core/new/custombindings/easing"
 		"ko.importDates":"/source/js/core/core/new/custombindings/importDate"
+		"ko.timescale":"/source/js/core/core/new/custombindings/timescale"
 
 		"VMM.Browser":"/source/js/core/core/new/VMM.Browser"
 		"VMM.Date":"/source/js/core/core/new/VMM.Date"
@@ -59,6 +66,8 @@ require [
 	"linq"
 	"ko.easing"
 	"ko.importDates"
+	"ko.timescale"
+
 ], (Timeline, ko, $)->
 	
 	tConfig= 
@@ -91,6 +100,17 @@ require [
 			spacing: ko.observable 15
 			nav: ko.observable
 				height:ko.observable 200
+				density:ko.observable 4
+				currentLeft:ko.observable 0
+				zoom:ko.observable 1
+				mousedown:(data,e)->
+					if data.config().nav().moving and e.buttons
+						data.config().nav().currentLeft data.config().nav().currentLeft()- (data.config().nav().lastX - e.clientX)
+					data.config().nav().moving= e.buttons
+					data.config().nav().lastX = e.clientX
+					0
+				zoomIn:(data)-> data.config().nav().zoom data.config().nav().zoom()* 1.1
+				zoomOut:(data)-> data.config().nav().zoom data.config().nav().zoom() *.9
 			
 			slider: ko.observable
 				height: ko.observable 600
@@ -116,8 +136,8 @@ require [
 
 			dates:ko.observableArray [
 
-					startDate:ko.observable "2011,12,12"
-					endDate:ko.observable "2012,1,27"
+					startDate:ko.observable "2014,1,1"
+					endDate:ko.observable "2014,1,10"
 					headline:ko.observable "vimeo"
 					text:ko.observable "<p>Vimeo vid</p>"
 					asset:ko.observable
@@ -126,8 +146,8 @@ require [
 						caption:ko.observable ""
 			
 				,
-					startDate:ko.observable "2011,12,12"
-					endDate:ko.observable "2012,1,27"
+					startDate:ko.observable "2014,1,1"
+					endDate:ko.observable "2014,1,10"
 					headline:ko.observable "you tube"
 					text:ko.observable "<p>You tube Test</p>"
 					asset:ko.observable
@@ -135,8 +155,8 @@ require [
 						credit:ko.observable ""
 						caption:ko.observable ""
 				,
-					startDate:ko.observable "2011,12,12"
-					endDate:ko.observable "2012,1,27"
+					startDate:ko.observable "2014,1,1"
+					endDate:ko.observable "2014,1,10"
 					headline:ko.observable "you tube"
 					text:ko.observable "<p>You tube Test another</p>"
 					asset:ko.observable
@@ -145,8 +165,8 @@ require [
 						caption:ko.observable "captioned by @Wildlife_Focus"
 
 				,
-					startDate:ko.observable "2011,12,12"
-					endDate:ko.observable "2012,1,27"
+					startDate:ko.observable "2014,1,1"
+					endDate:ko.observable "2014,1,10"
 					headline:ko.observable "wiki"
 					text:ko.observable "<p>wiki test</p>"
 					asset:ko.observable
@@ -154,8 +174,8 @@ require [
 						credit:ko.observable "credit to @therealmrbenn"
 						caption:ko.observable "captioned by @Wildlife_Focus"
 				,
-					startDate:ko.observable "2011,12,12"
-					endDate:ko.observable "2012,1,27"
+					startDate:ko.observable "2014,1,1"
+					endDate:ko.observable "2014,1,10"
 					headline:ko.observable "daily motion"
 					text:ko.observable "<p>daily motion</p>"
 					asset:ko.observable
@@ -163,8 +183,8 @@ require [
 						credit:ko.observable "credit to @therealmrbenn"
 						caption:ko.observable "captioned by @Wildlife_Focus"
 				,
-					startDate:ko.observable "2011,12,12"
-					endDate:ko.observable "2012,1,27"
+					startDate:ko.observable "2014,1,1"
+					endDate:ko.observable "2014,1,10"
 					headline:ko.observable "pcture"
 					text:ko.observable "<p>daily motion</p>"
 					asset:ko.observable
@@ -172,8 +192,8 @@ require [
 						credit:ko.observable "credit to @therealmrbenn"
 						caption:ko.observable "captioned by @Wildlife_Focus"
 				,
-					startDate:ko.observable "2011,12,12"
-					endDate:ko.observable "2012,1,27"
+					startDate:ko.observable "2014,1,1"
+					endDate:ko.observable "2014,1,10"
 					headline:ko.observable "sound clound"
 					text:ko.observable "<p>daily motion</p>"
 					asset:ko.observable
@@ -181,8 +201,8 @@ require [
 						credit:ko.observable "credit to @therealmrbenn"
 						caption:ko.observable "captioned by @Wildlife_Focus"
 				,
-					startDate:ko.observable "2011,12,12"
-					endDate:ko.observable "2012,1,27"
+					startDate:ko.observable "2014,1,1"
+					endDate:ko.observable "2014,1,10"
 					headline:ko.observable "google map"
 					text:ko.observable "<p>daily motion</p>"
 					asset:ko.observable
@@ -190,8 +210,8 @@ require [
 						credit:ko.observable "credit to @therealmrbenn"
 						caption:ko.observable "captioned by @Wildlife_Focus"
 				,
-					startDate:ko.observable "2011,12,12"
-					endDate:ko.observable "2012,1,27"
+					startDate:ko.observable "2014,1,1"
+					endDate:ko.observable "2014,1,10"
 					headline:ko.observable "google plus"
 					text:ko.observable "<p>daily motion</p>"
 					asset:ko.observable
@@ -199,8 +219,8 @@ require [
 						credit:ko.observable "credit to @therealmrbenn"
 						caption:ko.observable "captioned by @Wildlife_Focus"
 				,
-					startDate:ko.observable "2011,12,12"
-					endDate:ko.observable "2012,1,27"
+					startDate:ko.observable "2014,1,1"
+					endDate:ko.observable "2014,1,10"
 					headline:ko.observable "flickr"
 					text:ko.observable "<p>daily motion</p>"
 					asset:ko.observable
@@ -208,8 +228,8 @@ require [
 						credit:ko.observable "credit to @therealmrbenn"
 						caption:ko.observable "captioned by @Wildlife_Focus"
 				,
-					startDate:ko.observable "2011,12,12"
-					endDate:ko.observable "2012,1,27"
+					startDate:ko.observable "2014,1,1"
+					endDate:ko.observable "2014,1,10"
 					headline:ko.observable "flickr"
 					text:ko.observable "<p>daily motion</p>"
 					asset:ko.observable
@@ -217,8 +237,8 @@ require [
 						credit:ko.observable "credit to @therealmrbenn"
 						caption:ko.observable "captioned by @Wildlife_Focus"
 				,
-					startDate:ko.observable "2011,12,12"
-					endDate:ko.observable "2012,1,27"
+					startDate:ko.observable "2014,1,1"
+					endDate:ko.observable "2014,1,10"
 					headline:ko.observable "google doc"
 					text:ko.observable "<p>daily motion</p>"
 					asset:ko.observable
@@ -226,8 +246,8 @@ require [
 						credit:ko.observable "credit to @therealmrbenn"
 						caption:ko.observable "captioned by @Wildlife_Focus"
 				,
-					startDate:ko.observable "2011,12,12"
-					endDate:ko.observable "2012,1,27"
+					startDate:ko.observable "2014,1,1"
+					endDate:ko.observable "2014,1,10"
 					headline:ko.observable "web siter"
 					text:ko.observable "<p>daily motion</p>"
 					asset:ko.observable
@@ -235,8 +255,8 @@ require [
 						credit:ko.observable "credit to @therealmrbenn"
 						caption:ko.observable "captioned by @Wildlife_Focus"
 				,
-					startDate:ko.observable "2011,12,12"
-					endDate:ko.observable "2012,1,27"
+					startDate:ko.observable "2014,1,1"
+					endDate:ko.observable "2014,1,10"
 					headline:ko.observable "web siter"
 					text:ko.observable "<p>daily motion</p>"
 					asset:ko.observable
@@ -244,8 +264,8 @@ require [
 						credit:ko.observable "credit to @therealmrbenn"
 						caption:ko.observable "captioned by @Wildlife_Focus"
 				,
-					startDate:ko.observable "2011,12,12"
-					endDate:ko.observable "2012,1,27"
+					startDate:ko.observable "2014,1,1"
+					endDate:ko.observable "2014,1,10"
 					headline:ko.observable "iframe"
 					text:ko.observable "<p>daily motion</p>"
 					asset:ko.observable
@@ -253,8 +273,8 @@ require [
 						credit:ko.observable "credit to @therealmrbenn"
 						caption:ko.observable "captioned by @Wildlife_Focus"
 				,
-					startDate:ko.observable "2011,12,12"
-					endDate:ko.observable "2012,1,27"
+					startDate:ko.observable "2014,1,1"
+					endDate:ko.observable "2014,1,10"
 					headline:ko.observable "unknown"
 					text:ko.observable "<p>daily motion</p>"
 					asset:ko.observable
@@ -278,8 +298,8 @@ require [
 		ko.applyBindings tConfig
 		if false 
 			tConfig.timeline().dates.push
-				startDate:ko.observable "2011,12,12"
-				endDate:ko.observable "2012,1,27"
+				startDate:ko.observable "2014,1,1"
+				endDate:ko.observable "2014,1,10"
 				headline:ko.observable "Vine#3"
 				text:ko.observable "<p>Vine Test</p>"
 				asset:ko.observable
@@ -299,8 +319,8 @@ require [
 				"text":"People say stuff",
 				"startDate":"2012,1,26",
 				"date": [
-						"startDate":"2011,12,12",
-						"endDate":"2012,1,27",
+						"startDate":"2014,1,1",
+						"endDate":"2014,1,10",
 						"headline":"Vine",
 						"text":"<p>Vine Test</p>",
 						"asset":
@@ -309,7 +329,7 @@ require [
 							"caption":"caption @GilesBradshaw"
 					,
 						"startDate":"2012,1,26",
-						"endDate":"2012,1,27",
+						"endDate":"2014,1,10",
 						"headline":"Sh*t Politicians Say",
 						"text":"<p>In true political fashion, his character rattles off common jargon heard from people running for office.</p>",
 						"asset":
@@ -333,7 +353,7 @@ require [
 							"credit":"all credit to the bbc",
 							"caption":"a captioon gopes here"
 					,
-						"startDate":"2011,12,12",
+						"startDate":"2014,1,1",
 						"headline":"Sh*t Girls Say",
 						"text":"",
 						"asset":
@@ -429,7 +449,7 @@ require [
 							"credit":"",
 							"caption":"Writers & Creators: Kyle Humphrey & Graydon Sheppard"
 					,
-						"startDate":"2012,1,27",
+						"startDate":"2014,1,10",
 						"headline":"Sh*t Web Designers Say",
 						"text":"",
 						"asset":

@@ -16,7 +16,7 @@
 	<!-- ko dates-->
 	<!-- ko importDates:{dates:timeline().dates, configuration:config()} -->
 		<div class="gb-timeline gb-storyjs"
-		data-bind="attr:{style:'width:' + config().width() + 'px;'}"
+		data-bind="attr:{style:'width:' + config().width() + 'px;background:blue;'}"
 		>
 		<div class="gb-container gb-main">
 			<div class="gb-feature  gb-notouch"
@@ -94,29 +94,6 @@
 									</div>
 
 									<!-- /ko-->
-									<!--
-			<div class="gb-slider-item" style="left: 1815px; width: 1540px; height: 597px; display: table; -ms-overflow-y: auto;">
-				<div class="content">
-					<div class="content-container layout-text-media pad-left" style="display: table;">
-						<div class="media" style="float: left;">
-							<div class="media-wrapper">
-								<div class="media-container" style="max-width: 1540px;">
-									<div class="media-shadow media-frame video vine" id="cTZUAWS" style="width: 924px; height: 520px; max-width: 924px;">
-										<iframe width="100%" height="100%" class=" loaded playing" src="https://vine.co/v/b55LOA1dgJU/embed/simple" frameborder="0"></iframe>
-										<script src="http://platform.vine.co/static/scripts/embed.js" charset="utf-8" async=""></script>
-									</div>
-								</div>
-							</div>
-						</div>
-						<div class="text" style="width: 40%; display: table-cell;">
-							<div class="container" style="width: auto; display: table-cell;">
-								<h2 class="date">December 12, 2011 — January 27, 2012</h2><h3>Vine</h3><p><p>Vine Test</p><p></p>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-				-->
 								</div>
 							</div>
 					</div>
@@ -155,13 +132,82 @@
 				</div>
 			</div>
 			<div class="gb-navigation"
-				data-bind="attr:{style:'height:' + config().nav().height() + 'px'}"
+				data-bind="attr:{style:'overflow:hidden;height:' + config().nav().height() + 'px'}"
 				>
+				<div class="timenav"
+					 data-bind="attr:{style:'left:' + config().nav().currentLeft() + 'px'}"
+					 >
+					<div class="content">
+
+					</div>
+					<!--ko makeTimescale-->
+					<!-- ko timescale:{dates:$importedDates, configuration:config, zoom:config().nav().zoom} -->
+					<div class="time">
+
+						<div class="time-interval-minor">
+							<div class="minor" style="left: -1553.12px; width: 5305.99px;"></div>
+						</div>
+						<div class="time-interval-major">
+							<!-- ko foreach:$timescale.major -->
+							<div data-bind="
+									text:text,
+									attr:{style:'color:blue;left:' + left() + 'px;text-indent:' + indent() + 'px;opacity:100;'}
+									">
+
+							</div>
+							<!-- /ko -->
+
+						</div>
+
+						<div class="time-interval">
+							<!-- ko foreach:$timescale.interval -->
+							<div data-bind="
+									text:text,
+									attr:{style:'color:red;left:' + left() + 'px;text-indent:' + indent() + 'px;opacity:100;'}
+									">
+
+							</div>
+
+							<!-- /ko -->
+
+						</div>
+					</div>
+					<!-- /ko -->
+					<!-- /ko -->
+				</div>
+				<div class="timenav-background" data-bind="event:{mousemove:config().nav().mousedown}">
+					<div class="timenav-line">
+
+					</div>
+					<div class="timenav-interval-background">
+						<div class="top-highlight">
+
+						</div>
+					</div>
+				</div>
+				<div class="gb-toolbar" style="top: 27px;">
+					<div title="Return to Title" class="back-home" rel="timeline-tooltip">
+						<div class="icon">
+						</div>
+					</div>
+					<div title="Expand Timeline" class="zoom-in" data-bind="click:config().nav().zoomIn" rel="timeline-tooltip">
+						<div class="icon">
+						</div>
+					</div>
+					<div class="zoom-out" data-original-title="Contract Timeline" data-bind="click:config().nav().zoomOut" rel="timeline-tooltip">
+						<div class="icon"></div>
+					</div>
+				</div>
+			
+			
 			</div>
 		</div>
 		<div class="gb-feedback">
 		</div>
 	</div>
+
+	<input data-bind="value:config().nav().currentLeft"/>
+	<input data-bind="value:config().nav().zoom" />
 	<!-- /ko -->
 	<!-- /ko -->
 
@@ -173,10 +219,14 @@
 
 
 
+	<!--
+	<div class="vco-navigation">
+		<div class="timenav" style="left: 1055px;">
+			<div class="content"><div class="marker start active" id="marker_pU" style="left: 97px; display: none;"><div class="flag" style="top: 50px;"><div class="flag-content"><div class="thumbnail thumb-photo"></div><h3>Welcome to TimelineJS</h3></div></div><div class="dot"></div><div class="line"><div class="event-line"></div></div></div><div class="marker" id="marker_cuUzdG" style="left: 107px;"><div class="flag" style="top: 100px;"><div class="flag-content"><div class="thumbnail thumb-photo"></div><h3>It's Easy to Make Your Own Timeline</h3></div></div><div class="dot"></div><div class="line"><div class="event-line"></div></div></div><div class="marker" id="marker_MueUT" style="left: 307px;"><div class="flag" style="top: 50px;"><div class="flag-content"><h3>Illustrate your Timeline with photos, videos, tweets and more.</h3></div></div><div class="dot"></div><div class="line"><div class="event-line"></div></div></div><div class="marker" id="marker_siVhKW" style="left: 588px;"><div class="flag" style="top: 50px;"><div class="flag-content"><div class="thumbnail thumb-youtube" id="siVhKW_thumb"></div><h3>YouTube video</h3></div></div><div class="dot"></div><div class="line"><div class="event-line"></div></div></div><div class="marker" id="marker_tEcLLy" style="left: 618px;"><div class="flag" style="top: 100px;"><div class="flag-content"><div class="thumbnail thumb-youtube" id="tEcLLy_thumb"></div><h3>YouTube with no text</h3></div></div><div class="dot"></div><div class="line"><div class="event-line"></div></div></div><div class="marker" id="marker_DZxkau" style="left: 618px;"><div class="flag" style="top: 1px;"><div class="flag-content"><div class="thumbnail thumb-wikipedia"></div><h3>Wikipedia</h3></div></div><div class="dot"></div><div class="line"><div class="event-line"></div></div></div><div class="marker" id="marker_cMqDD" style="left: 1099px;"><div class="flag" style="top: 50px;"><div class="flag-content"><div class="thumbnail thumb-quote"></div><h3>Blockquote</h3></div></div><div class="dot"></div><div class="line"><div class="event-line"></div></div></div><div class="marker" id="marker_ioFgj" style="left: 1199px;"><div class="flag" style="top: 100px;"><div class="flag-content"><div class="thumbnail thumb-website" id="ioFgj_thumb"></div><h3>Website</h3></div></div><div class="dot"></div><div class="line"><div class="event-line"></div></div></div><div class="marker" id="marker_BuTSFfC" style="left: 1389px;"><div class="flag" style="top: 50px;"><div class="flag-content"><div class="thumbnail thumb-map"></div><h3>Google Map</h3></div></div><div class="dot"></div><div class="line"><div class="event-line"></div></div></div><div class="marker" id="marker_MOgucZ" style="left: 1399px;"><div class="flag" style="top: 100px;"><div class="flag-content"><div class="thumbnail thumb-map"></div><h3>Google Map with no text</h3></div></div><div class="dot"></div><div class="line"><div class="event-line"></div></div></div><div class="marker" id="marker_YQJoQOQ" style="left: 1449px;"><div class="flag" style="top: 1px;"><div class="flag-content"><div class="thumbnail thumb-photo" id="YQJoQOQ_thumb"></div><h3>Flickr</h3></div></div><div class="dot"></div><div class="line"><div class="event-line"></div></div></div><div class="marker" id="marker_xmuoRd" style="left: 1499px;"><div class="flag" style="top: 50px;"><div class="flag-content"><div class="thumbnail thumb-photo" id="xmuoRd_thumb"></div><h3>Flickr with no text</h3></div></div><div class="dot"></div><div class="line"><div class="event-line"></div></div></div><div class="marker" id="marker_ZEMlUmP" style="left: 1609px;"><div class="flag" style="top: 100px;"><div class="flag-content"><div class="thumbnail thumb-twitter"></div><h3>A Tweet</h3></div></div><div class="dot"></div><div class="line"><div class="event-line"></div></div></div><div class="marker" id="marker_rUoITYS" style="left: 1628px;"><div class="flag" style="top: 1px;"><div class="flag-content"><div class="thumbnail thumb-twitter"></div><h3>Yet Another Tweet</h3></div></div><div class="dot"></div><div class="line"><div class="event-line"></div></div></div><div class="marker" id="marker_IJSxlXN" style="left: 1715px;"><div class="flag" style="top: 50px;"><div class="flag-content"><div class="thumbnail thumb-vimeo" id="IJSxlXN_thumb"></div><h3>Vimeo</h3></div></div><div class="dot"></div><div class="line"><div class="event-line"></div></div></div><div class="marker" id="marker_zctSFUR" style="left: 1719px;"><div class="flag" style="top: 100px;"><div class="flag-content"><div class="thumbnail thumb-audio"></div><h3>SoundCloud </h3></div></div><div class="dot"></div><div class="line"><div class="event-line"></div></div></div><div class="marker" id="marker_mtXBDjR" style="left: 1736px;"><div class="flag" style="top: 1px;"><div class="flag-content"><h3>Get started!</h3></div></div><div class="dot"></div><div class="line"><div class="event-line"></div></div></div></div><div class="time"><div class="time-interval-minor"><div class="minor" style="left: -1553.12px; width: 5305.99px;"></div></div><div class="time-interval-major"><div style="left: -401.12px; text-indent: -13px; opacity: 100;">1800</div><div style="left: 599.53px; text-indent: -13px; opacity: 100;">1900</div><div style="left: 1600.19px; text-indent: -13.5px; opacity: 100;">2000</div><div style="left: 2600.87px; text-indent: -13px; opacity: 100;">2100</div></div><div class="time-interval"><div style="left: 99.2px; text-indent: -10.5px; opacity: 100;">1850</div><div style="left: 499.47px; text-indent: -10.5px; opacity: 100;">1890</div><div style="left: 899.72px; text-indent: -10.5px; opacity: 100;">1930</div><div style="left: 1299.99px; text-indent: -10px; opacity: 100;">1970</div><div style="left: 1700.27px; text-indent: -10.5px; opacity: 100;">2010</div><div style="left: 199.25px; text-indent: -10.5px; opacity: 100;">1860</div><div style="left: 299.34px; text-indent: -10.5px; opacity: 100;">1870</div><div style="left: 399.39px; text-indent: -11px; opacity: 100;">1880</div><div style="left: 599.53px; text-indent: -10.5px; opacity: 100;"></div><div style="left: 699.58px; text-indent: -10px; opacity: 100;">1910</div><div style="left: 799.64px; text-indent: -10.5px; opacity: 100;">1920</div><div style="left: 999.77px; text-indent: -11px; opacity: 100;">1940</div><div style="left: 1099.86px; text-indent: -10.5px; opacity: 100;">1950</div><div style="left: 1199.91px; text-indent: -10.5px; opacity: 100;">1960</div><div style="left: 1400.05px; text-indent: -10.5px; opacity: 100;">1980</div><div style="left: 1500.13px; text-indent: -10.5px; opacity: 100;">1990</div><div style="left: 1600.19px; text-indent: -11px; opacity: 100;"></div><div style="left: 1800.32px; text-indent: -11.5px; opacity: 100;">2020</div><div style="left: 1900.4px; text-indent: -11.5px; opacity: 100;">2030</div></div></div>
+		</div><div class="timenav-background"><div class="timenav-line" style="left: 1154px;"></div><div class="timenav-indicator" style="left: 1144px;"></div><div class="timenav-interval-background"><div class="top-highlight"></div></div></div><div class="vco-toolbar" style="top: 27px;"><div title="Return to Title" class="back-home" rel="timeline-tooltip"><div class="icon"></div></div><div title="Expand Timeline" class="zoom-in" rel="timeline-tooltip"><div class="icon"></div></div><div title="Contract Timeline" class="zoom-out" rel="timeline-tooltip"><div class="icon"></div></div></div>
+	</div>
 
-
-
-
+		-->
 
 
 </body>

@@ -500,21 +500,6 @@ define [
 			_time.epochs = _time.years / dateFractionBrowser.epoch
 			_time.eras = _time.years / dateFractionBrowser.era
 			_time.eons = _time.years / dateFractionBrowser.eon
-			
-			#
-			#			trace("AGES "		 + 		_time.ages);
-			#			trace("EPOCHS "		 + 		_time.epochs);
-			#			trace("MILLENIUMS "    + 		_time.milleniums);
-			#			trace("CENTURIES "	 + 		_time.centuries);
-			#			trace("DECADES "	 + 		_time.decades);
-			#			trace("YEARS "		 + 		_time.years);
-			#			trace("MONTHS "		 + 		_time.months);
-			#			trace("WEEKS "		 + 		_time.weeks);
-			#			trace("DAYS "		 + 		_time.days);
-			#			trace("HOURS "		 + 		_time.hours);
-			#			trace("MINUTES "	 + 		_time.minutes);
-			#			trace("SECONDS "	 + 		_time.seconds);
-			#			
 			_time
 		
 		#	POSITION

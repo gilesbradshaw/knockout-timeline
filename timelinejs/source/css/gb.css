@@ -2050,7 +2050,7 @@ height:14px
 .gb-notouch .gb-navigation .timenav .content .marker .flag-small.flag-small-last:hover .flag-content h3{
 margin-top:4px
 }
-/*
+
 .gb-timeline .gb-navigation{
 clear:both;
 cursor:move;
@@ -2059,7 +2059,7 @@ height:200px;
 border-top:1px solid #e3e3e3;
 position:relative
 }
-	*/
+
 
 
 .gb-timeline .gb-navigation .gb-toolbar{
@@ -2272,7 +2272,7 @@ background:#e9e9e9
 .gb-timeline .gb-navigation .timenav{
 position:absolute;
 top:0;
-left:-250px;
+left:0px;
 z-index:1
 }
 .gb-timeline .gb-navigation .timenav .content{
@@ -2769,15 +2769,14 @@ z-index:10
 position:relative;
 top:2px;
 display:inline-block;
-background-image:url(data:image/png;
-base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAMCAMAAACdvocfAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAAZQTFRFzMzM////040VdgAAAAJ0Uk5T/wDltzBKAAAAEklEQVR42mJgYAQCBopJgAADAAbwADHy2qHzAAAAAElFTkSuQmCC);
+background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAMCAMAAACdvocfAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAAZQTFRFzMzM////040VdgAAAAJ0Uk5T/wDltzBKAAAAEklEQVR42mJgYAQCBopJgAADAAbwADHy2qHzAAAAAElFTkSuQmCC);
 width:100px;
 height:6px;
 background-position:center top;
 white-space:nowrap;
 color:#666;
 margin-top:0;
-padding-top:0
+padding-top:0;
 }
 
 .gb-timeline .gb-navigation .timenav .time .time-interval{
